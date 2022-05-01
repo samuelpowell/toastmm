@@ -31,11 +31,19 @@ Aim: simplify codebase, ensuring that all code is builds and is used
  - Implement libfe CMakeLists.txt for default build without options
  - Remove complex<T> SuperLU solver engines from build (`fwdsolver_*slu.cc`), and exclude headers
  - Replace functionalisty of SuperLU solver engines with Eigen templated LU
+ - Fix headers that do not actually require SuperLU
+ - Implement CMakeLists.txt for libstoast
+ - Implement CMakeLists.txt for libfdot
+ - Implement CMakeLists.txt for matlab2 MEX build
   
-
-
 # TODO
 
  - Check Makefile / Xcode projects configuration for shared library flags, e.g. -fPIC required on Linux. Consider `FLAGS`, `SHLIB_CFLAGS`
  - Look at building static libraries for intermediary components
  - Investigate `warning C4910` on MSVC - some declspec conflict
+ - Look at MEX config as per first item
+ - Check `MESA_SUPPORT`
+ - Make individual libraries properly CMake with interface exports, etc. to avoid replicating includes in e.g. matlab2#
+ - Remove MESA based projection
+ - Remove MPI
+ - Remove CUDA
