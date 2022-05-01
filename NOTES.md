@@ -12,13 +12,12 @@ Aim: working one-liner build, without external dependencies, on all platforms
 
 ## Optional numerics / support libraries
 
- - reintroduce external solvers and BLAS
+ - reintroduce external solvers and BLAS as options
  - use system provided builds where possible, else e.g., `vcpkg` to avoid maintenance
 
 ## Remove unused code
 
 Aim: simplify codebase, ensuring that all code is builds and is used
-
 
 # Changelog
 

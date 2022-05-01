@@ -1,5 +1,13 @@
+# Editors / IDEs
 .vscode/*
 
+# CMake out of tree build
+build/
+
+# Distribution outputs
+dist/
+
+# Original toast++ ignores
 
 toast_common.zip
 
