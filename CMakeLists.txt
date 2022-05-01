@@ -11,13 +11,27 @@ set(LBFGS_USE_SSE ON)
 set(LBFGS_lib_TARGET_NAME liblbfgs)
 add_subdirectory(extern/liblbfgs)
 
+
+# Toast architecture
+#
+# Toast headers expect WIN32 / WIN64 to be defined on Windows
+if(WIN32)
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+        # 64 bits
+        add_compile_definitions(-DWIN64)
+    elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
+        # 32 bits
+        add_compile_definitions(-DWIN32)
+    endif()
+endif()
+
 # Libraries
 
 # Make windows builds slightly quieter for development
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4244 /wd4996 /wd4267 /wd4251")
 
 add_subdirectory(src/libmath)
-# add_subdirectory(src/libfe)
+add_subdirectory(src/libfe)
 # add_subdirectory(src/libstoast)
 
 # Executables

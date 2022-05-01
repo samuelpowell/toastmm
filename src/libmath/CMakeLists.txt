@@ -3,7 +3,8 @@ project(libmath VERSION 0.1.0)
 
 add_library(libmath SHARED)
 
-target_compile_definitions(libmath PRIVATE NEED_EXPLICIT_INSTANTIATION)
+# Managed by headers
+# target_compile_definitions(libmath PRIVATE NEED_EXPLICIT_INSTANTIATION)
 
 target_include_directories(libmath PRIVATE ../../)            # For toastdef
 target_include_directories(libmath PRIVATE ../../include)     # For blasnames for toastdef
