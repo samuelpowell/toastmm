@@ -20,4 +20,6 @@ Aim: working one-liner build, without external dependencies, on all platforms
 Aim: simplify codebase, ensuring that all code is builds and is used
 
 
+# Changelog
 
+ - Bump liblbfgs to master for CMake support
