@@ -32,7 +32,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4244 /wd4996 /wd4267 /wd4251")
 
 add_subdirectory(src/libmath)
 add_subdirectory(src/libfe)
-# add_subdirectory(src/libstoast)
+add_subdirectory(src/libstoast)
 
 # Executables
 # add_subdirectory(src/supertoast)

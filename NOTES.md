@@ -29,10 +29,13 @@ Aim: simplify codebase, ensuring that all code is builds and is used
  - Implement libmath CMakeLists.txt for default build without options
  - Add `#define FELIB_IMPLEMENTATION` to `wdg18inf.cc` for proper symbol import/export on Windows
  - Implement libfe CMakeLists.txt for default build without options
+ - Remove complex<T> SuperLU solver engines from build (`fwdsolver_*slu.cc`), and exclude headers
+ - Replace functionalisty of SuperLU solver engines with Eigen templated LU
+  
 
 
 # TODO
 
  - Check Makefile / Xcode projects configuration for shared library flags, e.g. -fPIC required on Linux. Consider `FLAGS`, `SHLIB_CFLAGS`
  - Look at building static libraries for intermediary components
- - Investigate `LINK : warning LNK4217: ...` which arises due to dllimport/export conflict
+ - Investigate `warning C4910` on MSVC - some declspec conflict

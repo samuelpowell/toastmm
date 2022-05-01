@@ -10,6 +10,8 @@
 #include "toasttype.h"
 #include "mathlib.h"
 
+#include "Eigen/SparseLU"
+
 class Solution;
 class MWsolution;
 
@@ -402,11 +404,13 @@ public:
     TVector<T> *Fd;         ///< diagonal of Cholesky factorisation
     TPreconditioner<T> *precon; ///< preconditioner instance
     TCompRowMatrix<T> *B;   ///< mass matrix; only used for time-domain problems
-    //mutable SuperLU_data<T> lu_data; ///< parameters for LU solver
-    void *SuperLU;          ///< SuperLU solver engine
     double iterative_tol;   ///< iterative solver tolerance
     int iterative_maxit;    ///< iterative solver max iterations (0 for auto)
     PreconType precontp;    ///< preconditioner
+
+    // Eigen replacement for SuperLU
+    Eigen::SparseMatrix<T> *FF;         // Column major copy of input matrix
+    Eigen::SparseLU<Eigen::SparseMatrix<T>, Eigen::COLAMDOrdering<int> > *ES;
 
 protected:
     void Setup (int nth=1);

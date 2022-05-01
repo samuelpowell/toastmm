@@ -3,7 +3,7 @@
 
 
 #include "stoastlib.h"
-#include "slu_zdefs.h"
+//#include "slu_zdefs.h"
 //#include "supermatrix.h"
 #include "camera.h"
 
