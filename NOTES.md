@@ -15,10 +15,15 @@ Aim: working one-liner build, without external dependencies, on all platforms
  - reintroduce external solvers and BLAS as options
  - use system provided builds where possible, else e.g., `vcpkg` to avoid maintenance
 
-## Remove unused code
+## Remove features and unused code
 
 Aim: simplify codebase, ensuring that all code is builds and is used
+
+ - CUDA, MPI
 
 # Changelog
 
  - Bump liblbfgs to master for CMake support
+ - Add Eigen
+ - Remove LU decomposition from TCompRowMatrix, implementation (`crmatrix.cc`) removed from build and decleration commented, remove SuperLU headers from `crmatrix_cm.cc`.
+ - Implement libmath CMakeLists.txt for default build without options
