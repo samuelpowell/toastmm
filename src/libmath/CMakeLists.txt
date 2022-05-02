@@ -9,6 +9,8 @@ add_library(libmath SHARED)
 target_include_directories(libmath PRIVATE ../../)            # For toastdef
 target_include_directories(libmath PRIVATE ../../include)     # For blasnames for toastdef
 
+target_include_directories(libmath INTERFACE .)     # Provide headers for dependents
+
 # Standard build
 #
 # Removed: arpach.cc, crmatrix.cc

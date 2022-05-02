@@ -8,9 +8,10 @@ target_link_libraries(libfe PRIVATE libmath)
 # Managed by headers
 # target_compile_definitions(libfe PRIVATE NEED_EXPLICIT_INSTANTIATION)
 
-target_include_directories(libfe PRIVATE ../libmath)
 target_include_directories(libfe PRIVATE ../../)                # For toastdef
 target_include_directories(libfe PRIVATE ../../include)         # For blasnames for toastdef
+
+target_include_directories(libfe INTERFACE .)     # Provide headers for dependents
 
 # Standard build
 #

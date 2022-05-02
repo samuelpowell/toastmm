@@ -3,16 +3,14 @@ project(libstoast VERSION 0.1.0)
 
 add_library(libstoast SHARED)
 
-target_link_libraries(libstoast libfe libmath)
-
 # Manged by headers
 # target_compile_definitions(libstoast PRIVATE NEED_EXPLICIT_INSTANTIATION)
 
 target_include_directories(libstoast PRIVATE ../../)                               # For toastdef
 target_include_directories(libstoast PRIVATE ../../include)                        # For blasnames for toastdef
-target_include_directories(libstoast PRIVATE ../libfe)                             # For felib.h
-target_include_directories(libstoast PRIVATE ../libmath)                           # For mathlib.h
 target_include_directories(libstoast PRIVATE ../../extern/eigen-3.4.0)             # Eigen for solvers, etc.
+
+target_include_directories(libstoast INTERFACE .)     # Provide headers for dependents
 
 # Standard build
 #
@@ -35,6 +33,12 @@ target_sources(libstoast PRIVATE    solution.cc mwsolution.cc source.cc fwdsolve
 #
 # ENABLE_MPI: jacobian_mpi.cc
 #                          
+
+target_link_libraries(libstoast libfe libmath)
+
+if(OpenMP_CXX_FOUND)
+    target_link_libraries(libstoast OpenMP::OpenMP_CXX)
+endif()
 
 install(TARGETS libstoast
         CONFIGURATIONS Release

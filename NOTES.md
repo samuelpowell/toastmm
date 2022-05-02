@@ -35,6 +35,8 @@ Aim: simplify codebase, ensuring that all code is builds and is used
  - Implement CMakeLists.txt for libstoast
  - Implement CMakeLists.txt for libfdot
  - Implement CMakeLists.txt for matlab2 MEX build
+ - Provide interface headers for subprojects, pick up headers automatically
+ - Fix gitignore exclusion of liblbfgs and reimport
   
 # TODO
 

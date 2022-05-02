@@ -12,9 +12,6 @@ target_link_libraries(libfdot PRIVATE libstoast)
 
 target_include_directories(libfdot PRIVATE ../../)                      # For toastdef
 target_include_directories(libfdot PRIVATE ../../include)               # For blasnames for toastdef
-target_include_directories(libfdot PRIVATE ../libstoast)                # For stoastlib.h
-target_include_directories(libfdot PRIVATE ../libfe)                    # For felib.h
-target_include_directories(libfdot PRIVATE ../libmath)                  # For mathlib.h
 target_include_directories(libfdot PRIVATE ../../extern/eigen-3.4.0)    # Eigen for solvers, etc.
 
 # Standard build
