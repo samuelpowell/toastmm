@@ -7,6 +7,11 @@ build/
 # Distribution outputs
 dist/
 
+# Matlab demo outputs
+script/matlab/demos/*.dat
+
+
+
 # Original toast++ ignores
 
 toast_common.zip

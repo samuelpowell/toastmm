@@ -58,10 +58,6 @@ TFwdSolver<T>::~TFwdSolver ()
     if (precon) delete precon;
     if (pphi)   delete []pphi;
 
-    // Eigen CSC matrix and solver
-    if(FF)      delete FF;
-    if(ES)      delete ES;
-
     DeleteType ();
     CLEANUP_MPI();
 }
@@ -121,13 +117,17 @@ void TFwdSolver<T>::SetupType (int nth)
 template<>
 void TFwdSolver<std::complex<float> >::DeleteType ()
 {
-    delete ES;
+    if(ES) {
+        delete ES;
+    }
 }
 
 template<>
 void TFwdSolver<std::complex<double> >::DeleteType ()
 {
-    delete ES;
+    if(ES) {
+        delete ES;
+    }
 }
 
 template<class T>

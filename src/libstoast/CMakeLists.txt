@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.0.0)
 project(libstoast VERSION 0.1.0)
 
 add_library(libstoast SHARED)
+set_target_properties(libstoast PROPERTIES PREFIX "")
 
 # Manged by headers
 # target_compile_definitions(libstoast PRIVATE NEED_EXPLICIT_INSTANTIATION)
