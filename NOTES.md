@@ -40,8 +40,11 @@ Aim: simplify codebase, ensuring that all code is builds and is used
  - Fixup nr.cc for MacOS Clang by removing definition of `vector` and using `dvector` instead
  - Need explicit instantiation required on MacOS
  - Standard CXX 98 required for MacOS (owing to narrowing in matlab interface) which requires spacing on double template args
-
-  
+ - Implement CMakeLists.txt for all bintools targets
+ - Enable explicit instantiation in fwdsolver_mw.h
+ - Add STOASTLIB (dll import/export) to MWsolution class
+ - Implement CMakeLists.txt for all buildable supertoast targets (NB: some Makefile targets no longer exist or reference old code)
+    
 # TODO
 
  - Check Makefile / Xcode projects configuration for shared library flags, e.g. -fPIC required on Linux. Consider `FLAGS`, `SHLIB_CFLAGS`

@@ -9,7 +9,7 @@
 #include "supertoast_util.h"
 #include "timing.h"
 #include <time.h>
-#include <unistd.h>
+//#include <unistd.h>
 
 #ifdef TOAST_MPI
 #include "mpi.h"

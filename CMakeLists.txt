@@ -61,8 +61,8 @@ add_subdirectory(src/libstoast)
 add_subdirectory(src/libfdot)
 
 # Executables
-# add_subdirectory(src/supertoast)
-# add_subdirectory(src/bintools)
+add_subdirectory(src/supertoast)
+add_subdirectory(src/bintools)
 
 # MATLAB (mex) interface
 add_subdirectory(src/matlab2)
