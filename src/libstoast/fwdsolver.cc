@@ -101,14 +101,14 @@ template<>
 void TFwdSolver<std::complex<float> >::SetupType (int nth)
 {
     using namespace Eigen;
-    ES = new SparseLU<SparseMatrix<std::complex<float>>, COLAMDOrdering<int> >;
+    ES = new SparseLU<SparseMatrix<std::complex<float> >, COLAMDOrdering<int> >;
 }
 
 template<>
 void TFwdSolver<std::complex<double> >::SetupType (int nth)
 {
     using namespace Eigen;
-    ES = new SparseLU<SparseMatrix<std::complex<double>>, COLAMDOrdering<int> >;
+    ES = new SparseLU<SparseMatrix<std::complex<double> >, COLAMDOrdering<int> >;
 }
 
 template<class T>
@@ -497,7 +497,7 @@ void TFwdSolver<std::complex<float> >::Reset (const Solution &sol,
     AssembleSystemMatrix (sol, omega, elbasis);
     if (solvertp == LSOLVER_DIRECT) {
       using namespace Eigen;
-      Map<const SparseMatrix<std::complex<float>, RowMajor>> eF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr());      
+      Map<const SparseMatrix<std::complex<float>, RowMajor> > eF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr());      
       FF = new SparseMatrix<std::complex<float>, ColMajor> (eF);
       ES->analyzePattern(*FF);  
       ES->factorize(*FF);   
@@ -514,7 +514,7 @@ void TFwdSolver<std::complex<double> >::Reset (const Solution &sol,
     AssembleSystemMatrix (sol, omega, elbasis);
     if (solvertp == LSOLVER_DIRECT) {
       using namespace Eigen;
-      Map<const SparseMatrix<std::complex<double>, RowMajor>> eF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr());      
+      Map<const SparseMatrix<std::complex<double>, RowMajor> > eF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr());      
       FF = new SparseMatrix<std::complex<double>, ColMajor> (eF);
       ES->analyzePattern(*FF);  
       ES->factorize(*FF);   

@@ -36,7 +36,11 @@ Aim: simplify codebase, ensuring that all code is builds and is used
  - Implement CMakeLists.txt for libfdot
  - Implement CMakeLists.txt for matlab2 MEX build
  - Provide interface headers for subprojects, pick up headers automatically
- - Fix gitignore exclusion of liblbfgs and reimport
+ - Fix gitignore exclusion of liblbfgs and Eigen and reimport
+ - Fixup nr.cc for MacOS Clang by removing definition of `vector` and using `dvector` instead
+ - Need explicit instantiation required on MacOS
+ - Standard CXX 98 required for MacOS (owing to narrowing in matlab interface) which requires spacing on double template args
+
   
 # TODO
 
