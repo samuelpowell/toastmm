@@ -861,8 +861,7 @@ public:
      * \return Result of the addition, {s+v[i]}
      * \sa TVector::operator+()
      */
-#ifndef USE_CUDA_FLOAT
-// none of the operator friend definitions seem to work with nvcc
+
 #if defined(_WIN32)
     template <class VT> friend TVector<VT> operator+ (const VT &s,
         const TVector<VT> &v);
@@ -871,7 +870,7 @@ public:
 #else
     friend TVector<VT> (::operator+ <>) (const VT &s, const TVector<VT> &v);
 #endif
-#endif // !USE_CUDA_FLOAT
+
 
     /**
      * \brief Element-wise subtraction from a scalar from the left

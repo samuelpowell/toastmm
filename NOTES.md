@@ -44,11 +44,9 @@ Aim: simplify codebase, ensuring that all code is builds and is used
  - Enable explicit instantiation in fwdsolver_mw.h  (linux build failed with this, perhaps this could be a Clang thing, added to TODO)
  - Add STOASTLIB (dll import/export) to MWsolution class
  - Implement CMakeLists.txt for all buildable supertoast targets (NB: some Makefile targets no longer exist or reference old code)
- 
- # Changelog (cleanup)
-
-  - Purge unused numerics, configuration, projects
-  - Purge MPI support
+ - Purge unused numerics, configuration, projects
+ - Purge MPI support
+ - Purge CUDA support
       
 # TODO
 
@@ -60,4 +58,3 @@ Aim: simplify codebase, ensuring that all code is builds and is used
  - Make individual libraries properly CMake with interface exports, etc. to avoid replicating includes in e.g. matlab2#
  - Look at fwdsolver_mw.h instantiation requirements, determine appropriate preprocessor gaurd (e.g. Clang?)
  - Remove MESA based projection
- - Remove CUDA
