@@ -12,11 +12,6 @@
 #include "slu_zdefs.h"  // SuperLU 4
 #include "ilutoast.h"
 
-#ifdef USE_CUDA_FLOAT
-#include "toastcuda.h"
-#include "toastspmv.h"
-#endif
-
 #ifdef ML_INTERFACE
 #include "ml_defs.h"
 #include "ml_operator.h"

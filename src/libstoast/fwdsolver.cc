@@ -2,10 +2,6 @@
 #define STOASTLIB_IMPLEMENTATION
 #include "stoastlib.h"
 
-#ifdef USE_CUDA_FLOAT
-#include "toastcuda.h"
-#endif
-
 #include "Eigen/Sparse"
 #include "Eigen/SparseLU"
 
@@ -1112,54 +1108,26 @@ void TFwdSolver<T>::ReadParams (ParamParser &pp)
 	        precontp = PRECON_NULL;
 	    else if (!strcasecmp (cbuf, "DIAG"))
 	        precontp = PRECON_DIAG;
-#ifdef USE_CUDA_FLOAT
-	    else if (!strcasecmp (cbuf, "CUSP_AINV"))
-	        precontp = PRECON_CUSP_AINV;
-	    else if (!strcasecmp (cbuf, "CUSP_SMOOTHED_AGGREGATION"))
-	        precontp = PRECON_CUSP_SMOOTHED_AGGREGATION;
-#else
 	    else if (!strcasecmp (cbuf, "ICH"))
 	        precontp = PRECON_ICH;
 	    else if (!strcasecmp (cbuf, "DILU"))
 	        precontp = PRECON_DILU;
-#endif
 	}
 	while (precontp == (PreconType)-1) {
 	    int cmd;
 	    cout << "\nSelect preconditioner for linear solver:\n";
 	    cout << "(0) None\n";
 	    cout << "(1) Diagonal\n";
-#ifdef USE_CUDA_FLOAT
-	    cout << "(2) Approximate inverse\n";
-	    cout << "(3) Smoothed aggregate\n";
-#else
 	    cout << "(2) Incomplete Choleski\n";
 	    cout << "(3) Diagonal incomplete LU\n";
-#endif
 	    cin >> cmd;
 	    switch (cmd) {
 	    case 0: precontp = PRECON_NULL; break;
 	    case 1: precontp = PRECON_DIAG; break;
-#ifdef USE_CUDA_FLOAT
-	    case 2: precontp = PRECON_CUSP_AINV; break;
-	    case 3: precontp = PRECON_CUSP_SMOOTHED_AGGREGATION; break;
-#else
 	    case 2: precontp = PRECON_ICH; break;
 	    case 3: precontp = PRECON_DILU; break;
-#endif
 	    }
 	}
-#ifdef USE_CUDA_FLOAT
-	CuspPreconType cpt;
-	switch (precontp) {
-	case PRECON_DIAG: cpt = CUSP_PRECON_DIAGONAL; break;
-	case PRECON_CUSP_AINV: cpt = CUSP_PRECON_AINV; break;
-	case PRECON_CUSP_SMOOTHED_AGGREGATION:
-	    cpt = CUSP_PRECON_SMOOTHED_AGGREGATION; break;
-	default: cpt = CUSP_PRECON_IDENTITY; break;
-	}
-	cuda_SetCuspPrecon (cpt);
-#endif
     }
 }
 

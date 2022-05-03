@@ -27,7 +27,6 @@ target_sources(libmath PRIVATE  mathdef.cc util.cc timing.cc vector.cc gsmatrix.
 #
 # USE_BLZPACK: eigpair.cc
 # ENABLE_PTHREAD: task.cc vector_MT.cc
-# ENABLE_CUDA vector_cusp.cu crmatrix_cusp.cc
 
 # Assorted header defines to resolve
 #
