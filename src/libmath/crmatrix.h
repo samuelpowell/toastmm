@@ -107,29 +107,6 @@ int ILUSymSolve (TCompRowMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
     double tol = 1e-10, double droptol = 1e-3, int maxit = 500);
 // solve symmetric system Ax=b with ILU solver
 
-#ifdef USE_CUDA_FLOAT
-template<class MT>
-int PCG (const TCompRowMatrix<MT> &A, const TVector<MT> &b,
-    TVector<MT> &x, double &tol, TPreconditioner<MT> *precon = 0,
-    int maxit = 0);
-
-template<class MT>
-void PCG (const TCompRowMatrix<MT> &A, const TVector<MT> *b,
-    TVector<MT> *x, int nrhs, double tol, int maxit = 0,
-    TPreconditioner<MT> *precon = 0, IterativeSolverResult *res = 0);
-
-template<class MT>
-int BiCGSTAB (const TCompRowMatrix<MT> &A, const TVector<MT> &b,
-    TVector<MT> &x, double &tol, TPreconditioner<MT> *precon = 0,
-    int maxit = 0);
-
-template<class MT>
-void BiCGSTAB (const TCompRowMatrix<MT> &A, const TVector<MT> *b,
-    TVector<MT> *x, int nrhs, double tol, int maxit = 0,
-    TPreconditioner<MT> *precon = 0, IterativeSolverResult *res = 0);
-#endif // USE_CUDA_FLOAT
-
-
 #ifdef ML_INTERFACE
 
 template<class MT>
@@ -500,26 +477,6 @@ public:
     friend int ILUSymSolve<> (TCompRowMatrix<MT> &A, const TVector<MT> &b,
         TVector<MT> &x, double tol, double droptol, int maxit);
     // solve symmetric system Ax=b with ILU solver
-
-#ifdef USE_CUDA_FLOAT
-    friend int PCG<> (const TCompRowMatrix<MT> &A,
-        const TVector<MT> &b, TVector<MT> &x, double &tol,
-        TPreconditioner<MT> *precon, int maxit);
-
-    friend void PCG<> (const TCompRowMatrix<MT> &A,
-        const TVector<MT> *b, TVector<MT> *x, int nrhs, double tol, int maxit,
-        TPreconditioner<MT> *precon, IterativeSolverResult *res);
-
-    friend int BiCGSTAB<> (const TCompRowMatrix<MT> &A,
-        const TVector<MT> &b, TVector<MT> &x, double &tol,
-        TPreconditioner<MT> *precon, int maxit);
-    // biconjugate gradient stabilised method.
-
-    friend void BiCGSTAB<> (const TCompRowMatrix<MT> &A,
-        const TVector<MT> *b, TVector<MT> *x, int nrhs, double tol, int maxit,
-        TPreconditioner<MT> *precon, IterativeSolverResult *res);
-
-#endif
 
     void ExportHB (std::ostream &os);
     // output matrix in Harwell-Boeing format

@@ -46,11 +46,6 @@ void SelectSourceProfile (ParamParser &pp, int &qtype, double &qwidth,
 void SelectMeasurementProfile (ParamParser &pp, int &mtype, double &mwidth);
 void SelectInitialParams (ParamParser &pp, const Mesh &mesh, Solution &msol);
 
-#ifdef USE_CUDA_FLOAT
-#include "toastcuda.h"
-void cuda_Init (ParamParser &pp);
-#endif
-
 // =========================================================================
 // MAIN 
 
@@ -82,10 +77,6 @@ int main (int argc, char *argv[]) {
     pp.GetInt("NTHREAD", nth);
     Task_Init (nth);
     pp.PutInt("NTHREAD", nth);
-#endif
-
-#ifdef USE_CUDA_FLOAT
-    cuda_Init (pp);
 #endif
 
     QMMesh mesh;
@@ -706,12 +697,3 @@ void SelectInitialParams (ParamParser &pp, const Mesh &mesh, Solution &msol)
     msol.SetParam (OT_C2A, param[OT_C2A]);
 }
 
-#ifdef USE_CUDA_FLOAT
-void cuda_Init (ParamParser &pp)
-{
-    int dev;
-    if (!pp.GetInt ("CUDA_DEVICE", dev))
-        dev = 0;
-    cuda_Init (dev);
-}
-#endif

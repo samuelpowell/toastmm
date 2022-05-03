@@ -19,10 +19,6 @@
 #include <cstdlib>
 #include "mathlib.h"
 
-#ifdef USE_CUDA_FLOAT
-#include "toastcuda.h"
-#endif
-
 using namespace std;
 
 // ==========================================================================
@@ -456,7 +452,6 @@ TVector<VT> TVector<VT>::operator+ (const VT &s) const
     return tmp;
 }
 
-#ifndef USE_CUDA_FLOAT
 template<class VT>
 TVector<VT> operator+ (const VT &s, const TVector<VT> &v)
 {
@@ -465,7 +460,6 @@ TVector<VT> operator+ (const VT &s, const TVector<VT> &v)
     for (int i = 0; i < v.size; i++) tmp.data[i] += s;
     return tmp;  
 }
-#endif
 
 template<class VT>
 TVector<VT> TVector<VT>::operator- (const TVector<VT> &v) const

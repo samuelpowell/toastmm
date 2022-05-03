@@ -27,8 +27,6 @@ typedef enum {
     PRECON_DILU,                     ///< diagonal incomplete LU
     PRECON_CG_MULTIGRID,             ///< multigrid
     PRECON_ILU,                      ///< incomplete LU
-    PRECON_CUSP_AINV,                ///< approximate inverse (CUDA/CUSP only)
-    PRECON_CUSP_SMOOTHED_AGGREGATION ///< smoothed aggregation (CUDA/CUSP only)
 } PreconType;
 //@}
 
