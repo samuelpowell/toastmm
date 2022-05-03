@@ -1172,11 +1172,6 @@ void TFwdSolver<T>::WriteParams (ParamParser &pp)
 	    pp.PutString ("LINSOLVER_PRECON", "ICH"); break;
 	case PRECON_DILU:
 	    pp.PutString ("LINSOLVER_PRECON", "DILU"); break;
-	case PRECON_CUSP_AINV:
-	    pp.PutString ("LINSOLVER_PRECON", "CUSP_AINV"); break;
-	case PRECON_CUSP_SMOOTHED_AGGREGATION:
-	    pp.PutString ("LINSOLVER_PRECON", "CUSP_SMOOTHED_AGGREGATION");
-	    break;
 	}
     }
 }
