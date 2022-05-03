@@ -5,7 +5,7 @@
 #include "mathlib.h"
 #include "solution.h"
 
-class MWsolution: public Solution {
+class STOASTLIB MWsolution: public Solution {
 
 public:
   MWsolution (int nparam, int _meshlength, int _nofwavel,

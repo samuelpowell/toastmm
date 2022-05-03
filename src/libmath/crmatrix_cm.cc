@@ -10,8 +10,8 @@
 #include <iomanip>
 #include <string.h>
 #include "mathlib.h"
-#include "slu_zdefs.h"
-#include "supermatrix.h"
+//#include "slu_zdefs.h"
+//#include "supermatrix.h"
 //#include "zsp_defs.h"
 
 using namespace std;

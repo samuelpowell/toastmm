@@ -1,6 +1,29 @@
+# Editors / IDEs
+.vscode/*
+
+# CMake out of tree build
+build/
+
+# Distribution outputs
+dist/
+
+# Test ouptuts
+test/**/*.out
+test/**/*.nim
+test/**/*.raw
+test/**/*.fem
+
+# Matlab demo outputs
+script/matlab/demos/*.dat
+
+
+
+# Original toast++ ignores
+
 toast_common.zip
 
 *~
+
 
 *.dylib
 
@@ -30,7 +53,7 @@ gcc_shared/mexopts.incl
 
 gcc_shared/toast.env
 
-lib
+
 
 linux
 

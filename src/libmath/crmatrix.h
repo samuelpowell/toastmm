@@ -94,8 +94,8 @@ template<class MT>
 void LUSolve (const TCompRowMatrix<MT> &LU, const TVector<MT> &b,
     TVector<MT> &x);
 
-template<class MT>
-void LU (TCompRowMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x);
+// template<class MT>
+// void LU (TCompRowMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x);
 
 template<class MT>
 int ILUSolve (TCompRowMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,

@@ -4,6 +4,8 @@
 // Definition of class Wedge18inf
 // ==========================================================================
 
+#define FELIB_IMPLEMENTATION
+
 #include <math.h>
 #include <stdlib.h>
 #include <mathlib.h>

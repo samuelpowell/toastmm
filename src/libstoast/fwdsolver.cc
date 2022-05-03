@@ -1,14 +1,17 @@
 #define __FWDSOLVER_CC
 #define STOASTLIB_IMPLEMENTATION
 #include "stoastlib.h"
-#include "fwdsolver_zslu.h"
-#include "fwdsolver_cslu.h"
+// #include "fwdsolver_zslu.h"
+// #include "fwdsolver_cslu.h"
 #ifdef MPI_FWDSOLVER
 #include "toast_mpi.h"
 #endif
 #ifdef USE_CUDA_FLOAT
 #include "toastcuda.h"
 #endif
+
+#include "Eigen/Sparse"
+#include "Eigen/SparseLU"
 
 using namespace std;
 
@@ -65,7 +68,6 @@ template<class T>
 void TFwdSolver<T>::Setup (int nth)
 {
     // set initial and default parameters
-    SuperLU = 0;
     dscale = DATA_LIN;
     solvertp = LSOLVER_ITERATIVE;
     precontp = PRECON_NULL;
@@ -80,6 +82,11 @@ void TFwdSolver<T>::Setup (int nth)
     meshptr = 0;
     pphi = 0;
 
+    // Eigen CSC matrix and solver
+    FF = 0;
+    ES = 0;
+
+
     SetupType (nth);
     SETUP_MPI();
 }
@@ -87,15 +94,17 @@ void TFwdSolver<T>::Setup (int nth)
 // =========================================================================
 
 template<>
-void TFwdSolver<std::complex<double> >::SetupType (int nth)
+void TFwdSolver<std::complex<float> >::SetupType (int nth)
 {
-    SuperLU = new ZSuperLU (nth);
+    using namespace Eigen;
+    ES = new SparseLU<SparseMatrix<std::complex<float> >, COLAMDOrdering<int> >;
 }
 
 template<>
-void TFwdSolver<std::complex<float> >::SetupType (int nth)
+void TFwdSolver<std::complex<double> >::SetupType (int nth)
 {
-    SuperLU = new CSuperLU ();
+    using namespace Eigen;
+    ES = new SparseLU<SparseMatrix<std::complex<double> >, COLAMDOrdering<int> >;
 }
 
 template<class T>
@@ -106,15 +115,19 @@ void TFwdSolver<T>::SetupType (int nth)
 // =========================================================================
 
 template<>
-void TFwdSolver<std::complex<double> >::DeleteType ()
+void TFwdSolver<std::complex<float> >::DeleteType ()
 {
-    delete (ZSuperLU*)SuperLU;
+    if(ES) {
+        delete ES;
+    }
 }
 
 template<>
-void TFwdSolver<std::complex<float> >::DeleteType ()
+void TFwdSolver<std::complex<double> >::DeleteType ()
 {
-    delete (CSuperLU*)SuperLU;
+    if(ES) {
+        delete ES;
+    }
 }
 
 template<class T>
@@ -247,7 +260,7 @@ void TFwdSolver<std::complex<double> >::Allocate ()
     // allocate factorisations and preconditioners
     if (solvertp == LSOLVER_DIRECT) {
 	//lu_data.Setup(F);
-	((ZSuperLU*)SuperLU)->Reset (F);
+	//((ZSuperLU*)SuperLU)->Reset (F);
     } else {
 	if (precon) delete precon;
 	switch (precontp) {
@@ -279,7 +292,7 @@ void TFwdSolver<std::complex<float> >::Allocate ()
 
     // allocate factorisations and preconditioners
     if (solvertp == LSOLVER_DIRECT) {
-        ((CSuperLU*)SuperLU)->Reset (F);
+    //    ((CSuperLU*)SuperLU)->Reset (F);
 	// lu_data.Setup(meshptr->nlen(), F);
     } else {
 	if (precon) delete precon;
@@ -483,8 +496,11 @@ void TFwdSolver<std::complex<float> >::Reset (const Solution &sol,
     // single complex version
     AssembleSystemMatrix (sol, omega, elbasis);
     if (solvertp == LSOLVER_DIRECT) {
-	//lu_data.Setup (F);
-	((CSuperLU*)SuperLU)->Reset (F);
+      using namespace Eigen;
+      Map<const SparseMatrix<std::complex<float>, RowMajor> > eF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr());      
+      FF = new SparseMatrix<std::complex<float>, ColMajor> (eF);
+      ES->analyzePattern(*FF);  
+      ES->factorize(*FF);   
     } else
 	precon->Reset (F);
     if (B) AssembleMassMatrix();
@@ -496,9 +512,13 @@ void TFwdSolver<std::complex<double> >::Reset (const Solution &sol,
 {
     // complex version
     AssembleSystemMatrix (sol, omega, elbasis);
-    if (solvertp == LSOLVER_DIRECT)
-	//lu_data.Setup (F);
-	((ZSuperLU*)SuperLU)->Reset (F);
+    if (solvertp == LSOLVER_DIRECT) {
+      using namespace Eigen;
+      Map<const SparseMatrix<std::complex<double>, RowMajor> > eF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr());      
+      FF = new SparseMatrix<std::complex<double>, ColMajor> (eF);
+      ES->analyzePattern(*FF);  
+      ES->factorize(*FF);   
+    }
     else
 	precon->Reset (F);
     if (B) AssembleMassMatrix();
@@ -548,7 +568,10 @@ void TFwdSolver<std::complex<float> >::CalcField (
     TVector<std::complex<float> > &cphi, IterativeSolverResult *res, int th) const
 {
     if (solvertp == LSOLVER_DIRECT) {
-        ((CSuperLU*)SuperLU)->CalcField (qvec, cphi, res);
+        using namespace Eigen;
+        Map<const VectorXcf> eqvec(qvec.data_buffer(), qvec.Dim());
+        Map<VectorXcf> ecphi(cphi.data_buffer(), cphi.Dim());
+        ecphi = ES->solve(eqvec); 
     } else {
         double tol = iterative_tol;
 	int it = IterativeSolve (*F, qvec, cphi, tol, precon, iterative_maxit);
@@ -571,19 +594,10 @@ void TFwdSolver<std::complex<double> >::CalcField (
     clock_t time0 = tm.tms_utime;
 #endif
     if (solvertp == LSOLVER_DIRECT) {
-	((ZSuperLU*)SuperLU)->CalcField (qvec, cphi, res, th);
-        //SuperMatrix B, X;
-	//int n = meshptr->nlen();
-	//
-	//doublecomplex *rhsbuf = (doublecomplex*)qvec.data_buffer();
-	//doublecomplex *xbuf   = (doublecomplex*)cphi.data_buffer();
-	//zCreate_Dense_Matrix (&B, n, 1, rhsbuf, n, SLU_DN, SLU_Z,SLU_GE);
-	//zCreate_Dense_Matrix (&X, n, 1, xbuf, n, SLU_DN, SLU_Z, SLU_GE);
-	//
-	//lu_data.Solve (&B, &X);
-	//
-	//Destroy_SuperMatrix_Store (&B);
-	//Destroy_SuperMatrix_Store (&X);
+        using namespace Eigen;
+        Map<const VectorXcd> eqvec(qvec.data_buffer(), qvec.Dim());
+        Map<VectorXcd> ecphi(cphi.data_buffer(), cphi.Dim());
+        ecphi = ES->solve(eqvec); 
     } else {
         double tol = iterative_tol;
 	int it = IterativeSolve (*F, qvec, cphi, tol, precon, iterative_maxit);
@@ -664,10 +678,18 @@ void TFwdSolver<std::complex<double> >::CalcFields (const CCompRowMatrix &qvec,
     }
 
     if (solvertp == LSOLVER_DIRECT) {
-	((ZSuperLU*)SuperLU)->CalcFields (qvec, phi, res);
-    //for (int i = 0; i < nq; i++) {
-	//    CalcField (qvec.Row(i), phi[i], res);
-	//}
+  
+    int nq = qvec.nRows();
+    for (int i = 0; i < nq; i++) {
+
+      using namespace Eigen;
+      CVector qveci = qvec.Row(i);
+      Map<const VectorXcd> eqvec(qveci.data_buffer(), qveci.Dim());
+      Map<VectorXcd> ecphi(phi[i].data_buffer(), phi[i].Dim());
+      ecphi = ES->solve(eqvec);    //Use the factors to solve the linear system 
+
+	  //CalcField (qvec.Row(i), phi[i], res);
+	  }
     } else {
 #if THREAD_LEVEL==2
 

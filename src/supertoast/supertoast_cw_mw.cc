@@ -9,7 +9,9 @@
 #include "supertoast_util.h"
 #include "timing.h"
 #include <time.h>
+#if defined(__APPLE__) || defined(__linux__) 
 #include <unistd.h>
+#endif
 
 #ifdef TOAST_MPI
 #include "mpi.h"
