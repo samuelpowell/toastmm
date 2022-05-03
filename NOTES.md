@@ -41,7 +41,7 @@ Aim: simplify codebase, ensuring that all code is builds and is used
  - Need explicit instantiation required on MacOS
  - Standard CXX 98 required for MacOS (owing to narrowing in matlab interface) which requires spacing on double template args
  - Implement CMakeLists.txt for all bintools targets
- - Enable explicit instantiation in fwdsolver_mw.h
+ - Enable explicit instantiation in fwdsolver_mw.h  (linux build failed with this, perhaps this could be a Clang thing, added to TODO)
  - Add STOASTLIB (dll import/export) to MWsolution class
  - Implement CMakeLists.txt for all buildable supertoast targets (NB: some Makefile targets no longer exist or reference old code)
     
@@ -53,6 +53,7 @@ Aim: simplify codebase, ensuring that all code is builds and is used
  - Look at MEX config as per first item
  - Check `MESA_SUPPORT`
  - Make individual libraries properly CMake with interface exports, etc. to avoid replicating includes in e.g. matlab2#
+ - Look at fwdsolver_mw.h instantiation requirements, determine appropriate preprocessor gaurd (e.g. Clang?)
  - Remove MESA based projection
  - Remove MPI
  - Remove CUDA

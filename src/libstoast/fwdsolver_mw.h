@@ -125,10 +125,14 @@ typedef TFwdSolverMW<std::complex<double> > CFwdSolverMW;
 
 // ==========================================================================
 // extern declarations of FwdSolverMW (only required for VS)
+//
+// SP TODO: Something fishy going on here, required for MSVC and MacOS (Clang?)
 
-#ifndef __FWDSOLVER_MW_CC
+//#ifndef __FWDSOLVER_MW_CC
+#ifndef __linux__
 extern template class STOASTLIB TFwdSolverMW<double>;
 extern template class STOASTLIB TFwdSolverMW<std::complex<double> >;
-#endif // !__FWDSOLVER_MW_CC
+#endif
+//#endif // !__FWDSOLVER_MW_CC
 
 #endif // __FWDSOLVER_MW_H
