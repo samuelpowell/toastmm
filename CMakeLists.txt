@@ -13,7 +13,7 @@ set(LBFGS_lib_TARGET_NAME liblbfgs)
 add_subdirectory(extern/liblbfgs)
 
 
-# Toast architecture specific
+# Toast architecture specific & rpath settings
 #
 
 # Windows
@@ -26,17 +26,15 @@ if(WIN32)
         add_compile_options(/wd4244 /wd4996 /wd4267 /wd4251)
     endif()
     if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-        # 64 bits
         add_compile_definitions(WIN64)
     elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
-        # 32 bits
         add_compile_definitions(WIN32)
     endif()
 endif()
 
 # MacOS
 #
-if(APPLE)
+if(APPLE OR UNIX)
     # Make Mac builds slightly quieter for development
     add_compile_options(-Wno-deprecated-register)
     
@@ -46,11 +44,26 @@ if(APPLE)
     # Fix rpaths on install to point to the same directory
     set(CMAKE_SKIP_BUILD_RPATH FALSE)
     set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+    if(APPLE)
     set(CMAKE_INSTALL_RPATH "@loader_path")
+    endif()
+    if(UNIX)
+    # Needs fix
+    # set(CMAKE_INSTALL_RPATH "$ORIGIN:$ORIGIN/../lib")
+    endif()
     set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
     
 endif()
 
+
+# Linux
+#
+if(UNIX)
+
+    # Templates must be instantiated
+    add_compile_definitions(NEED_EXPLICIT_INSTANTIATION)
+
+endif()
 
 # Libraries
 

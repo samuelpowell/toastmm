@@ -7,6 +7,9 @@ build/
 # Distribution outputs
 dist/
 
+# Test ouptuts
+test/**/*.out
+
 # Matlab demo outputs
 script/matlab/demos/*.dat
 

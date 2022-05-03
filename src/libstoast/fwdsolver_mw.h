@@ -122,12 +122,13 @@ private:
 typedef TFwdSolverMW<double>         RFwdSolverMW;
 typedef TFwdSolverMW<std::complex<double> > CFwdSolverMW;
 
+
 // ==========================================================================
 // extern declarations of FwdSolverMW (only required for VS)
 
-//#ifndef __FWDSOLVER_MW_CC
+#ifndef __FWDSOLVER_MW_CC
 extern template class STOASTLIB TFwdSolverMW<double>;
 extern template class STOASTLIB TFwdSolverMW<std::complex<double> >;
-//#endif // !__FWDSOLVER_MW_CC
+#endif // !__FWDSOLVER_MW_CC
 
 #endif // __FWDSOLVER_MW_H
