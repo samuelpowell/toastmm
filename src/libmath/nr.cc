@@ -33,15 +33,15 @@ void nrerror(const char error_text[])
 	exit(1);
 }
 
-double *vector(long nl, long nh)
-/* allocate a double vector with subscript range v[nl..nh] */
-{
-	double *v;
+// double *vector(long nl, long nh)
+// /* allocate a double vector with subscript range v[nl..nh] */
+// {
+// 	double *v;
 
-	v=(double *)malloc((size_t) ((nh-nl+1+NR_END)*sizeof(double)));
-	if (!v) nrerror("allocation failure in vector()");
-	return v-nl+NR_END;
-}
+// 	v=(double *)malloc((size_t) ((nh-nl+1+NR_END)*sizeof(double)));
+// 	if (!v) nrerror("allocation failure in vector()");
+// 	return v-nl+NR_END;
+// }
 
 int *ivector(long nl, long nh)
 /* allocate an int vector with subscript range v[nl..nh] */
@@ -1039,12 +1039,12 @@ void dfpmin (double p[], int n, double gtol, int *iter, double *fret,
     double den, fac, fad, fae, fp, stpmax, sum = 0.0, sumdg, sumxi, temp, test;
     double *dg, *g, *hdg, **hessin, *pnew, *xi;
 
-    dg = vector (1,n);
-    g = vector (1,n);
-    hdg = vector (1,n);
+    dg = dvector (1,n);
+    g = dvector (1,n);
+    hdg = dvector (1,n);
     hessin = matrix (1,n,1,n);
-    pnew = vector (1,n);
-    xi = vector (1,n);
+    pnew = dvector (1,n);
+    xi = dvector (1,n);
     fp = (*func)(p);
     cout << "initial objective = " << fp << endl;
     (*dfunc)(p,g);

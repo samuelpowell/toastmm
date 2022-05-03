@@ -2,7 +2,7 @@
 #define MUA_FREE_SOLVER_H
 
 #include "stoastlib.h"
-#include "supermatrix.h"
+//#include "supermatrix.h"
 #include "fwdsolver.h"
 #include "qmmesh.h"
 #include "projector.h"
