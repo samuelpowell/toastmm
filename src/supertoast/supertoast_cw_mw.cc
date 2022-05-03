@@ -9,7 +9,7 @@
 #include "supertoast_util.h"
 #include "timing.h"
 #include <time.h>
-#ifdef linux
+#if defined(__APPLE__) || defined(__linux__) 
 #include <unistd.h>
 #endif
 
