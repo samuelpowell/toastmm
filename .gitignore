@@ -9,6 +9,9 @@ dist/
 
 # Test ouptuts
 test/**/*.out
+test/**/*.nim
+test/**/*.raw
+test/**/*.fem
 
 # Matlab demo outputs
 script/matlab/demos/*.dat
@@ -20,6 +23,7 @@ script/matlab/demos/*.dat
 toast_common.zip
 
 *~
+
 
 *.dylib
 

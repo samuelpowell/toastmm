@@ -49,7 +49,7 @@ if(APPLE OR UNIX)
     endif()
     if(UNIX)
     # Needs fix
-    # set(CMAKE_INSTALL_RPATH "$ORIGIN:$ORIGIN/../lib")
+    set(CMAKE_INSTALL_RPATH "$ORIGIN:$ORIGIN/../lib")
     endif()
     set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
     
