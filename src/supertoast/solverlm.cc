@@ -62,16 +62,7 @@ RDenseMatrix mul (const RMatrix &A, const RMatrix &B)
     return tmp;
 }
 
-// ==========================================================================
-// parameter block for definition of distributed Jacobian
 
-#ifdef TOAST_MPI
-struct JAC_DATA_MPI {
-    int np, rank;        // number of processes, current process
-    int rtot;            // total number of rows in complete Jacobian
-    int r0, r1;          // first and last+1 rows of Jacobian to calculate
-};
-#endif // TOAST_MPI
 
 // ==========================================================================
 // This data structure defines the Hessian implicitly

@@ -23,9 +23,7 @@
 #include "mwsolution.h"
 #include "solution.h"
 #include "param.h"
-//#ifdef TOAST_MPI
-//#include <mpi.h>
-//#endif
+
 
 using namespace std;
 

@@ -13,9 +13,6 @@
 #include <unistd.h>
 #endif
 
-#ifdef TOAST_MPI
-#include "mpi.h"
-#endif // TOAST_MPI
 
 using namespace std;
 
@@ -103,18 +100,6 @@ int main (int argc, char *argv[])
     pp.GetString("PREFIX", g_prefix);
     pp.PutString("PREFIX", g_prefix);
     
-#ifdef TOAST_MPI
-    // Initialise MPI
-    int mpi_rank, mpi_size;
-    int mpi_status = MPI_Init (&argc, &argv);
-    MPI_Comm_rank (MPI_COMM_WORLD, &mpi_rank);
-    MPI_Comm_size (MPI_COMM_WORLD, &mpi_size);
-    LOGOUT("Initialising MPI session. MPI status = %d", mpi_status);
-    LOGOUT("Processor %d of %d", mpi_rank, mpi_size);
-
-    cerr << "processor " << mpi_rank << " of " << mpi_size << endl;
-#endif // TOAST_MPI
-
 #ifdef TOAST_THREAD
     int nth = 0;
     pp.GetInt("NTHREAD", nth);
@@ -550,9 +535,6 @@ int main (int argc, char *argv[])
     LOGOUT("Solver: %f", solver_time);
 #endif
 
-#ifdef TOAST_MPI
-    MPI_Finalize();
-#endif
 
     return 0;
 }                                                                              

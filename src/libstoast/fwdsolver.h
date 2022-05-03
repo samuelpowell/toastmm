@@ -395,11 +395,7 @@ public:
     const QMMesh *meshptr;  ///< pointer to the associated FEM mesh
     LSOLVER solvertp;       ///< linear solver type
     IterativeMethod method; ///< iterative solver method, if applicable
-#ifdef MPI_FWDSOLVER
-    TCompRowMatrixMPI<T> *F;  ///< Distributed FEM system matrix
-#else
     TCompRowMatrix<T> *F;   ///< FEM system matrix
-#endif
     TCompRowMatrix<T> *FL;  ///< lower triangle of system matrix decomposition
     TVector<T> *Fd;         ///< diagonal of Cholesky factorisation
     TPreconditioner<T> *precon; ///< preconditioner instance
@@ -438,90 +434,12 @@ protected:
     TVector<T> *pphi;       ///< work buffer for field calculation
     bool unwrap_phase;      ///< use phase unwrapping?
 
-    // ===============================================================
-    // MPI-specific functions and data members
-
-#ifdef MPI_FWDSOLVER
-
-public:
-
-    /**
-     * \brief Set MPI parameters.
-     * \note Sets up the MPI-specific parameters (stores MPI size and
-     *   rank, defines the initial distribution of sources over processes)
-     */
-    void Setup_MPI();
-
-    /**
-     * \brief Deallocate MPI data structures.
-     */
-    void Cleanup_MPI();
-
-    /**
-     * \brief Define the distribution of nq sources over the available
-     *   processes.
-     * \param nq number of sources
-     * \note An even distribution is assumed. Modify this to implement
-     *   a load-balancing strategy.
-     */
-    void DistributeSources_MPI (int nq) const;
-
-    /**
-     * \brief Distributed field calculation (non-blocking)
-     * \param [in] qvec array of source column vectors
-     * \param [out] phi array of field vectors
-     * \note No synchronisation is performed at the end of the computation.
-     *   Each process only computes the field vectors for the sources it
-     *   is responsible for. Other field vectors remain unchanged.
-     *   The calling function is responsible to either continue the distributed
-     *   computation or perform a synchronisation.
-     * \note On call, phi must be an array of nq vectors, where nq is the
-     *   number of rows in qvec.
-     */
-    void CalcFields_proc (const TCompRowMatrix<T> &qvec,
-        TVector<T> *phi) const;
-
-    /**
-     * \brief Distributed boundary projection calculation (non-blocking)
-     * \param [in] mvec array of measurement column vectors
-     * \param [in] phi array of field vectors
-     * \param [in] scl data scaling
-     * \param [out] proj projection vector
-     * \note Each process calculates the projections for the sources it is
-     *   responsible for, and only updates the corresponding section of
-     *   \e proj. No synchronisation is performed. Each process only
-     *   requires those fields phi which correspond to processed sources, so
-     *   this method can be combined with \ref CalcFields_proc.
-     */
-    void ProjectAll_proc (const TCompRowMatrix<T> &mvec,
-        const TVector<T> *phi, DataScale scl,  TVector<T> &proj);
-
-protected:
-
-    MPI_Datatype mpitp;   ///< MPI type corresponding to template type
-    int rnk;              ///< MPI process number (>= 0)
-    int sze;              ///< number of MPI processes (>= 1)
-    mutable int nQ;       ///< current number of sources for load balancing
-    mutable int *Q0, *Q1; ///< range of sources (q0<=q<q1) for all processes
-
-#endif // MPI_FWDSOLVER
-
 #if THREAD_LEVEL==2
     int nthread;
 #endif
 };
 
 
-// ==========================================================================
-// Some macros
-
-#ifdef MPI_FWDSOLVER
-#define SETUP_MPI() Setup_MPI()
-#define CLEANUP_MPI() Cleanup_MPI()
-#else
-#define SETUP_MPI()
-#define CLEANUP_MPI()
-#endif
 
 // ==========================================================================
 // template typedefs

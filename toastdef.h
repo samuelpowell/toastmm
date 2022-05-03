@@ -98,11 +98,4 @@
 #define GCC_VERSION 0
 #endif
 
-#ifdef TOAST_MPI
-
-// Uncomment to enable MPI bindings in TFwdSolver class
-//#define MPI_FWDSOLVER
-
-#endif
-
 #endif // !__TOASTDEF_H

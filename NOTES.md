@@ -21,7 +21,7 @@ Aim: simplify codebase, ensuring that all code is builds and is used
 
  - CUDA, MPI
 
-# Changelog
+# Changelog (build system)
 
  - Bump liblbfgs to master for CMake support
  - Add Eigen
@@ -44,7 +44,12 @@ Aim: simplify codebase, ensuring that all code is builds and is used
  - Enable explicit instantiation in fwdsolver_mw.h  (linux build failed with this, perhaps this could be a Clang thing, added to TODO)
  - Add STOASTLIB (dll import/export) to MWsolution class
  - Implement CMakeLists.txt for all buildable supertoast targets (NB: some Makefile targets no longer exist or reference old code)
-    
+ 
+ # Changelog (cleanup)
+
+  - Purge unused numerics, configuration, projects
+  - Purge MPI support
+      
 # TODO
 
  - Check Makefile / Xcode projects configuration for shared library flags, e.g. -fPIC required on Linux. Consider `FLAGS`, `SHLIB_CFLAGS`
@@ -55,5 +60,4 @@ Aim: simplify codebase, ensuring that all code is builds and is used
  - Make individual libraries properly CMake with interface exports, etc. to avoid replicating includes in e.g. matlab2#
  - Look at fwdsolver_mw.h instantiation requirements, determine appropriate preprocessor gaurd (e.g. Clang?)
  - Remove MESA based projection
- - Remove MPI
  - Remove CUDA

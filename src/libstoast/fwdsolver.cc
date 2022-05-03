@@ -1,11 +1,7 @@
 #define __FWDSOLVER_CC
 #define STOASTLIB_IMPLEMENTATION
 #include "stoastlib.h"
-// #include "fwdsolver_zslu.h"
-// #include "fwdsolver_cslu.h"
-#ifdef MPI_FWDSOLVER
-#include "toast_mpi.h"
-#endif
+
 #ifdef USE_CUDA_FLOAT
 #include "toastcuda.h"
 #endif
@@ -59,7 +55,6 @@ TFwdSolver<T>::~TFwdSolver ()
     if (pphi)   delete []pphi;
 
     DeleteType ();
-    CLEANUP_MPI();
 }
 
 // =========================================================================
@@ -88,7 +83,7 @@ void TFwdSolver<T>::Setup (int nth)
 
 
     SetupType (nth);
-    SETUP_MPI();
+
 }
 
 // =========================================================================
@@ -175,11 +170,7 @@ void TFwdSolver<float>::Allocate ()
     // allocate system matrix
     meshptr->SparseRowStructure (rowptr, colidx, nzero);
     if (F) delete F;
-#ifdef MPI_FWDSOLVER
-    F = new FCompRowMatrixMPI (n, n, rowptr, colidx);
-#else
     F = new FCompRowMatrix (n, n, rowptr, colidx);
-#endif
     delete []rowptr;
     delete []colidx;
 
@@ -212,11 +203,7 @@ void TFwdSolver<double>::Allocate ()
     // allocate system matrix
     meshptr->SparseRowStructure (rowptr, colidx, nzero);
     if (F) delete F;
-#ifdef MPI_FWDSOLVER
-    F = new RCompRowMatrixMPI (n, n, rowptr, colidx);
-#else
     F = new RCompRowMatrix (n, n, rowptr, colidx);
-#endif
     delete []rowptr;
     delete []colidx;
 
@@ -249,11 +236,7 @@ void TFwdSolver<std::complex<double> >::Allocate ()
     // allocate system matrix
     meshptr->SparseRowStructure (rowptr, colidx, nzero);
     if (F) delete F;
-#ifdef MPI_FWDSOLVER
-    F = new CCompRowMatrixMPI (n, n, rowptr, colidx);
-#else
     F = new CCompRowMatrix (n, n, rowptr, colidx);
-#endif
     delete []rowptr;
     delete []colidx;
 
@@ -282,11 +265,7 @@ void TFwdSolver<std::complex<float> >::Allocate ()
     // allocate system matrix
     meshptr->SparseRowStructure (rowptr, colidx, nzero);
     if (F) delete F;
-#ifdef MPI_FWDSOLVER
-    F = new SCCompRowMatrixMPI (n, n, rowptr, colidx);
-#else
     F = new SCCompRowMatrix (n, n, rowptr, colidx);
-#endif
     delete []rowptr;
     delete []colidx;
 
@@ -732,7 +711,6 @@ void TFwdSolver<T>::CalcFields (const TCompRowMatrix<T> &qvec,
 	res->rel_err = 0.0;
     }
 
-#ifndef MPI_FWDSOLVER
     int i, nq = qvec.nRows();
 
     if (solvertp == LSOLVER_DIRECT) {
@@ -770,39 +748,6 @@ void TFwdSolver<T>::CalcFields (const TCompRowMatrix<T> &qvec,
 	delete []qv;
 #endif
     }
-
-#else
-
-    int i, q0, q1, n = meshptr->nlen();
-    int nq = qvec.nRows();
-
-    // store all projections in a single vector, so we can gather the results
-    TVector<T> phi_tot(nq*n);
-    TVector<T> *phi_single = new TVector<T>[nq];
-    for (i = 0; i < nq; i++)
-	phi_single[i].Relink (phi_tot, i*n, n);
-
-    // distributed field calculation
-    CalcFields_proc (qvec, phi_single);
-
-    // Synchronise: collect fields from all processes
-    int *ofs = new int[sze];
-    int *len = new int[sze];
-    for (i = 0; i < sze; i++) {
-	ofs[i] = Q0[i]*n;
-	len[i] = (Q1[i]-Q0[i])*n;
-    }
-    MPI_Allgatherv (MPI_IN_PLACE, 0, MPI_DATATYPE_NULL, phi_tot.data_buffer(),
-		    len, ofs, mpitp, MPI_COMM_WORLD);
-
-    for (i = 0; i < nq; i++)
-	phi[i] = phi_single[i];
-
-    delete []ofs;
-    delete []len;
-    delete []phi_single;
-
-#endif
 }
 
 // =========================================================================
@@ -852,33 +797,8 @@ TVector<T> TFwdSolver<T>::ProjectAll (const TCompRowMatrix<T> &mvec,
 	xASSERT (meshptr, "Mesh reference not defined."); 
 
 	if (scl == DATA_DEFAULT) scl = dscale;
-
-#ifndef MPI_FWDSOLVER
-
     return ::ProjectAll (meshptr, mvec, phi, scl);
 
-#else
-
-    // distributed calculation of projections
-    TVector<T> proj (meshptr->nQM);
-    ProjectAll_proc (mvec, phi, scl, proj);
-
-    // synchronise the projection vector
-    int i;
-    int *ofs = new int[sze];
-    int *len = new int[sze];
-    for (i = 0; i < sze; i++) {
-	ofs[i] = meshptr->Qofs[Q0[i]];
-	len[i] = (Q1[i] == nQ ? meshptr->nQM : meshptr->Qofs[Q1[i]])-ofs[i];
-    }
-    MPI_Allgatherv (MPI_IN_PLACE, 0, MPI_DATATYPE_NULL, proj.data_buffer(),
-		    len, ofs, mpitp, MPI_COMM_WORLD);
-
-    delete []ofs;
-    delete []len;
-    return proj;
-
-#endif // MPI_FWDSOLVER
 }
 
 // =========================================================================
@@ -900,11 +820,7 @@ TVector<T> TFwdSolver<T>::ProjectAll (const TCompRowMatrix<T> &qvec,
     Reset (sol, omega);
     // for MPI, this is a bottleneck - how to do in parallel?
 
-#ifndef MPI_FWDSOLVER
     CalcFields (qvec, pphi);
-#else
-    CalcFields_proc (qvec, pphi);
-#endif // MPI_FWDSOLVER
 
     return ProjectAll (mvec, pphi, scl);
 }
@@ -1320,114 +1236,6 @@ void TFwdSolver<T>::SetLinSolver (const char *solver, double tol)
     }
 }
 
-
-// =========================================================================
-// =========================================================================
-// MPI-specific methods
-
-#ifdef MPI_FWDSOLVER
-
-// =========================================================================
-// Set MPI parameters
-
-template<class T>
-void TFwdSolver<T>::Setup_MPI ()
-{
-    MPI_Comm_rank (MPI_COMM_WORLD, &rnk);
-    MPI_Comm_size (MPI_COMM_WORLD, &sze);
-    mpitp = TMPI<T>::MPIType();
-    nQ = 0;
-}
-
-// =========================================================================
-// Deallocate MPI data structures.
-
-template<class T>
-void TFwdSolver<T>::Cleanup_MPI ()
-{
-    if (nQ) {
-	delete []Q0;
-	delete []Q1;
-	nQ = 0;
-    }
-}
-
-// =========================================================================
-// Distribute sources over processes
-
-template<class T>
-void TFwdSolver<T>::DistributeSources_MPI (int nq) const
-{
-    if (nq != nQ) { // re-allocate
-	if (nQ) {
-	    delete []Q0;
-	    delete []Q1;
-	}
-	if (nQ = nq) {
-	    Q0 = new int[nQ];
-	    Q1 = new int[nQ];
-	}
-    }
-
-    if (nq) {
-	int i;
-	for (i = 0; i < sze; i++) {
-	    Q0[i] = (i*nq)/sze;
-	    Q1[i] = ((i+1)*nq)/sze;
-	}
-    }
-}
-
-// =========================================================================
-// Nonblocking distributed calculation of fields:
-// Does not perform synchronisation of results
-
-template<class T>
-void TFwdSolver<T>::CalcFields_proc (const TCompRowMatrix<T> &qvec,
-    TVector<T> *phi) const
-{
-    int nq = qvec.nRows();
-    if (nq != nQ) DistributeSources_MPI (nq);
-
-    int q, q0, q1;
-    
-    q0 = Q0[rnk];
-    q1 = Q1[rnk];
-
-    for (q = q0; q < q1; q++)
-	CalcField (qvec.Row(q), phi[q]);
-}
-
-// =========================================================================
-// Nonblocking distributed calculation of projections:
-// Does not perform synchronisation of results
-// Each process only updates the part of the projection vector it is
-// responsible for. Only the relevant fields are required by each process,
-// so they can be provided by CalcFields_proc
-
-template<class T>
-void TFwdSolver<T>::ProjectAll_proc (const TCompRowMatrix<T> &mvec,
-    const TVector<T> *phi, DataScale scl, TVector<T> &proj)
-{
-	xASSERT (meshptr, "Mesh reference not defined."); 
-
-	// Note: we don't really know the number of sources here, so we use
-    // the value stored in the mesh
-    int nq = meshptr->nQ;
-    if (nq != nQ) DistributeSources_MPI (nq);
-
-    int q, q0, q1;
-    
-    q0 = Q0[rnk];
-    q1 = Q1[rnk];
-
-    for (q = q0; q < q1; q++) {
-	TVector<T> projq (proj, meshptr->Qofs[q], meshptr->nQMref[q]);
-	projq = ProjectSingle (q, mvec, phi[q], scl);
-    }
-}
-
-#endif // MPI_FWDSOLVER
 
 
 // =========================================================================

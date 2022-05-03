@@ -27,13 +27,11 @@ target_sources(libmath PRIVATE  mathdef.cc util.cc timing.cc vector.cc gsmatrix.
 #
 # USE_BLZPACK: eigpair.cc
 # ENABLE_PTHREAD: task.cc vector_MT.cc
-# ENABLE_MPI crmatrix_mpi.cc dnsmatrix_mpi.cc toast_mpi.cc
 # ENABLE_CUDA vector_cusp.cu crmatrix_cusp.cc
 
 # Assorted header defines to resolve
 #
 # TOAST_THREAD
-# TOAST_MPI
 # TOAST_PARALLEL
 # COMPUTE_FLOPS
 
