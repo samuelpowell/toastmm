@@ -52,13 +52,6 @@
 #include "task.h"
 #endif
 
-#ifdef TOAST_MPI
-#include <mpi.h>
-#include "toast_mpi.h"
-#include "dnsmatrix_mpi.h"
-#include "crmatrix_mpi.h"
-#endif
-
 #ifdef TOAST_PARALLEL
 #include "task.h"
 #endif

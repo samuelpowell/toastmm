@@ -31,10 +31,6 @@ target_sources(libfe PRIVATE    point.cc node.cc ndlist.cc element.cc ellist.cc 
 # ENABLE_MPI: mesh_mpi.cc
 #
 
-# Assorted header defines to resolve
-#
-# TOAST_MPI
-
 install(TARGETS libfe
         CONFIGURATIONS Release
         LIBRARY DESTINATION release/lib
