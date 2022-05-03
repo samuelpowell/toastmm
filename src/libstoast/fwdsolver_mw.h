@@ -7,9 +7,6 @@
 #define __FWDSOLVER_MW_H
 
 #include "fwdsolver.h"
-#ifdef TOAST_MPI
-#include "toast_mpi.h"
-#endif
 
 // =========================================================================
 
@@ -107,13 +104,7 @@ protected:
     void Cleanup();
 
 private:
-#ifdef TOAST_MPI
-    MPI_Datatype mpitp;
-    int sze, rnk;
-    int *projall_count;
-    int *projall_ofs;
-    int *qidx;
-#endif
+
 };
 
 // ==========================================================================

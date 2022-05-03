@@ -8,9 +8,7 @@
 #include "fwdsolver.h"
 #include "source.h"
 #include "timing.h"
-#ifdef TOAST_MPI
-#include <mpi.h>
-#endif
+
 
 #define MAXREGION 100
 
@@ -55,9 +53,6 @@ void cuda_Init (ParamParser &pp);
 
 int main (int argc, char *argv[]) {
 
-#ifdef TOAST_MPI
-    MPI_Init (&argc, &argv);
-#endif
 
     const double c0 = 0.3;
     double tol = 1e-8;
@@ -251,10 +246,6 @@ int main (int argc, char *argv[]) {
 
     // cleanup
     delete []dphi;
-
-#ifdef TOAST_MPI
-    MPI_Finalize();
-#endif
 
     return 0;
 }                                                                              

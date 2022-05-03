@@ -59,8 +59,4 @@
 #include "timespec.h"
 #include "refine_mesh.h"
 
-#ifdef TOAST_MPI
-#include "mesh_mpi.h"
-#endif
-
 #endif // !__FELIB_H

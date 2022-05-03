@@ -1913,36 +1913,6 @@ RVector RescaleHessian (const  RMatrix *J, const RVector &x,
     return M;
 }
 
-#ifdef TOAST_MPI
-RVector RescaleHessianPart (RDenseMatrix &Jpart, const RVector &x,
-    RCompRowMatrix *RHess, int rank)
-{
-    int i, j, k, nz;
-    int m = Jpart.nRows(), n = Jpart.nCols();
-    RVector M(n), Mpart(n);
-
-    // J^T J contribution
-    for (j = 0; j < m; j++) {
-	RVector r = Jpart.Row(j);
-	for (i = 0; i < n; i++) Mpart[i] += r[i]*r[i];
-    }
-    MPI_Reduce ((void*)Mpart.data_buffer(), (void*)M.data_buffer(),
-	n, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD); // add contributions
-
-    if (!rank) {
-	// Psi'' contribution
-	if (RHess) M += RHess->Diag();
-
-	for (i = 0; i < n; i++) 
-	    M[i] = 1.0/sqrt (M[i]);
-    }
-    MPI_Bcast ((void*)M.data_buffer(), n, MPI_DOUBLE, 0,
-	MPI_COMM_WORLD);
-    return M;
-    
-}
-#endif
-
 // =================================================================
 // select a part of a vector from all wavelength parts and merge 
 RVector Mergewavels (const RVector &b, int r0, int len, int nofwavel)
