@@ -81,7 +81,7 @@ int main (int argc, char *argv[]) {
     int nQ, nM, nQM;
     CCompRowMatrix qvec, mvec;
     CVector *dphi;
-    int i, j, cmd;
+    int i, cmd;
     double t0, wt0, dt;
     Point bbmin, bbmax;
 

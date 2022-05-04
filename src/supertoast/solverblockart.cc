@@ -80,7 +80,7 @@ void SolverBlockART::Solve (CFwdSolver &FWS, const Raster &raster,
 {
     cout << "Starting Block-ART solver ..." << endl;
 
-    int i, q, m, r, ai, iter;
+    int i, ai, iter;
     const QMMesh *mesh = FWS.MeshPtr();
     int nprm = 2;
     int ndat = data.Dim();

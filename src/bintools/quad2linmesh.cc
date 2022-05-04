@@ -16,7 +16,6 @@ void Usage();
 
 int main (int argc, char *argv[])
 {
-  //CHECK_EXPIRED();
     
     int i;
     bool do_stdin = true;

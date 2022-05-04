@@ -13,8 +13,6 @@ void Lin2Quad (Mesh &mesh);
 
 int main (void)
 {
-  //CHECK_EXPIRED();
-
     Mesh mesh;
 
     cin >> mesh;

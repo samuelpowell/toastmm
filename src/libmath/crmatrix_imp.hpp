@@ -1184,35 +1184,6 @@ void TCompRowMatrix<MT>::Ax (const TVector<MT> &x, TVector<MT> &b) const
 }
 #endif // THREAD_LEVEL==1
 
-#ifdef UNDEF// USE_SPBLAS
-// warning: SPBLAS appears to have a size limit to the matrix and fails with
-// an arithmetic exception if this is exceeded.
-template<>
-void TCompRowMatrix<double>::Ax (const TVector<double> &x, TVector<double> &b)
-    const
-{
-    // NOT THREADSAFE: DO NOT USE THIS WITH THREADED CODE
-    static double *dwork;
-    static int ndwork = 0;
-
-    dASSERT(x.Dim() == cols,
-	"Parameter 1 invalid size (expected %d, actual %d)", cols, x.Dim());
-    if (b.Dim() != rows) b.New(rows);
-
-    static int transa = 0;
-    static int ccols = 1;
-    static double alpha = 1.0, beta = 0.0;
-    static int descra[9] = {0,0,0,0,1};
-    if (ndwork < rows) {
-        if (ndwork) delete []dwork;
-	dwork = new double[ndwork=rows];
-    }
-
-    dcsrmmz_(transa, (int&)rows, ccols, (int&)cols, alpha, descra, val, colidx,
-	     rowptr, rowptr+1, x.data_buffer(), (int&)cols, beta,
-	     b.data_buffer(), (int&)rows, dwork, ndwork);
-}
-#endif // USE_SPBLAS
 
 // ==========================================================================
 

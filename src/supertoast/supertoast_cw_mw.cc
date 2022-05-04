@@ -193,7 +193,7 @@ int main (int argc, char *argv[])
     for (i = 0; i < nofwavel; i++) {
 	for  (j = 0; j < nofMuachromo; j++) {
 	    char exttype[30];
-	    sprintf (exttype,"EXTINC_WAVEL_%d_CHROMO_%d", int(wlength[i]),j+1);
+	    snprintf (exttype, sizeof(exttype), "EXTINC_WAVEL_%d_CHROMO_%d", int(wlength[i]),j+1);
     
 	    if (!pp.GetReal (exttype, extcoef(i,j))) {
 		cout << "Enter the extinction value for Chromophore " << j+1
@@ -382,11 +382,11 @@ int main (int argc, char *argv[])
 	    char fname[256];
 	    if (msol.IsActive(i)) {
 		if (i < msol.nmuaChromo) 
-		    sprintf (fname,"%sreconChromophore_%d.nim",g_prefix, i+1);
+		    snprintf (fname, sizeof(fname), "%sreconChromophore_%d.nim",g_prefix, i+1);
 		if (i == msol.nmuaChromo)
-		    sprintf (fname,"%sreconScatPrefactor_A.nim",g_prefix);
+		    snprintf (fname, sizeof(fname), "%sreconScatPrefactor_A.nim",g_prefix);
 		if (i == msol.nmuaChromo + 1) 
-		    sprintf (fname,"%sreconScatPower_b.nim",g_prefix);
+		    snprintf (fname, sizeof(fname), "%sreconScatPower_b.nim",g_prefix);
 		WriteNimHeader (meshname, n, fname, "N/A");  
 		msol.WriteImgGeneric (0, fname, i);
 	    }
@@ -399,11 +399,11 @@ int main (int argc, char *argv[])
 	    if (msol.IsActive(i)) {
 		char fname[256];
 		if (i < msol.nmuaChromo) 
-		    sprintf (fname,"%sreconChromophore_%d.raw",g_prefix,i+1);
+		    snprintf (fname, sizeof(fname), "%sreconChromophore_%d.raw",g_prefix,i+1);
 		if (i == msol.nmuaChromo)
-		    sprintf (fname,"%sreconScatPrefactor_A.raw",g_prefix);
+		    snprintf (fname, sizeof(fname), "%sreconScatPrefactor_A.raw",g_prefix);
 		if (i == msol.nmuaChromo + 1) 
-		    sprintf (fname,"%sreconScatPower_b.raw",g_prefix);
+		    snprintf (fname, sizeof(fname), "%sreconScatPower_b.raw",g_prefix);
 		WriteRimHeader (raster->BDim(), fname);
 		gsol.WriteImgGeneric (0, fname, i);
 	    }

@@ -7,10 +7,6 @@
 #define __VECTOR_CC
 #define MATHLIB_IMPLEMENTATION
 
-//#if (defined(WIN32)||defined(WIN64))
-//#include "stdafx.h"
-//#endif
-
 #include <iostream>
 #include <string>
 #include <sstream>

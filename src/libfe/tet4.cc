@@ -1224,7 +1224,7 @@ int Tetrahedron4::Intersection (const Point &p1, const Point &p2,
 {
     if (boundary_only && !bndel) return 0;
     
-    int i, n = 0;
+    int n = 0;
     double a, rx, ry, rz;
     double sx = p1[0], sy = p1[1], sz = p1[2];
     double dx = p2[0]-p1[0], dy = p2[1]-p1[1], dz = p2[2]-p1[2];

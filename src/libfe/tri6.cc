@@ -1439,7 +1439,6 @@ int Triangle6::Intersection (const Point &p1, const Point &p2,
     Point *s, bool add_endpoints, bool boundary_only)
 {
     double xs, ys;
-    double pmin, pmax, smin, smax;
     const double EPS = 1e-12;
     int pindx = 0;
     Point p(2);

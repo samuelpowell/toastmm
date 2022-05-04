@@ -18,29 +18,23 @@ add_subdirectory(extern/liblbfgs)
 
 # Windows
 #
-# Toast headers expect WIN32 / WIN64 to be defined on Windows
-#
 if(WIN32)
     if(MSVC)
-        # Make windows builds slightly quieter for development
-        add_compile_options(/wd4244 /wd4996 /wd4267 /wd4251)
-    endif()
-    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-        add_compile_definitions(WIN64)
-    elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
-        add_compile_definitions(WIN32)
+        # Make builds quieter for development
+        add_compile_options(/wd4244 /wd4996 /wd4267 /wd4251 /wd4910 /wd4661)
     endif()
 endif()
 
 # MacOS
 #
 if(APPLE OR UNIX)
-    # Make Mac builds slightly quieter for development
-    add_compile_options(-Wno-deprecated-register)
-    
-    # Templates must be instantiated
-    add_compile_definitions(NEED_EXPLICIT_INSTANTIATION)
+    # Make builds quieter for development
+    add_compile_options(-Wno-deprecated-register -Wno-unused-result)
 
+    if(NOT APPLE)
+        add_compile_options(-Wno-format-truncation)
+    endif()
+    
     # Fix rpaths on install to point to the same directory
     set(CMAKE_SKIP_BUILD_RPATH FALSE)
     set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
@@ -57,9 +51,6 @@ endif()
 # Linux
 #
 if(UNIX)
-
-    # Templates must be instantiated
-    add_compile_definitions(NEED_EXPLICIT_INSTANTIATION)
 
 endif()
 

@@ -8,7 +8,7 @@
 #include "supertoast.h"
 #include "supertoast_util.h"
 #include <time.h>
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 #else
 #include <unistd.h>
 #endif

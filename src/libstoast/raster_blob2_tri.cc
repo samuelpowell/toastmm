@@ -1713,7 +1713,7 @@ int Raster_Blob2::SutherlandHodgman (int el, double px, double py,
     int i;
 
     Element *pel = meshptr->elist[el];
-    int ni, nv = pel->nNode();
+    int nv = pel->nNode();
     if (nv > npoly) return -1;
 
     vec_t tri[3];

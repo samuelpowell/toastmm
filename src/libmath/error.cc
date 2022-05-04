@@ -164,33 +164,6 @@ void LogOut_Progress (int count)
 // ==========================================================================
 // expiry-handling routines
 
-void DefaultExpiryhandler ()
-{
-    cerr << EXPIRED_MSG;
-    exit (1);
-}
-static void (*Expiryhandler)() = DefaultExpiryhandler;
-
-void SetExpiryhandler (void (*ExpiryFunc)())
-{
-    Expiryhandler = ExpiryFunc;
-}
-
-int Expired (int month, int year)
-{
-    if (month < 0) return 0;
-    struct tm expiry_date = {0};
-    expiry_date.tm_mday = 1;
-    expiry_date.tm_mon = month-1;
-    expiry_date.tm_year = year-1900;
-    return (time(0) > mktime (&expiry_date));
-}
-
-MATHLIB void Check_Expired (int month, int year)
-{
-    if (Expired(month, year)) Expiryhandler();
-}
-
 static char versionstr[256] = "";
 static char fullversionstr[256] = "";
 

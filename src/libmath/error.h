@@ -136,18 +136,6 @@ MATHLIB extern char logbuf[256];
 MATHLIB extern std::ofstream logfile;
 #endif
 
-// expiry-checking routines
-void SetExpiryhandler (void (*ExpiryFunc)());
-MATHLIB void Check_Expired (int month, int year);
-#ifdef EXPIRY_YEAR
-#ifndef EXPIRY_MONTH
-#define EXPIRY_MONTH 1
-#endif // !EXPIRY_MONTH
-#define CHECK_EXPIRED() Check_Expired(EXPIRY_MONTH,EXPIRY_YEAR)
-#else
-#define CHECK_EXPIRED()
-#endif // EXPIRY_YEAR
-
 // flop counting routines
 void ResetFlops();
 unsigned int FlopsAdd();
