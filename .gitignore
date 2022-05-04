@@ -15,4 +15,5 @@ test/**/*.fem
 
 # Matlab demo outputs
 script/matlab/demos/*.dat
+script/matlab/demos/*.mat
 
