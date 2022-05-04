@@ -18,17 +18,10 @@ add_subdirectory(extern/liblbfgs)
 
 # Windows
 #
-# Toast headers expect WIN32 / WIN64 to be defined on Windows
-#
 if(WIN32)
     if(MSVC)
         # Make windows builds slightly quieter for development
         add_compile_options(/wd4244 /wd4996 /wd4267 /wd4251)
-    endif()
-    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-        add_compile_definitions(WIN64)
-    elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
-        add_compile_definitions(WIN32)
     endif()
 endif()
 

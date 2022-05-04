@@ -8,11 +8,11 @@
 
 #include "arch.h"
 
-#if defined(WIN32)||defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 #define NEED_EXPLICIT_INSTANTIATION   // JK in Windows (VS2005) explicit instantiation is required
 #endif
 
-#if defined(WIN32)||defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 #define DLLEXPORT __declspec(dllexport)
 #define DLLIMPORT __declspec(dllimport)
 #define DLLEXTERN extern
@@ -22,41 +22,25 @@
 #define DLLEXTERN
 #endif
 
-#ifdef TOASTLIB
-#define DLL_LIB DLLEXPORT
-#else
-#define DLL_LIB DLLIMPORT
-#endif
+// #define NEED_FRIEND_PT
 
-//#define NEED_FRIEND_PT
+#define VERBOSE_LEVEL 1	// Log file verbosity level
 
 
-#define EXPIRY_YEAR 2012
-#define EXPIRY_MONTH 12
-// This defines the date after which the CHECK_EXPIRY macro will
-// terminate a program.
-
-#define VERBOSE_LEVEL 1
-// Log file verbosity level
-
-
+// Threading
+//
 #ifdef TOAST_THREAD
-
 #define THREAD_LEVEL 2 // 0=none, 1=fine-grain, 2=coarse-grain
 #define TOAST_THREAD_MATLAB_GRADIENT  // parallelise Matlab toastGradient
 #define TOAST_THREAD_MATLAB_QMVEC     // parallelise Matlab Mvec
 #define TOAST_THREAD_ASSEMBLE         // parallelise system matrix assembly
-
 #else
-
 #define THREAD_LEVEL 0
-
 #endif
-
 
 #include "blasnames.h"
 
-#if (!defined(WIN32))&&(!defined(WIN64))
+#if (!defined(_WIN32)) && (!defined(_WIN64))
 //#define USE_BLAS_LEVEL1
 // Use external BLAS level 1 routines (vector-vector operations)
 // instead of local C++ implementations where possible.
@@ -73,21 +57,15 @@
 // Use external BLAS level 3 routines (matrix-matrix operations)
 // instead of local C++ implementations where possible
 
-#if !defined(WIN32)&&!defined(WIN64) // for now
-#define USE_SPBLAS
-// Use external sparse BLAS routines from the NIST SPARSE BLAS toolkit
-#endif
-
 #define TRI6IP_STORE_COORDS
 #define TRI10IP_STORE_COORDS
 #define TET10IP_STORE_COORDS
-
 #define TRI10_STORE_COORDS
 
-#define NSUBSAMPLE 50
 // The number of sub-samples (in 1-D) used for numerical integration
 // over elements. The total number of samples is n(n+1)/2 in a triangle, and
 // ((n+3)*n+2)*n/6 in a tetrahedron, where n=NSUBSAMPLE
+#define NSUBSAMPLE 50
 
 // GCC version number
 #ifdef __GNUC__

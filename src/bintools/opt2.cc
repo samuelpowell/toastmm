@@ -19,8 +19,6 @@ int main (int argc, char *argv[])
     int i, res, len, *perm;
     Mesh mesh;
 
-    CHECK_EXPIRED ();
-
     // command line parser
     for (i = 1; i < argc; i++) {
         xASSERT(argv[i][0] == '-', "Error parsing command line");

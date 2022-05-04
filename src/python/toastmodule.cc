@@ -3,7 +3,7 @@ int toastVerbosity;  // global verbosity flag
 
 #include <Python.h>
 #include <numpy/arrayobject.h>
-#include "toastarch.h"
+#include "arch.h"
 #include "felib.h"
 #include "stoastlib.h"
 #include <fstream>

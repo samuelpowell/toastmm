@@ -93,8 +93,6 @@ int main (int argc, char *argv[])
     int nfixed;                 // number of fixed nodes
 
 // check expiry date
-
-    CHECK_EXPIRED ();
     SetVersion ("15");
 
 // command line interpretation

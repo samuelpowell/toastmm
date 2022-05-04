@@ -15,6 +15,10 @@ Aim: working one-liner build, without external dependencies, on all platforms
  - reintroduce external solvers and BLAS as options
  - use system provided builds where possible, else e.g., `vcpkg` to avoid maintenance
 
+## Threading
+
+ - manage threading within toast, and optional BLAS
+
 ## Remove features and unused code
 
 Aim: simplify codebase, ensuring that all code is builds and is used
@@ -47,7 +51,14 @@ Aim: simplify codebase, ensuring that all code is builds and is used
  - Purge unused numerics, configuration, projects
  - Purge MPI support
  - Purge CUDA support
-      
+ - Cleanup core headers
+   - Make all defines check for `_WIN32` not `WIN32`, remove setting from CMake
+   - Remove unused `TOASTLIB` define
+   - Remove expiry functions (not used) and defines
+   - Remove USE_SPLBLAS (unued)
+
+
+
 # TODO
 
  - Check Makefile / Xcode projects configuration for shared library flags, e.g. -fPIC required on Linux. Consider `FLAGS`, `SHLIB_CFLAGS`
@@ -58,3 +69,6 @@ Aim: simplify codebase, ensuring that all code is builds and is used
  - Make individual libraries properly CMake with interface exports, etc. to avoid replicating includes in e.g. matlab2#
  - Look at fwdsolver_mw.h instantiation requirements, determine appropriate preprocessor gaurd (e.g. Clang?)
  - Remove MESA based projection
+ - Resolve `TOAST_THREAD`, `TOAST_THREAD_LEVEL`, `TOAST_THREAD_MATLAB_GRADIENT`, `TOAST_THREAD_MATLAB_QMVEC`, `TOAST_THREAD_ASSEMBLE`
+- 
+

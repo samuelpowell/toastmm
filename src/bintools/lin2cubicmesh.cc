@@ -24,7 +24,6 @@ int Exists (const Node &nd, const NodeList &nlist, int nn, double rad = 1e-8)
 
 int main (void)
 {
-    CHECK_EXPIRED();
 
     Mesh mesh;
 
