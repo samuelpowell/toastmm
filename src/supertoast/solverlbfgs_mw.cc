@@ -134,11 +134,11 @@ static int progress (void *instance, const lbfgsfloatval_t *x_lbfgs,
 	    char fname[256];
 	    if (msol->IsActive(i)) {
 		if (i < msol->nmuaChromo)
-		    sprintf (fname, "%sreconChromophore_%d.nim",g_prefix,i+1);
+		    snprintf (fname, sizeof(fname), "%sreconChromophore_%d.nim",g_prefix,i+1);
 		else if (i == msol->nmuaChromo)
-		    sprintf (fname, "%sreconScatPrefactor_A.nim",g_prefix);
+		    snprintf (fname, sizeof(fname), "%sreconScatPrefactor_A.nim",g_prefix);
 		else if (i == msol->nmuaChromo + 1)
-		    sprintf (fname, "%sreconScatPower_b.nim",g_prefix);
+		    snprintf (fname, sizeof(fname), "%sreconScatPower_b.nim",g_prefix);
 		else
 		    xERROR("Invalid parameter index during output");
 		msol->WriteImgGeneric (k, fname, i);
@@ -152,11 +152,11 @@ static int progress (void *instance, const lbfgsfloatval_t *x_lbfgs,
 		RVector img(raster->BLen());
 		raster->Map_SolToBasis (bsol->GetParam(i), img);
 		if (i < msol->nmuaChromo)
-		    sprintf (fname,"%sreconChromophore_%d.raw",g_prefix,i+1);
+		    snprintf (fname, sizeof(fname), "%sreconChromophore_%d.raw",g_prefix,i+1);
 		else if (i == msol->nmuaChromo)
-		    sprintf (fname,"%sreconScatPrefactor_A.raw",g_prefix);
+		    snprintf (fname, sizeof(fname), "%sreconScatPrefactor_A.raw",g_prefix);
 		else if (i == msol->nmuaChromo + 1) 
-		    sprintf (fname,"%sreconScatPower_b.raw",g_prefix);
+		    snprintf (fname, sizeof(fname), "%sreconScatPower_b.raw",g_prefix);
 		else
 		    xERROR("Invalid parameter index during output");
 		Solution::WriteImgGeneric (k, fname, img);

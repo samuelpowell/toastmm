@@ -1834,7 +1834,7 @@ RCompRowMatrix BuildRHessian (Regularisation *reg, const RVector &x,
 RVector RescaleHessian (const RDenseMatrix *J, const RVector &x,
     RCompRowMatrix *RHess)
 {
-    int i, j, m = J->nRows(), n = J->nCols();
+    int i, m = J->nRows(), n = J->nCols();
     RVector M(n);
 
     // J^T J contribution

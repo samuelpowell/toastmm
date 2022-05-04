@@ -3,7 +3,7 @@
 #include "mathlib.h"
 #include "timing.h"
 
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 #include <windows.h>
 #else
 #include <sys/times.h>
@@ -31,7 +31,7 @@ static double tick_per_sec ()
 {
     clock_t ticks_per_second;
 
-#if defined (WIN32) || defined(WIN64)
+#if defined (_WIN32) || defined(_WIN64)
     ticks_per_second = 100;
 #else
 #ifndef CLK_TCK
@@ -53,7 +53,7 @@ inline double cpu2sec (clock_t cputime)
 
 inline double getclock ()
 {
-#if defined (WIN32) || defined (WIN64)
+#if defined (_WIN32) || defined (_WIN64)
     return cpu2sec (clock());
 #else
     struct tms tm;
@@ -85,7 +85,7 @@ double toc (double tic)
 
 double walltic ()
 {
-#if defined (WIN32) || defined (WIN64)
+#if defined (_WIN32) || defined (_WIN64)
 	return tic();
 #else
 	gettimeofday(&g_tv, NULL);
@@ -95,7 +95,7 @@ double walltic ()
 
 double walltoc ()
 {
-#if defined (WIN32) || defined (WIN64)
+#if defined (_WIN32) || defined (_WIN64)
 	return toc();
 #else
     struct timeval tv;
@@ -107,7 +107,7 @@ double walltoc ()
 
 double walltoc (double walltic)
 {
-#if defined (WIN32) || defined (WIN64)
+#if defined (_WIN32) || defined (_WIN64)
 	return toc(walltic);
 #else
     struct timeval tv;

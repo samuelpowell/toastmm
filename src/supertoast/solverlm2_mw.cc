@@ -1254,13 +1254,13 @@ void SolverLM2_MW::Solve (CFwdSolverMW &FWS, const Raster &raster,
 			char fname[256];
 			if (msol.IsActive(i)) {
 			    if (i < msol.nmuaChromo) 
-				sprintf (fname,"%sreconChromophore_%d.nim",
+				snprintf (fname, sizeof(fname), "%sreconChromophore_%d.nim",
 				    g_prefix,i+1);
 			    else if (i == msol.nmuaChromo)
-			        sprintf (fname,"%sreconScatPrefactor_A.nim",
+			        snprintf (fname, sizeof(fname), "%sreconScatPrefactor_A.nim",
 				    g_prefix);
 			    else if (i == msol.nmuaChromo + 1) 
-			        sprintf (fname,"%sreconScatPower_b.nim",
+			        snprintf (fname, sizeof(fname), "%sreconScatPower_b.nim",
 				    g_prefix);
 			    else
 				xERROR("Invalid parameter index during output");
@@ -1275,13 +1275,13 @@ void SolverLM2_MW::Solve (CFwdSolverMW &FWS, const Raster &raster,
 			char fname[256];
 			if (msol.IsActive(i)) {
 			    if (i < msol.nmuaChromo)
-				sprintf (fname, "%sreconChromophore_%d.raw",
+				snprintf (fname, sizeof(fname), "%sreconChromophore_%d.raw",
 				    g_prefix,i+1);
 			    else if (i == msol.nmuaChromo)
-			        sprintf (fname, "%sreconScatPrefactor_A.raw",
+			        snprintf (fname, sizeof(fname), "%sreconScatPrefactor_A.raw",
 				    g_prefix);
 			    else if (i == msol.nmuaChromo+1)
-			        sprintf (fname,"%sreconScatPower_b.raw",
+			        snprintf (fname, sizeof(fname), "%sreconScatPower_b.raw",
 				    g_prefix);
 			    else
 				xERROR("Invalid parameter index during output");
@@ -1346,7 +1346,7 @@ void SolverLM2_MW::Solve (CFwdSolverMW &FWS, const Raster &raster,
 
 void SolverLM2_MW::ReadParams (ParamParser &pp)
 {
-    char cbuf[256], c;
+    char cbuf[256];
     bool def = false;
 
     // 1. === MAX NUMBER OF ITERATIONS ===
@@ -1620,7 +1620,7 @@ void GenerateJacobian (CFwdSolverMW &FWS, const Raster &raster,
     const CCompRowMatrix &qvec, const CCompRowMatrix &mvec,
     DataScale dscale, MWJacobian *J)
 {
-    int i, j;
+    int i;
     int nlen    = mesh->nlen();
     int slen    = raster.SLen();
     int nq      = mesh->nQ;

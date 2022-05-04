@@ -41,8 +41,8 @@ int main (int argc, char *argv[])
 {
     //char *meshname = "ellips_tri10.msh";
     //char *tgtname = "tgt_mua_ellips_tri10.nim";
-    char *meshname = "circle25_32.msh";
-    char *tgtname = "tmp.nim";
+    const char *meshname = "circle25_32.msh";
+    const char *tgtname = "tmp.nim";
 
     Mesh mesh;
     ifstream ifs (meshname);

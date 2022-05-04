@@ -296,7 +296,7 @@ void CalcJacobianCW (QMMesh *mesh, Raster *raster,
     char *solver, double tol, mxArray **res)
 {
     const double c0 = 0.3;
-    int i, n, dim, nQ, nM, nQM, slen;
+    int i, n, dim, nQ, nM, slen;
 
     n    = mesh->nlen();
     dim  = mesh->Dimension();
