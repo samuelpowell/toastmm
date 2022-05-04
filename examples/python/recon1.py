@@ -80,7 +80,7 @@ import toast
 meshdir = os.path.expandvars("$TOASTDIR/test/2D/meshes/")
 meshfile1 = meshdir + "ellips_tri10.msh"  # mesh for target data generation
 meshfile2 = meshdir + "circle25_32.msh"   # mesh for reconstruction
-qmfile = meshdir + "circle25_32x32.qm"    # source-detector file
+qmfile = meshdir + "circle25_32x32.qm"    # source-detector filegit
 muafile = meshdir + "tgt_mua_ellips_tri10.nim" # nodal target absorption
 musfile = meshdir + "tgt_mus_ellips_tri10.nim" # nodal target scattering
 
