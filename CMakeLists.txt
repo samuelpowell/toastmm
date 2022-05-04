@@ -31,9 +31,6 @@ if(APPLE OR UNIX)
     # Make Mac builds slightly quieter for development
     add_compile_options(-Wno-deprecated-register)
     
-    # Templates must be instantiated
-    add_compile_definitions(NEED_EXPLICIT_INSTANTIATION)
-
     # Fix rpaths on install to point to the same directory
     set(CMAKE_SKIP_BUILD_RPATH FALSE)
     set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
@@ -50,9 +47,6 @@ endif()
 # Linux
 #
 if(UNIX)
-
-    # Templates must be instantiated
-    add_compile_definitions(NEED_EXPLICIT_INSTANTIATION)
 
 endif()
 

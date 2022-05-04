@@ -8,9 +8,8 @@
 
 #include "arch.h"
 
-#if defined(_WIN32) || defined(_WIN64)
-#define NEED_EXPLICIT_INSTANTIATION   // JK in Windows (VS2005) explicit instantiation is required
-#endif
+// All platforms appreciated explicit instantiation
+#define NEED_EXPLICIT_INSTANTIATION 
 
 #if defined(_WIN32) || defined(_WIN64)
 #define DLLEXPORT __declspec(dllexport)
