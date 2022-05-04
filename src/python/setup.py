@@ -3,6 +3,7 @@ import sys
 import numpy as np
 from setuptools import setup, Extension
 from sysconfig import get_paths
+import platform
 
 major = "%d" % sys.version_info[0]
 minor = "%d" % sys.version_info[1]
@@ -10,34 +11,59 @@ minor = "%d" % sys.version_info[1]
 pyinc = get_paths()['include'] 
 npinc = np.get_include()
 
+# Library dependency location
+toastroot = '../../dist/release/'
+
+# We pull the libraries from the release distribution install output. On Windows
+# it would be fine to get these from the build tree, but on other OS we want the
+# versions with the install RPATH in order that the libraries can be found. The
+# rpath of the toast extension itself has to be set accordingly.
+if sys.platform == 'windows':
+    lib_dir = toastroot + 'bin'
+    lib_ext = '.dll'
+    link_args = ''
+    lib_names = ['libmath','libfe','libstoast']
+    lib_dest = '/toast'
+elif sys.platform == 'linux':
+    lib_dir = toastroot + 'lib'
+    lib_ext = '.so'
+    link_args = ['-Wl,-rpath=$ORIGIN/lib']
+    lib_names = ['math','fe','stoast']
+    lib_dest = '/toast/lib'
+elif sys.platform == 'darwin':
+    lib_dir = toastroot + 'lib'
+    lib_ext = '.dylib'
+    link_args = ['-Wl,-rpath=@loader_path/lib']
+    lib_names = ['math','fe','stoast']
+    lib_dest = '/toast/lib'
+else:
+    raise Exception('Unknown platform')
+
+lib_files = (lib_dest, [lib_dir + '/libfe'     + lib_ext,
+                        lib_dir + '/libmath'   + lib_ext,
+                        lib_dir + '/libstoast' + lib_ext])
+
+# Define the toast C extension
+#
+# TODO: To enable an isolated installation, we need to make the paths to the source 
+# headers absolute. Again, a good way to do this might be to use CMake as above, and
+# to configure this file.
 module1 = Extension('toast.toastmod',
                     include_dirs = [pyinc,
                                     npinc,
                                     '../..',
-                                    '../include',
-                                    '../src/libmath',
-                                    '../src/libfe',
-                                    '../src/libstoast',
-                                    '../extern/eigen-3.4.0'],
-                    libraries = ['libmath','libfe','libstoast'] if "nt" in os.name else ['math','fe','stoast'],
-                    library_dirs = ['../build/src/libfe/Release',
-                                    '../build/src/libmath/Release',
-                                    '../build/src/libstoast/Release'],
-                    runtime_library_dirs = None if "nt" in os.name else ['../lib'],
+                                    '../../include',
+                                    '../libmath',
+                                    '../libfe',
+                                    '../libstoast',
+                                    '../../extern/eigen-3.4.0'],
+                    library_dirs = [lib_dir],
+                    libraries = lib_names,
+                    extra_link_args = link_args,
                     sources = ['toastmodule.cc'])
 
-# Install library files, on windows these must go alongside the library, on Linux and
-# MacOS the rpath will be set such that they are sought in the lib subdirectory
-if "nt" in os.name:
-    lib_files = ('lib/site-packages/toast', ['../../build/src/libfe/Release/libfe.dll',
-                      '../../build/src/libmath/Release/libmath.dll',
-                      '../../build/src/libstoast/Release/libstoast.dll'])
-else:
-    lib_files = ('lib/site-packages/toast', ['../../build/src/libfe/Release/libfe.dll',
-                         '../../build/src/libmath/Release/libmath.dll',
-                         '../../build/src/libstoast/Release/libstoast.dll'])
                          
-
+# Define installation
 setup(
     name = 'PyToast',
     version = '120529',
@@ -45,7 +71,7 @@ setup(
     author = 'Martin Schweiger',
     url = 'http://www.toastplusplus.org',
     setup_requires=['wheel'],
-    install_requires=["numpy", "scipy", "glumpy"],
+    install_requires=["numpy", "scipy"],
     python_requires='>=3',
     extras_require={  
         "demo": ["matplotlib"]
