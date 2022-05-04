@@ -205,13 +205,13 @@ void SolverPCG_CW_MW::Solve (RFwdSolverMW &FWS, const Raster &raster,
 	        char fname[256];
 		if (msol.IsActive(i)) {
 		    if (i < msol.nmuaChromo) 
-		        sprintf (fname,"%sreconChromophore_%d.nim",
+		        snprintf (fname, sizeof(fname), "%sreconChromophore_%d.nim",
 				 g_prefix,i+1);
 		    else if (i == msol.nmuaChromo)
-		        sprintf (fname,"%sreconScatPrefactor_A.nim",
+		        snprintf (fname, sizeof(fname), "%sreconScatPrefactor_A.nim",
 				 g_prefix);
 		    else if (i == msol.nmuaChromo + 1) 
-		        sprintf (fname,"%sreconScatPower_b.nim",g_prefix);
+		        snprintf (fname, sizeof(fname), "%sreconScatPower_b.nim",g_prefix);
 		    msol.WriteImgGeneric (i_count+1, fname, i);
 		}
 	    }
@@ -223,13 +223,13 @@ void SolverPCG_CW_MW::Solve (RFwdSolverMW &FWS, const Raster &raster,
 	        char fname[256];
 		if (msol.IsActive(i)) {
 		    if (i < msol.nmuaChromo) 
-		        sprintf (fname,"%sreconChromophore_%d.raw",
+		        snprintf (fname, sizeof(fname), "%sreconChromophore_%d.raw",
 				 g_prefix,i+1);
 		    else if (i == msol.nmuaChromo)
-		        sprintf (fname,"%sreconScatPrefactor_A.raw",
+		        snprintf (fname, sizeof(fname), "%sreconScatPrefactor_A.raw",
 				 g_prefix);
 		    else if (i == msol.nmuaChromo + 1) 
-		        sprintf (fname,"%sreconScatPower_b.raw",g_prefix);
+		        snprintf (fname, sizeof(fname), "%sreconScatPower_b.raw",g_prefix);
 		    else
 		        xERROR("Invalid parameter index during output");
 		    gsol.WriteImgGeneric (i_count+1, fname, i);

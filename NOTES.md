@@ -56,7 +56,9 @@ Aim: simplify codebase, ensuring that all code is builds and is used
    - Remove unused `TOASTLIB` define
    - Remove expiry functions (not used) and defines
    - Remove USE_SPLBLAS (unued)
-
+- Cleanup code
+   - Remove unused variables
+   - Replace sprintf -> snprintf for some security
 
 
 # TODO
@@ -70,5 +72,5 @@ Aim: simplify codebase, ensuring that all code is builds and is used
  - Look at fwdsolver_mw.h instantiation requirements, determine appropriate preprocessor gaurd (e.g. Clang?)
  - Remove MESA based projection
  - Resolve `TOAST_THREAD`, `TOAST_THREAD_LEVEL`, `TOAST_THREAD_MATLAB_GRADIENT`, `TOAST_THREAD_MATLAB_QMVEC`, `TOAST_THREAD_ASSEMBLE`
- - Uninitialised variable used in `int Mesh::RegionBoundaries (IDenseMatrix &idx)` and others, check MSVC build
+
 

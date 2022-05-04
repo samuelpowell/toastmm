@@ -194,7 +194,7 @@ int main (int argc, char *argv[])
     for (i = 0; i < nofwavel; i++) {
 	for  (j = 0; j < nofMuachromo; j++) {
 	    char exttype[30];
-	    sprintf (exttype,"EXTINC_WAVEL_%d_CHROMO_%d", int(wlength[i]),j+1);
+	    snprintf (exttype, sizeof(exttype), "EXTINC_WAVEL_%d_CHROMO_%d", int(wlength[i]),j+1);
     
 	    if (!pp.GetReal (exttype, extcoef(i,j))) {
 		cout << "Enter the extinction value for Chromophore " << j+1
@@ -371,11 +371,11 @@ int main (int argc, char *argv[])
 	    char fname[256];
 	    if (msol.IsActive(i)) {
 		if (i < msol.nmuaChromo) 
-		    sprintf (fname,"%sreconChromophore_%d.nim",g_prefix,i+1);
+		    snprintf (fname, sizeof(fname), "%sreconChromophore_%d.nim",g_prefix,i+1);
 		if (i == msol.nmuaChromo)
-		    sprintf (fname,"%sreconScatPrefactor_A.nim",g_prefix);
+		    snprintf (fname, sizeof(fname), "%sreconScatPrefactor_A.nim",g_prefix);
 		if (i == msol.nmuaChromo + 1) 
-		    sprintf (fname,"%sreconScatPower_b.nim",g_prefix);
+		    snprintf (fname, sizeof(fname), "%sreconScatPower_b.nim",g_prefix);
 		WriteNimHeader (meshname, n, fname, "N/A");  
 		msol.WriteImgGeneric (0, fname, i);
 	    }
@@ -388,11 +388,11 @@ int main (int argc, char *argv[])
 	    if (msol.IsActive(i)) {
 		char fname[256];
 		if (i < msol.nmuaChromo) 
-		    sprintf (fname,"%sreconChromophore_%d.raw",g_prefix,i+1);
+		    snprintf (fname, sizeof(fname), "%sreconChromophore_%d.raw",g_prefix,i+1);
 		if (i == msol.nmuaChromo)
-		    sprintf (fname,"%sreconScatPrefactor_A.raw",g_prefix);
+		    snprintf (fname, sizeof(fname), "%sreconScatPrefactor_A.raw",g_prefix);
 		if (i == msol.nmuaChromo + 1) 
-		    sprintf (fname,"%sreconScatPower_b.raw",g_prefix);
+		    snprintf (fname, sizeof(fname), "%sreconScatPower_b.raw",g_prefix);
 		WriteRimHeader (raster->BDim(), fname);
 		gsol.WriteImgGeneric (0, fname, i);
 	    }
@@ -567,13 +567,13 @@ void OutputProgramInfo ()
     pp.Lineout ("| diffusion equation from frequency-domain data   |");
     pp.Lineout ("+-------------------------------------------------+");
     pp.Lineout (VERSION_STRING);
-    sprintf (cbuf, "Executed %s", ctime(&tme));
+    snprintf (cbuf, sizeof(cbuf), "Executed %s", ctime(&tme));
     if ((host = getenv("HOST")))
-        sprintf (cbuf+strlen(cbuf), "on host %s ", host);
-    sprintf (cbuf+strlen(cbuf), "(PID %d)", getpid());
+        snprintf (cbuf+strlen(cbuf), sizeof(cbuf) - strlen(cbuf), "on host %s ", host);
+    snprintf (cbuf+strlen(cbuf), sizeof(cbuf) - strlen(cbuf), "(PID %d)", getpid());
     pp.Lineout (cbuf);
     if (getcwd (cwd, 250)) {
-        sprintf (cbuf, "CWD: %s", cwd);
+        snprintf (cbuf, sizeof(cbuf), "CWD: %s", cwd);
 	pp.Lineout (cbuf);
     }
     pp.Lineout ("===================================================");
@@ -763,18 +763,18 @@ void SelectInitialParams (const Mesh &mesh, MWsolution &msol,
       char reconstr[256];
 
       if (p < msol.nmuaChromo) {
-	  sprintf (resetstr,"CHROMOPHORE_%d",p+1);
-	  sprintf (reconstr, "RECON_CHROMOPHORE_%d",p+1);
+	  snprintf (resetstr, sizeof(resetstr), "CHROMOPHORE_%d",p+1);
+	  snprintf (reconstr, sizeof(resetstr),  "RECON_CHROMOPHORE_%d",p+1);
       } else if (p == msol.nmuaChromo) {
-	  sprintf (resetstr,"SCATTERING_PREFACTOR_A");
-	  sprintf (reconstr, "RECON_SCATTERING_PREFACTOR_A");
+	  snprintf (resetstr, sizeof(resetstr), "SCATTERING_PREFACTOR_A");
+	  snprintf (reconstr, sizeof(resetstr),  "RECON_SCATTERING_PREFACTOR_A");
       } else if (p == msol.nmuaChromo+1) {
-	  sprintf (resetstr,"SCATTERING_POWER_B");
-	  sprintf (reconstr, "RECON_SCATTERING_POWER_B");
+	  snprintf (resetstr, sizeof(resetstr), "SCATTERING_POWER_B");
+	  snprintf (reconstr, sizeof(resetstr),  "RECON_SCATTERING_POWER_B");
       } else if (p == msol.nmuaChromo+2) {
-	  sprintf (resetstr,"RESET_N");
+	  snprintf (resetstr, sizeof(resetstr), "RESET_N");
       } else {
-	  sprintf (resetstr, "BACKGROUND_MUA_%d",
+	  snprintf (resetstr, sizeof(resetstr),  "BACKGROUND_MUA_%d",
 		   (int)wlength[p-msol.nmuaChromo-3]);
       }
 
@@ -817,7 +817,7 @@ void SelectInitialParams (const Mesh &mesh, MWsolution &msol,
 		cout << "\nGlobal value:\n>> ";
 		cin >> prm;
 		param[p] = prm;
-		sprintf (cbuf, "HOMOG %f", prm);
+		snprintf (cbuf, sizeof(cbuf), "HOMOG %f", prm);
 		break;
 	    case 2:
 		nreg = ScanRegions (mesh, nregnode);
@@ -828,7 +828,7 @@ void SelectInitialParams (const Mesh &mesh, MWsolution &msol,
 			cout << "Value for region " << i << " (" << nregnode[i]
 			     << " nodes):\n>> ";
 			cin >> prm;
-			sprintf (cbuf+strlen(cbuf), " %f", prm);
+			snprintf (cbuf+strlen(cbuf), sizeof(cbuf) - strlen(cbuf),  " %f", prm);
 			for (j = 0; j < mesh.nlen(); j++)
 			    if (mesh.nlist[j].Region() == i)
 				param[p][j] = prm;
@@ -886,7 +886,7 @@ void SelectInitialReferenceParams (const Mesh &mesh, Solution &msol,
     const ParameterType prmtp[3] = {PRM_MUA, PRM_MUS, PRM_N};
     for (p = 0; p < 3; p++) {
         char resetstr[256];
-	sprintf (resetstr,"%s_%d", rootstr[p], whichWavel);
+	snprintf (resetstr, sizeof(resetstr), "%s_%d", rootstr[p], whichWavel);
 
 	param[p].New(mesh.nlen());
 	if (pp.GetString (resetstr, cbuf)) {
@@ -929,7 +929,7 @@ void SelectInitialReferenceParams (const Mesh &mesh, Solution &msol,
 		cout << "\nGlobal value:\n>> ";
 		cin >> prm;
 		param[p] = prm;
-		sprintf (cbuf, "HOMOG %f", prm);
+		snprintf (cbuf, sizeof(cbuf), "HOMOG %f", prm);
 		break;
 	    case 2:
 		nreg = ScanRegions (mesh, nregnode);
@@ -940,7 +940,7 @@ void SelectInitialReferenceParams (const Mesh &mesh, Solution &msol,
 			cout << "Value for region " << i << " (" << nregnode[i]
 			     << " nodes):\n>> ";
 			cin >> prm;
-			sprintf (cbuf+strlen(cbuf), " %f", prm);
+			snprintf (cbuf+strlen(cbuf), sizeof(cbuf) - strlen(cbuf), " %f", prm);
 			for (j = 0; j < mesh.nlen(); j++)
 			    if (mesh.nlist[j].Region() == i)
 				param[p][j] = prm;
@@ -983,7 +983,7 @@ void SelectData (DataScale dscale, int nqm, int nlambda, const RVector &wlength,
 
 	switch (dscale) {
 	case DATA_LIN:
- 	    sprintf (tag, "DATA_REAL_WAVEL_%0.0f", wlength[i]);
+ 	    snprintf (tag, sizeof(tag), "DATA_REAL_WAVEL_%0.0f", wlength[i]);
 	    if (!pp.GetString (tag, cbuf)) {
 	        cout << "\nData file for " << tag << ":\n>> ";
 		cin >> cbuf;
@@ -991,7 +991,7 @@ void SelectData (DataScale dscale, int nqm, int nlambda, const RVector &wlength,
 	    pp.PutString (tag, cbuf);
 	    ReadDataFile (cbuf, adata);
 	    
- 	    sprintf (tag, "DATA_IMAG_WAVEL_%0.0f", wlength[i]);
+ 	    snprintf (tag, sizeof(tag), "DATA_IMAG_WAVEL_%0.0f", wlength[i]);
 	    if (!pp.GetString (tag, cbuf)) {
 	        cout << "\nData file for " << tag << ":\n>> ";
 		cin >> cbuf;
@@ -1000,7 +1000,7 @@ void SelectData (DataScale dscale, int nqm, int nlambda, const RVector &wlength,
 	    ReadDataFile (cbuf, pdata);
 	    break;
 	case DATA_LOG:
- 	    sprintf (tag, "DATA_MOD_WAVEL_%0.0f", wlength[i]);
+ 	    snprintf (tag, sizeof(tag), "DATA_MOD_WAVEL_%0.0f", wlength[i]);
 	    if (!pp.GetString (tag, cbuf)) {
 	        cout << "\nData file for " << tag << ":\n>> ";
 		cin >> cbuf;
@@ -1008,7 +1008,7 @@ void SelectData (DataScale dscale, int nqm, int nlambda, const RVector &wlength,
 	    pp.PutString (tag, cbuf);
 	    ReadDataFile (cbuf, adata);
 
- 	    sprintf (tag, "DATA_ARG_WAVEL_%0.0f", wlength[i]);
+ 	    snprintf (tag, sizeof(tag), "DATA_ARG_WAVEL_%0.0f", wlength[i]);
 	    if (!pp.GetString (tag, cbuf)) {
 	        cout << "\nData file for " << tag << ":\n>> ";
 		cin >> cbuf;
@@ -1043,7 +1043,7 @@ void SelectRefdata (DataScale dscale, int nqm, int nlambda,
 
 	switch (dscale) {
 	case DATA_LIN:
- 	    sprintf (tag, "REFDATA_REAL_WAVEL_%0.0f", wlength[i]);
+ 	    snprintf (tag, sizeof(tag), "REFDATA_REAL_WAVEL_%0.0f", wlength[i]);
 	    if (!pp.GetString (tag, cbuf)) {
 	        cout << "\nReference data file for " << tag << ":\n>> ";
 		cin >> cbuf;
@@ -1051,7 +1051,7 @@ void SelectRefdata (DataScale dscale, int nqm, int nlambda,
 	    pp.PutString (tag, cbuf);
 	    ReadDataFile (cbuf, adata);
 	    
- 	    sprintf (tag, "REFDATA_IMAG_WAVEL_%0.0f", wlength[i]);
+ 	    snprintf (tag, sizeof(tag), "REFDATA_IMAG_WAVEL_%0.0f", wlength[i]);
 	    if (!pp.GetString (tag, cbuf)) {
 	        cout << "\nReference data file for " << tag << ":\n>> ";
 		cin >> cbuf;
@@ -1060,7 +1060,7 @@ void SelectRefdata (DataScale dscale, int nqm, int nlambda,
 	    ReadDataFile (cbuf, pdata);
 	    break;
 	case DATA_LOG:
- 	    sprintf (tag, "REFDATA_MOD_WAVEL_%0.0f", wlength[i]);
+ 	    snprintf (tag, sizeof(tag), "REFDATA_MOD_WAVEL_%0.0f", wlength[i]);
 	    if (!pp.GetString (tag, cbuf)) {
 	        cout << "\nReference data file for " << tag << ":\n>> ";
 		cin >> cbuf;
@@ -1068,7 +1068,7 @@ void SelectRefdata (DataScale dscale, int nqm, int nlambda,
 	    pp.PutString (tag, cbuf);
 	    ReadDataFile (cbuf, adata);
 
- 	    sprintf (tag, "REFDATA_ARG_WAVEL_%0.0f", wlength[i]);
+ 	    snprintf (tag, sizeof(tag), "REFDATA_ARG_WAVEL_%0.0f", wlength[i]);
 	    if (!pp.GetString (tag, cbuf)) {
 	        cout << "\nReference data file for " << tag << ":\n>> ";
 		cin >> cbuf;
@@ -1123,14 +1123,14 @@ void SelectBasis (IVector &gdim, IVector &bdim)
 
     // write back
     if (dim > 2) {
-        sprintf (cbuf, "%d %d %d", gdim[0], gdim[1], gdim[2]);
+        snprintf (cbuf, sizeof(cbuf), "%d %d %d", gdim[0], gdim[1], gdim[2]);
 	pp.PutString ("GRID", cbuf);
-	sprintf (cbuf, "%d %d %d", bdim[0], bdim[1], bdim[2]);
+	snprintf (cbuf, sizeof(cbuf), "%d %d %d", bdim[0], bdim[1], bdim[2]);
 	pp.PutString ("BASIS", cbuf);
     } else {
-        sprintf (cbuf, "%d %d", gdim[0], gdim[1]);
+        snprintf (cbuf, sizeof(cbuf), "%d %d", gdim[0], gdim[1]);
 	pp.PutString ("GRID", cbuf);
-	sprintf (cbuf, "%d %d", bdim[0], bdim[1]);
+	snprintf (cbuf, sizeof(cbuf), "%d %d", bdim[0], bdim[1]);
 	pp.PutString ("BASIS", cbuf);
     }
 }
