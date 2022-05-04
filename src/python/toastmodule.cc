@@ -1,5 +1,4 @@
 // -*- C++ -*-
-int toastVerbosity;  // global verbosity flag
 
 #include <Python.h>
 #include <numpy/arrayobject.h>

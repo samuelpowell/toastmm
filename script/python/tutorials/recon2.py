@@ -40,7 +40,7 @@ def objective(proj,data,sd,logx):
 # Objective function for line search callback
 def objective_ls(logx):
     x = np.exp(logx)
-    slen = x.shape[0]/2
+    slen = int(x.shape[0]/2)
     scmua = x[0:slen]
     sckap = x[slen:2*slen]
     smua = scmua/cm
@@ -67,14 +67,11 @@ def projection(phi, mvec):
 # ---------------------------------------------------
 # Image error
 def imerr(im1, im2):
-    im1 = np.reshape(im1, -1, 1)
-    im2 = np.reshape(im2, -1, 1)
+    im1 = np.reshape(im1, (-1, 1))
+    im2 = np.reshape(im2, (-1, 1))
     err = np.sum(np.power(im1-im2, 2))/np.sum(np.power(im2, 2))
     return err
 
-
-# PyToast environment
-execfile(os.getenv("TOASTDIR") + "/ptoast_install.py")
 import toast
 
 # Set the file paths

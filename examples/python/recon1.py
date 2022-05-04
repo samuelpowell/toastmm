@@ -67,14 +67,13 @@ def projection(phi, mvec):
 # ---------------------------------------------------
 # Image error
 def imerr(im1, im2):
-    im1 = np.reshape(im1, -1, 1)
-    im2 = np.reshape(im2, -1, 1)
+    im1 = np.reshape(im1, (-1, 1))
+    im2 = np.reshape(im2, (-1, 1))
     err = np.sum(np.power(im1-im2, 2))/np.sum(np.power(im2, 2))
     return err
 
 
 # PyToast environment
-exec(compile(open(os.getenv("TOASTDIR") + "/ptoast_install.py", "rb").read(), os.getenv("TOASTDIR") + "/ptoast_install.py", 'exec'))
 import toast
 
 # Set the file paths

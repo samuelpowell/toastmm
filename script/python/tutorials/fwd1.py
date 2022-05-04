@@ -11,8 +11,6 @@ from scipy.sparse import linalg
 from numpy.random import rand
 import matplotlib.pyplot as plt
 
-# PyToast environment
-execfile(os.getenv("TOASTDIR") + "/ptoast_install.py")
 import toast
 
 # Set the file paths
@@ -41,7 +39,7 @@ nq = qvec.shape[1]
 phi = np.empty(qvec.shape,dtype='complex128')
 for q in range(nq):
     qq = qvec[:,q].todense()
-    res = linalg.minres(smat,qq,tol=1e-12)
+    res = linalg.gmres(smat,qq,tol=1e-12)
     phi[:,q] = res[0]
 
 # Project to boundary

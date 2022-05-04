@@ -1,39 +1,42 @@
-from __future__ import print_function
-import setuptools  # To enable bdist_wheel
-from distutils.core import setup, Extension
 import os
 import sys
-from distutils.sysconfig import get_python_inc
-import numpy.distutils as npd
-
-
-toastdir = os.getenv('TOASTDIR')
-if toastdir == None:
-	if "nt" in os.name:
-		toastdir = os.getcwd() + '/../..'
-	else:
-		print('Expected environment variable TOASTDIR is not defined!')
-		print('Please enter the path to the TOAST root directory:')
-		toastdir = raw_input()
-		#sys.exit(1)
+import numpy as np
+from setuptools import setup, Extension
+from sysconfig import get_paths
 
 major = "%d" % sys.version_info[0]
 minor = "%d" % sys.version_info[1]
-pyinc = get_python_inc(plat_specific=1)
-npinc = npd.misc_util.get_numpy_include_dirs()
+
+pyinc = get_paths()['include'] 
+npinc = np.get_include()
 
 module1 = Extension('toast.toastmod',
                     include_dirs = [pyinc,
-                                    npinc[0],
-                                    toastdir,
-                                    toastdir+'/include',
-                                    toastdir+'/src/libmath',
-                                    toastdir+'/src/libfe',
-                                    toastdir+'/src/libstoast'],
+                                    npinc,
+                                    '../..',
+                                    '../include',
+                                    '../src/libmath',
+                                    '../src/libfe',
+                                    '../src/libstoast',
+                                    '../extern/eigen-3.4.0'],
                     libraries = ['libmath','libfe','libstoast'] if "nt" in os.name else ['math','fe','stoast'],
-                    library_dirs = [toastdir+'/win/x64/Release/lib'] if "nt" in os.name else [toastdir+'/lib'],
-                    runtime_library_dirs = None if "nt" in os.name else [toastdir+'/lib'],
+                    library_dirs = ['../build/src/libfe/Release',
+                                    '../build/src/libmath/Release',
+                                    '../build/src/libstoast/Release'],
+                    runtime_library_dirs = None if "nt" in os.name else ['../lib'],
                     sources = ['toastmodule.cc'])
+
+# Install library files, on windows these must go alongside the library, on Linux and
+# MacOS the rpath will be set such that they are sought in the lib subdirectory
+if "nt" in os.name:
+    lib_files = ('lib/site-packages/toast', ['../../build/src/libfe/Release/libfe.dll',
+                      '../../build/src/libmath/Release/libmath.dll',
+                      '../../build/src/libstoast/Release/libstoast.dll'])
+else:
+    lib_files = ('lib/site-packages/toast', ['../../build/src/libfe/Release/libfe.dll',
+                         '../../build/src/libmath/Release/libmath.dll',
+                         '../../build/src/libstoast/Release/libstoast.dll'])
+                         
 
 setup(
     name = 'PyToast',
@@ -41,10 +44,13 @@ setup(
     description = 'Python TOAST extension',
     author = 'Martin Schweiger',
     url = 'http://www.toastplusplus.org',
+    setup_requires=['wheel'],
+    install_requires=["numpy", "scipy", "glumpy"],
+    python_requires='>=3',
+    extras_require={  
+        "demo": ["matplotlib"]
+    },
     ext_modules = [module1],
-    packages = ['toast'],
-    data_files = [('', [toastdir+'/win/x64/Release/bin/pthreadVC2.dll',
-                        toastdir+'/win/x64/Release/bin/libfe.dll',
-                        toastdir+'/win/x64/Release/bin/libmath.dll',
-                        toastdir+'/win/x64/Release/bin/libstoast.dll'])] if "nt" in os.name else []
+    packages=['toast'],
+    data_files = [lib_files]
 )

@@ -11,8 +11,6 @@ from numpy.random import rand
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
-# PyToast environment
-execfile(os.getenv("TOASTDIR") + "/ptoast_install.py")
 
 # Import the toast modules
 import toast
@@ -62,8 +60,8 @@ for bkg in range(2):
     J = mesh.Jacobian(basis.Handle(), dphi, aphi, proj)
 
     # Extract sensitivity regions for a single source-detector pair
-    slen = J.shape[1]/2
-    nqm = J.shape[0]/2
+    slen = int(J.shape[1]/2)
+    nqm = int(J.shape[0]/2)
     J8_lnamp = J[10,:]
     J8_phase = J[10+nqm]
     J8_lnamp_mua = J8_lnamp[0:slen-1]

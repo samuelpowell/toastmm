@@ -14,8 +14,6 @@ import matplotlib.animation as animation
 
 plt.ion()
 
-# PyToast environment
-execfile(os.getenv("TOASTDIR") + "/ptoast_install.py")
 import toast
 
 # Set the file paths
