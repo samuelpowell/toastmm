@@ -83,7 +83,6 @@ void SolverPCG_CW_MW::Solve (RFwdSolverMW &FWS, const Raster &raster,
     int nprm = bsol.nActive();
     int n    = bsol.ActiveDim();
     int nofwavel = msol.nofwavel;
-    bool pvalid;
     double delta_new, delta_old, delta_mid, delta_0, delta_d, beta;
     double of, ofp, of_value, of_prior, fmin, alpha0;
     double gamma = 1.0;

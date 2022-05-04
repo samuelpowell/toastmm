@@ -21,7 +21,7 @@ add_subdirectory(extern/liblbfgs)
 if(WIN32)
     if(MSVC)
         # Make windows builds slightly quieter for development
-        add_compile_options(/wd4244 /wd4996 /wd4267 /wd4251)
+        add_compile_options(/wd4244 /wd4996 /wd4267 /wd4251 /wd4910 /wd4661)
     endif()
 endif()
 

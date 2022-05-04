@@ -19,7 +19,7 @@
 int Raster_Pixel2::SutherlandHodgman (int el, int xgrid, int ygrid,
     Point *clip_poly, int npoly) const
 {
-    int i,j;
+    int i;
 
     Point *list = new Point[npoly];
 
@@ -33,7 +33,7 @@ int Raster_Pixel2::SutherlandHodgman (int el, int xgrid, int ygrid,
 	(bbmax[1]-bbmin[1])*(double)(ygrid+1)/(double)(bdim[1]-1);
 
     Element *pel = meshptr->elist[el];
-    int ni, nv = pel->nNode();
+    int nv = pel->nNode();
     if (nv > npoly) return -1;
 
     vec_t tri[3];
@@ -365,11 +365,10 @@ RCompRowMatrix *Raster_Pixel2::CreateBvw_tri (const IVector &wdim)
     const
 {
     const int sublen = 1000;
-    int i, j, k, ii, jj, si, sj, pi, pj, idx_i, idx_j, idx;
+    int i, j, ii, jj, si, sj, pi, pj, idx_i, idx_j, idx;
     double x0, x1, y0, y1, xcnt, ycnt;
     double px0, px1, py0, py1, v;
     double xmin, xmax, ymin, ymax;
-    bool intersect;
     int *npx = new int[blen];
     for (i = 0; i < blen; i++) npx[i] = 0;
     int plen = wdim[0]*wdim[1];

@@ -86,7 +86,7 @@ int main (int argc, char *argv[])
     int nQ, nM, nQM;
     RCompRowMatrix qvec, mvec;
     RVector *dphi;
-    int i, j, idx, cmd;
+    int i, j, idx;
     Point bbmin, bbmax;
 
     SelectMesh (pp, meshname, mesh);

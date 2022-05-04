@@ -1560,7 +1560,7 @@ void SolverLM2_CW_MW::Solve (RFwdSolverMW &FWS, const Raster &raster,
 
 void SolverLM2_CW_MW::ReadParams (ParamParser &pp)
 {
-    char cbuf[256], c;
+    char cbuf[256];
     bool def = false;
 
     // 1. === MAX NUMBER OF ITERATIONS ===
@@ -1852,7 +1852,7 @@ void GenerateJacobian (RFwdSolverMW &FWS, const Raster &raster,
     const RCompRowMatrix &qvec, const RCompRowMatrix &mvec,
     DataScale dscale, MWJacobian *J)
 {
-    int i, j;
+    int i;
     int dim     = raster.Dim();
     int nlen    = mesh->nlen();
     int slen    = raster.SLen();

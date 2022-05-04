@@ -3119,7 +3119,7 @@ RVector Tetrahedron10::BndIntFCos (int side, const RVector &cntcos, double a,
 int Tetrahedron10::Intersection (const Point &p1, const Point &p2,
     Point *s, bool add_endpoints, bool boundary_only)
 {
-    int i, n = 0;
+    int n = 0;
     double a, rx, ry, rz;
     double sx = p1[0], sy = p1[1], sz = p1[2];
     double dx = p2[0]-p1[0], dy = p2[1]-p1[1], dz = p2[2]-p1[2];

@@ -68,7 +68,6 @@ void SolverPCG::Solve (CFwdSolver &FWS, const Raster &raster,
     int glen = raster.GLen();
     int slen = raster.SLen();
     int n    = slen*2;
-    bool pvalid;
     double delta_new, delta_old, delta_mid, delta_0, delta_d, beta, alpha0;
     double of, ofp, of_value, of_prior, fmin;
     double gamma = 1.0;
