@@ -29,7 +29,7 @@ endif()
 #
 if(APPLE OR UNIX)
     # Make builds quieter for development
-    add_compile_options(-Wno-deprecated-register -Wno-format-truncation)
+    add_compile_options(-Wno-deprecated-register -Wno-format-truncation -Wno-unused-result)
     
     # Fix rpaths on install to point to the same directory
     set(CMAKE_SKIP_BUILD_RPATH FALSE)
