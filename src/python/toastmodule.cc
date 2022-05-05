@@ -1513,7 +1513,7 @@ static PyObject *toast_fields(PyObject *self, PyObject *args)
   PyObject *dfield;
 
   CalcFields(mesh, raster, qvec, mua, mus, ref, freq,
-             "DIRECT", 1e-12, &dfield);
+             "GMRES", 1e-12, &dfield);
 
   PyObject *ret;
 

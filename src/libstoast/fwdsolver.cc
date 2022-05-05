@@ -475,7 +475,8 @@ void TFwdSolver<std::complex<float> >::Reset (const Solution &sol,
       Map<const SparseMatrix<std::complex<float>, RowMajor> > eF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr());      
       FF = new SparseMatrix<std::complex<float>, ColMajor> (eF);
       ES->analyzePattern(*FF);  
-      ES->factorize(*FF);   
+      ES->factorize(*FF);
+      xASSERT(ES->info(), "System matrix factorisation failed");
     } else
 	precon->Reset (F);
     if (B) AssembleMassMatrix();
@@ -492,7 +493,8 @@ void TFwdSolver<std::complex<double> >::Reset (const Solution &sol,
       Map<const SparseMatrix<std::complex<double>, RowMajor> > eF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr());      
       FF = new SparseMatrix<std::complex<double>, ColMajor> (eF);
       ES->analyzePattern(*FF);  
-      ES->factorize(*FF);   
+      ES->factorize(*FF);      
+      xASSERT(ES->info(), "System matrix factorisation failed"); 
     }
     else
 	precon->Reset (F);

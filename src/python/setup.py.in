@@ -8,8 +8,8 @@ import platform
 pyinc = get_paths()['include'] 
 npinc = np.get_include()
 
-# Library dependency location
-distroot = '../'
+# Debug flag
+debug_flag = @PYTOAST_DEBUG_FLAG@
 
 # We pull the libraries from the release distribution install output. On Windows
 # it would be fine to get these from the build tree, but on other OS we want the
@@ -37,6 +37,9 @@ elif sys.platform == 'darwin':
     pkg_files = {'toast': ['lib/*.dylib']}
 else:
     raise Exception('Unknown platform')
+
+if debug_flag:
+    compile_args.extend(['-O0','-g'])
 
 # Define the toast C extension
 #

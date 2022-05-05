@@ -18,6 +18,12 @@ foreach(dir ${ROOT_INCLUDES} ${LIBMATH_INCLUDES} ${LIBFE_INCLUDES} ${LIBSTOAST_I
 endforeach()
 message(STATUS ${PYTOAST_INCLUDE_STRING})
 
+if(CMAKE_BUILD_TYPE MATCHES Debug)
+    set(PYTOAST_DEBUG_FLAG "True")
+else()
+    set(PYTOAST_DEBUG_FLAG "False")
+endif()
+
 configure_file(setup.py.in setup.py @ONLY)
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.py DESTINATION ${CMAKE_INSTALL_PREFIX}/pytoast)
