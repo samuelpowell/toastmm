@@ -472,6 +472,7 @@ static PyObject *toast_raster_matrix(PyObject *self, PyObject *args)
       break;
     default:
       std::cerr << "toast.BasisMatrix: source and target combination not recognised" << std::endl;
+      return NULL;
     }
     break;
   case 'B':
@@ -488,6 +489,7 @@ static PyObject *toast_raster_matrix(PyObject *self, PyObject *args)
       break;
     default:
       std::cerr << "toast.BasisMatrix: source and target combination not recognised" << std::endl;
+      return NULL;
     }
     break;
   case 'G':
@@ -501,10 +503,12 @@ static PyObject *toast_raster_matrix(PyObject *self, PyObject *args)
       break;
     default:
       std::cerr << "toast.BasisMatrix: source and target combination not recognised" << std::endl;
+      return NULL;
     }
     break;
   default:
     std::cerr << "toast.BasisMatrix: source not recognised" << std::endl;
+    return NULL;
   }
 
   const idxtype *rowptr, *colidx;
@@ -664,7 +668,7 @@ static PyObject *toast_make_mesh(PyObject *self, PyObject *args)
   {
     for (j = 0; j < nnd0; j++)
     {
-      if (el = mesh->elist[i])
+      if ((el = mesh->elist[i]))
       {
         if (j < el->nNode())
           el->Node[j] = idx[k];
@@ -889,7 +893,7 @@ static PyObject *toast_map_basis(PyObject *self, PyObject *args)
               << std::endl;
     return NULL;
   }
-  npy_intp py_nsrc = nsrc, py_ntgt = ntgt;
+  npy_intp py_ntgt = ntgt;
   PyObject *py_tgtvec = PyArray_SimpleNew(1, &py_ntgt, dtype);
 
   switch (dtype)
@@ -1220,9 +1224,9 @@ static PyObject *toast_qvec(PyObject *self, PyObject *args, PyObject *keywds)
   double qwidth = 1.0;
   QMMesh *mesh;
 
-  static char *kwlist[] = {"mesh", "type", "shape", "width", NULL};
+  static const char *kwlist[] = {"mesh", "type", "shape", "width", NULL};
 
-  if (!PyArg_ParseTupleAndKeywords(args, keywds, "i|ssd", kwlist, &hmesh,
+  if (!PyArg_ParseTupleAndKeywords(args, keywds, "i|ssd", (char **) kwlist, &hmesh,
                                    &typestr, &profstr, &qwidth))
     return NULL;
   if (!(mesh = (QMMesh *)g_meshmgr.Get(hmesh)))
@@ -1311,6 +1315,9 @@ void CalcMvec(const QMMesh *mesh, SRC_PROFILE mprof, double mwidth,
       std::cerr << "Not implemented" << std::endl;
       // m = CompleteTrigSourceVector (*mesh, i);
       break;
+    default:
+      std::cerr << "Not implemented" << std::endl;
+      break;
     }
     for (j = 0; j < n; j++)
       m[j] *= c0 / (2.0 * (*ref)[j] * A_Keijzer((*ref)[j]));
@@ -1327,9 +1334,9 @@ static PyObject *toast_mvec(PyObject *self, PyObject *args, PyObject *keywds)
   // PyObject *py_ref;
   double refind = 1.0;
 
-  static char *kwlist[] = {"mesh", "shape", "width", "ref", NULL};
+  static const char *kwlist[] = {"mesh", "shape", "width", "ref", NULL};
 
-  if (!PyArg_ParseTupleAndKeywords(args, keywds, "isdd", kwlist, &hmesh,
+  if (!PyArg_ParseTupleAndKeywords(args, keywds, "isdd", (char **) kwlist, &hmesh,
                                    &profstr, &mwidth, &refind))
     return NULL;
   if (!(mesh = (QMMesh *)g_meshmgr.Get(hmesh)))
@@ -2117,9 +2124,9 @@ static PyObject *toast_regul(PyObject *self, PyObject *args, PyObject *keywds)
   Raster *raster;
   PyObject *py_x;
 
-  static char *kwlist[] = {"regtype", "raster", "x", "tau", "beta", NULL};
+  static const char *kwlist[] = {"regtype", "raster", "x", "tau", "beta", NULL};
 
-  if (!PyArg_ParseTupleAndKeywords(args, keywds, "siOd|d", kwlist, &regtype,
+  if (!PyArg_ParseTupleAndKeywords(args, keywds, "siOd|d", (char **) kwlist, &regtype,
                                    &hraster, &py_x, &tau, &beta))
     return NULL;
   if (!(raster = (Raster *)g_rastermgr.Get(hraster)))
