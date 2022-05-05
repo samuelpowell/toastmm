@@ -18,7 +18,7 @@ distroot = '../'
 if sys.platform == 'win32':
     lib_ext = '.dll'
     lib_names = ['libmath','libfe','libstoast']
-    link_dir = [distroot + 'lib']
+    link_dir = ['toast/lib']
     link_args = ''
     pkg_files = {'toast': ['*.dll']}
 elif sys.platform == 'linux':

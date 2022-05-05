@@ -50,6 +50,14 @@ if(WIN32)
         get_filename_component( dir ${file} DIRECTORY )
         install( FILES ${file} DESTINATION ${CMAKE_INSTALL_PREFIX}/pytoast/toast )
     endforeach()
+
+    FILE(GLOB PYTOAST_IMPORT_LIBS ${CMAKE_INSTALL_PREFIX}/lib/*.lib)
+
+    foreach ( file ${PYTOAST_IMPORT_LIBS} )
+        get_filename_component( dir ${file} DIRECTORY )
+        install( FILES ${file} DESTINATION ${CMAKE_INSTALL_PREFIX}/pytoast/toast/lib )
+    endforeach()
+
 endif()
 
 if(APPLE OR UNIX)
