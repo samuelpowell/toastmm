@@ -73,11 +73,6 @@ void TFwdSolver<T>::Setup (int nth)
     meshptr = 0;
     pphi = 0;
 
-    // Eigen CSC matrix and solver
-    FF = 0;
-    ES = 0;
-
-
     SetupType (nth);
 
 }
@@ -87,15 +82,15 @@ void TFwdSolver<T>::Setup (int nth)
 template<>
 void TFwdSolver<std::complex<float> >::SetupType (int nth)
 {
-    using namespace Eigen;
-    ES = new SparseLU<SparseMatrix<std::complex<float> >, COLAMDOrdering<int> >;
+    //using namespace Eigen;
+    //ES = new SparseLU<SparseMatrix<std::complex<float> >, COLAMDOrdering<int> >;
 }
 
 template<>
 void TFwdSolver<std::complex<double> >::SetupType (int nth)
 {
-    using namespace Eigen;
-    ES = new SparseLU<SparseMatrix<std::complex<double> >, COLAMDOrdering<int> >;
+    //using namespace Eigen;
+    //ES = new SparseLU<SparseMatrix<std::complex<double> >, COLAMDOrdering<int> >;
 }
 
 template<class T>
@@ -108,17 +103,17 @@ void TFwdSolver<T>::SetupType (int nth)
 template<>
 void TFwdSolver<std::complex<float> >::DeleteType ()
 {
-    if(ES) {
-        delete ES;
-    }
+    // if(ES) {
+    //     delete ES;
+    // }
 }
 
 template<>
 void TFwdSolver<std::complex<double> >::DeleteType ()
 {
-    if(ES) {
-        delete ES;
-    }
+    // if(ES) {
+    //     delete ES;
+    // }
 }
 
 template<class T>
@@ -472,11 +467,10 @@ void TFwdSolver<std::complex<float> >::Reset (const Solution &sol,
     AssembleSystemMatrix (sol, omega, elbasis);
     if (solvertp == LSOLVER_DIRECT) {
       using namespace Eigen;
-      Map<const SparseMatrix<std::complex<float>, RowMajor> > eF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr());      
-      FF = new SparseMatrix<std::complex<float>, ColMajor> (eF);
-      ES->analyzePattern(*FF);  
-      ES->factorize(*FF);
-      xASSERT(ES->info(), "System matrix factorisation failed");
+      Map<const SparseMatrix<std::complex<float>, RowMajor> > RF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr());      
+      csolver.analyzePattern(RF);  
+      csolver.factorize(RF);
+      xASSERT(csolver.info() == 0, "System matrix factorisation failed");
     } else
 	precon->Reset (F);
     if (B) AssembleMassMatrix();
@@ -490,11 +484,10 @@ void TFwdSolver<std::complex<double> >::Reset (const Solution &sol,
     AssembleSystemMatrix (sol, omega, elbasis);
     if (solvertp == LSOLVER_DIRECT) {
       using namespace Eigen;
-      Map<const SparseMatrix<std::complex<double>, RowMajor> > eF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr());      
-      FF = new SparseMatrix<std::complex<double>, ColMajor> (eF);
-      ES->analyzePattern(*FF);  
-      ES->factorize(*FF);      
-      xASSERT(ES->info(), "System matrix factorisation failed"); 
+      Map<const SparseMatrix<std::complex<double>, RowMajor> > RF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr());      
+      csolver.analyzePattern(RF);  
+      csolver.factorize(RF);      
+      xASSERT(csolver.info() == 0, "System matrix factorisation failed"); 
     }
     else
 	precon->Reset (F);
@@ -548,7 +541,7 @@ void TFwdSolver<std::complex<float> >::CalcField (
         using namespace Eigen;
         Map<const VectorXcf> eqvec(qvec.data_buffer(), qvec.Dim());
         Map<VectorXcf> ecphi(cphi.data_buffer(), cphi.Dim());
-        ecphi = ES->solve(eqvec); 
+        ecphi = csolver.solve(eqvec); 
     } else {
         double tol = iterative_tol;
 	int it = IterativeSolve (*F, qvec, cphi, tol, precon, iterative_maxit);
@@ -574,7 +567,7 @@ void TFwdSolver<std::complex<double> >::CalcField (
         using namespace Eigen;
         Map<const VectorXcd> eqvec(qvec.data_buffer(), qvec.Dim());
         Map<VectorXcd> ecphi(cphi.data_buffer(), cphi.Dim());
-        ecphi = ES->solve(eqvec); 
+        ecphi = csolver.solve(eqvec); 
     } else {
         double tol = iterative_tol;
 	int it = IterativeSolve (*F, qvec, cphi, tol, precon, iterative_maxit);
@@ -663,7 +656,7 @@ void TFwdSolver<std::complex<double> >::CalcFields (const CCompRowMatrix &qvec,
       CVector qveci = qvec.Row(i);
       Map<const VectorXcd> eqvec(qveci.data_buffer(), qveci.Dim());
       Map<VectorXcd> ecphi(phi[i].data_buffer(), phi[i].Dim());
-      ecphi = ES->solve(eqvec);    //Use the factors to solve the linear system 
+      ecphi = csolver.solve(eqvec);    //Use the factors to solve the linear system 
 
 	  //CalcField (qvec.Row(i), phi[i], res);
 	  }
