@@ -48,6 +48,7 @@ module1 = Extension('toast.toastmod',
                     libraries = lib_names,
                     extra_link_args = link_args,
                     extra_compile_args = compile_args,
+                    define_macros = [('NPY_NO_DEPRECATED_API', 'NPY_1_7_API_VERSION')],
                     sources = ['toastmodule.cc'])
 
                          
