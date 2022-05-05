@@ -44,17 +44,19 @@ endforeach()
 # these are project files. 
 #
 if(WIN32)
-    FILE(GLOB PYTOAST_LIBS ${CMAKE_INSTALL_PREFIX}/bin/*.dll)
+    list(APPEND PYTOAST_LIBS ${CMAKE_INSTALL_PREFIX}/bin/libmath.dll
+                             ${CMAKE_INSTALL_PREFIX}/bin/libfe.dll
+                             ${CMAKE_INSTALL_PREFIX}/bin/libstoast.dll)
 
     foreach ( file ${PYTOAST_LIBS} )
-        get_filename_component( dir ${file} DIRECTORY )
         install( FILES ${file} DESTINATION ${CMAKE_INSTALL_PREFIX}/pytoast/toast )
     endforeach()
 
-    FILE(GLOB PYTOAST_IMPORT_LIBS ${CMAKE_INSTALL_PREFIX}/lib/*.lib)
+    list(APPEND PYTOAST_IMPORT_LIBS ${CMAKE_INSTALL_PREFIX}/lib/libmath.lib
+                                    ${CMAKE_INSTALL_PREFIX}/lib/libfe.lib
+                                    ${CMAKE_INSTALL_PREFIX}/lib/libstoast.lib)
 
     foreach ( file ${PYTOAST_IMPORT_LIBS} )
-        get_filename_component( dir ${file} DIRECTORY )
         install( FILES ${file} DESTINATION ${CMAKE_INSTALL_PREFIX}/pytoast/toast/lib )
     endforeach()
 
@@ -62,13 +64,16 @@ endif()
 
 if(APPLE OR UNIX)
     if(APPLE AND NOT UNIX)
-        FILE(GLOB PYTOAST_LIBS ${CMAKE_INSTALL_PREFIX}/lib/*.dylib)
+        list(APPEND PYTOAST_LIBS ${CMAKE_INSTALL_PREFIX}/lib/libmath.dylib
+                                 ${CMAKE_INSTALL_PREFIX}/lib/libfe.dylib
+                                 ${CMAKE_INSTALL_PREFIX}/lib/libstoast.dylib)
     else()
-        FILE(GLOB PYTOAST_LIBS ${CMAKE_INSTALL_PREFIX}/lib/*.so)
+        list(APPEND PYTOAST_LIBS ${CMAKE_INSTALL_PREFIX}/lib/libmath.so
+                                 ${CMAKE_INSTALL_PREFIX}/lib/libfe.so
+                                 ${CMAKE_INSTALL_PREFIX}/lib/libstoast.so)
     endif()
-message(STATUS ${PYTOAST_LIBS}})
+
     foreach ( file ${PYTOAST_LIBS} )
-        get_filename_component( dir ${file} DIRECTORY )
         install( FILES ${file} DESTINATION ${CMAKE_INSTALL_PREFIX}/pytoast/toast/lib )
     endforeach()
 endif()
