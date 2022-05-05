@@ -58,7 +58,7 @@ if(APPLE OR UNIX)
     else()
         FILE(GLOB PYTOAST_LIBS ${CMAKE_INSTALL_PREFIX}/lib/*.so)
     endif()
-
+message(STATUS ${PYTOAST_LIBS}})
     foreach ( file ${PYTOAST_LIBS} )
         get_filename_component( dir ${file} DIRECTORY )
         install( FILES ${file} DESTINATION ${CMAKE_INSTALL_PREFIX}/pytoast/toast/lib )
