@@ -50,15 +50,9 @@ target_link_libraries(getnim PRIVATE libmath)
 target_include_directories(getnim PRIVATE ../../ ../../include) 
 
 install(TARGETS cmpvec quad2linmesh opt2 mkmesh_sphere mkmesh_cyl mkmesh_brick meshinfo makeqm3d makeqm lin2quadmesh lin2cubicmesh getnim
-        CONFIGURATIONS Release
-        LIBRARY DESTINATION release/lib
-        RUNTIME DESTINATION release/bin)
-
-        install(TARGETS cmpvec quad2linmesh opt2 mkmesh_sphere mkmesh_cyl mkmesh_brick meshinfo makeqm3d makeqm lin2quadmesh lin2cubicmesh getnim
-        CONFIGURATIONS Debug
-        LIBRARY DESTINATION debug/lib
-        RUNTIME DESTINATION debug/bin)
-
+        LIBRARY DESTINATION lib
+        RUNTIME DESTINATION bin)
+        
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 include(CPack)
