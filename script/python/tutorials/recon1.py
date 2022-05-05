@@ -56,7 +56,7 @@ def objective_ls(logx):
 # ---------------------------------------------------
 # Projections from fields
 def projection(phi, mvec):
-    gamma = mvec.transpose() * phi
+    gamma = mvec.T * phi
     gamma = np.reshape(gamma, (-1, 1), 'F')
     lgamma = np.log(gamma)
     lnamp = lgamma.real
@@ -162,7 +162,7 @@ scmua = basis_inv.Map('B->S', bcmua)
 sckap = basis_inv.Map('B->S', bckap)
 
 # Vector of unknowns
-x = np.asmatrix(np.concatenate((scmua, sckap))).transpose()
+x = np.concatenate((scmua, sckap))
 logx = np.log(x)
 
 # Initial error
@@ -183,33 +183,33 @@ while itr <= itrmax:
     errp = err
     dphi = mesh_inv.Fields(None, qvec, mua, mus, ref, freq)
     aphi = mesh_inv.Fields(None, mvec, mua, mus, ref, freq)
-    proj = np.reshape(mvec.transpose() * dphi, (-1, 1), 'F')
+    proj = np.reshape(mvec.T * dphi, (-1, 1), 'F')
     J = mesh_inv.Jacobian(basis_inv.Handle(), dphi, aphi, proj)
 
     #Gradient of cost function
     proj = np.concatenate ((np.log(proj).real, np.log(proj).imag))
-    r = matrix(J).transpose() * (2*(data-proj)/sd**2)
-    r = np.multiply(r, x)
+    r = J.T @ (2*(data-proj)/sd**2)
+    r = np.multiply(r.flatten(), x)
 
     if itr > 1:
         delta_old = delta_new
-        delta_mid = np.dot(r.transpose(), s)
+        delta_mid = r.T @ s
         
     s = r # replace this with preconditioner
 
     if itr == 1:
         d = s
-        delta_new = np.dot(r.transpose(), d)
+        delta_new = r.T @ d
         delta0 = delta_new
     else:
-        delta_new = np.dot(r.transpose(), s)
+        delta_new = r.T @ s
         beta = (delta_new-delta_mid) / delta_old
         if itr % resetCG == 0 or beta <= 0:
             d = s
         else:
             d = s + d*beta
 
-    delta_d = np.dot(d.transpose(), d)
+    delta_d = d.T @ d
     step,err = toast.Linesearch(logx, d, step, err, objective_ls)
 
     logx = logx + d*step

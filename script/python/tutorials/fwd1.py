@@ -24,9 +24,9 @@ mesh.ReadQM(qmfile)
 nlen = mesh.NodeCount()
 
 # Homogeneous parameter distributions
-mua = np.ones ((1,nlen)) * 0.025
-mus = np.ones ((1,nlen)) * 2.0
-ref = np.ones ((1,nlen)) * 1.4
+mua = np.ones (nlen) * 0.025
+mus = np.ones (nlen) * 2.0
+ref = np.ones (nlen) * 1.4
 freq = 100
 
 # Set up the linear system

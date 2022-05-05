@@ -56,7 +56,7 @@ def objective_ls(logx):
 # ---------------------------------------------------
 # Projections from fields
 def projection(phi, mvec):
-    gamma = mvec.transpose() * phi
+    gamma = mvec.T * phi
     gamma = np.reshape(gamma, (-1, 1), 'F')
     lgamma = np.log(gamma)
     lnamp = lgamma.real
@@ -165,7 +165,7 @@ scmua = basis_inv.Map('B->S', bcmua)
 sckap = basis_inv.Map('B->S', bckap)
 
 # Vector of unknowns
-x = np.asmatrix(np.concatenate((scmua, sckap))).transpose()
+x = np.concatenate((scmua, sckap))
 logx = np.log(x)
 
 # Initial error
@@ -187,33 +187,32 @@ while itr <= itrmax:
     
     r = -toast.Gradient(mesh_inv.Handle(), basis_inv.Handle(),
                      qvec, mvec, mua, mus, ref, freq, data, sd)
-    r = matrix(r).transpose()
     r = np.multiply(r, x)
     
     if itr > 1:
         delta_old = delta_new
-        delta_mid = np.dot(r.transpose(), s)
+        delta_mid = r.T @ s
         
     s = r # replace this with preconditioner
 
     if itr == 1:
         d = s
-        delta_new = np.dot(r.transpose(), d)
+        delta_new = r.T @ d
         delta0 = delta_new
     else:
-        delta_new = np.dot(r.transpose(), s)
+        delta_new = r.T @ s
         beta = (delta_new-delta_mid) / delta_old
         if itr % resetCG == 0 or beta <= 0:
             d = s
         else:
             d = s + d*beta
 
-    delta_d = np.dot(d.transpose(), d)
+    delta_d = d.T @ d
     step,err = toast.Linesearch(logx, d, step, err, objective_ls)
 
     logx = logx + d*step
     x = np.exp(logx)
-    slen = x.shape[0]/2
+    slen = int(x.shape[0]/2)
     scmua = x[0:slen]
     sckap = x[slen:2*slen]
     smua = scmua/cm
