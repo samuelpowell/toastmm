@@ -20,12 +20,14 @@ if sys.platform == 'win32':
     lib_names = ['libmath','libfe','libstoast']
     link_dir = ['toast/lib']
     link_args = ''
+    compile_args = ''
     pkg_files = {'toast': ['*.dll']}
 elif sys.platform == 'linux':
     lib_ext = '.so'
     lib_names = ['math','fe','stoast']
     link_dir = ['toast/lib']
     link_args = ['-Wl,-rpath=$ORIGIN/lib']
+    compile_args = ['-std=c++98','-Wno-comment']
     pkg_files = {'toast': ['lib/*.so']}
 elif sys.platform == 'darwin':
     lib_ext = '.dylib'
@@ -45,6 +47,7 @@ module1 = Extension('toast.toastmod',
                     library_dirs = link_dir,
                     libraries = lib_names,
                     extra_link_args = link_args,
+                    extra_compile_args = compile_args,
                     sources = ['toastmodule.cc'])
 
                          
