@@ -26,11 +26,11 @@ endif()
 
 configure_file(setup.py.in setup.py @ONLY)
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.py DESTINATION ${CMAKE_INSTALL_PREFIX}/pytoast)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.py DESTINATION ${CMAKE_INSTALL_PREFIX}/python)
 
 # Install python source
 #
-install(DIRECTORY toast DESTINATION ${CMAKE_INSTALL_PREFIX}/pytoast)
+install(DIRECTORY toast DESTINATION ${CMAKE_INSTALL_PREFIX}/python)
 
 # Copy files required for build
 #
@@ -41,7 +41,7 @@ list(APPEND PYTOAST_BUILD_FILES ../../arch.h
                                 # Install python build system files
 foreach ( file ${PYTOAST_BUILD_FILES} )
     get_filename_component( dir ${file} DIRECTORY )
-    install( FILES ${file} DESTINATION ${CMAKE_INSTALL_PREFIX}/pytoast )
+    install( FILES ${file} DESTINATION ${CMAKE_INSTALL_PREFIX}/python )
 endforeach()
 
 # Install libraries 
@@ -55,7 +55,7 @@ if(WIN32)
                              ${CMAKE_INSTALL_PREFIX}/bin/libstoast.dll)
 
     foreach ( file ${PYTOAST_LIBS} )
-        install( FILES ${file} DESTINATION ${CMAKE_INSTALL_PREFIX}/pytoast/toast )
+        install( FILES ${file} DESTINATION ${CMAKE_INSTALL_PREFIX}/python/toast )
     endforeach()
 
     list(APPEND PYTOAST_IMPORT_LIBS ${CMAKE_INSTALL_PREFIX}/lib/libmath.lib
@@ -63,7 +63,7 @@ if(WIN32)
                                     ${CMAKE_INSTALL_PREFIX}/lib/libstoast.lib)
 
     foreach ( file ${PYTOAST_IMPORT_LIBS} )
-        install( FILES ${file} DESTINATION ${CMAKE_INSTALL_PREFIX}/pytoast/toast/lib )
+        install( FILES ${file} DESTINATION ${CMAKE_INSTALL_PREFIX}/python/toast/lib )
     endforeach()
 
 endif()
@@ -80,7 +80,7 @@ if(APPLE OR UNIX)
     endif()
 
     foreach ( file ${PYTOAST_LIBS} )
-        install( FILES ${file} DESTINATION ${CMAKE_INSTALL_PREFIX}/pytoast/toast/lib )
+        install( FILES ${file} DESTINATION ${CMAKE_INSTALL_PREFIX}/python/toast/lib )
     endforeach()
 endif()
 
