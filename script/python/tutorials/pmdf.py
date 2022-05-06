@@ -48,13 +48,13 @@ for bkg in range(2):
         mua = mesh.ReadNim (muafile)
         mus = mesh.ReadNim (musfile)
         
-    ref = np.ones ((1,nlen)) * 1.4
+    ref = np.ones (nlen) * 1.4
     freq = 100
 
     # Calculate fields and projections
     dphi = mesh.Fields(None, qvec, mua, mus, ref, freq)
     aphi = mesh.Fields(None, mvec, mua, mus, ref, freq)
-    proj = np.reshape(mvec.T * dphi, (-1, 1), 'F')
+    proj = np.reshape(mvec.T * dphi, (-1), 'F')
 
     # Calculate Jacobian matrix
     J = mesh.Jacobian(basis.Handle(), dphi, aphi, proj)

@@ -42,7 +42,7 @@ class Raster:
     def Make(self, mesh, grd, intgrd=None):
         """Initialise the mapper object by assigning a mesh and grid.
 
-        Syntax: raster.Make(mesh, grd)
+        Syntax: raster.Make(mesh, grd, intgrd)
 
         Parameters:
             mesh: toast.mesh.Mesh object

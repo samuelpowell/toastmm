@@ -58,7 +58,7 @@ def objective_ls(logx):
 # Projections from fields
 def projection(phi, mvec):
     gamma = mvec.transpose() * phi
-    gamma = np.reshape(gamma, (-1, 1), 'F')
+    gamma = np.reshape(gamma, (-1), 'F')
     lgamma = np.log(gamma)
     lnamp = lgamma.real
     phase = lgamma.imag
@@ -110,7 +110,7 @@ ndat = nqm*2
 # Target parameters
 mua = mesh_fwd.ReadNim(muafile)
 mus = mesh_fwd.ReadNim(musfile)
-ref = np.ones((1, nlen)) * refind
+ref = np.ones(nlen) * refind
 
 # Parameter plotting ranges
 mua_min = 0.015 # np.min(mua)

@@ -57,7 +57,7 @@ def objective_ls(logx):
 # Projections from fields
 def projection(phi, mvec):
     gamma = mvec.T * phi
-    gamma = np.reshape(gamma, (-1, 1), 'F')
+    gamma = np.reshape(gamma, (-1), 'F')
     lgamma = np.log(gamma)
     lnamp = lgamma.real
     phase = lgamma.imag
@@ -184,7 +184,7 @@ while itr <= itrmax:
     errp = err
     dphi = mesh_inv.Fields(None, qvec, mua, mus, ref, freq)
     aphi = mesh_inv.Fields(None, mvec, mua, mus, ref, freq)
-    proj = np.reshape(mvec.T * dphi, (-1, 1), 'F')
+    proj = np.reshape(mvec.T * dphi, (-1), 'F')
     J = mesh_inv.Jacobian(basis_inv.Handle(), dphi, aphi, proj)
 
     #Gradient of cost function
