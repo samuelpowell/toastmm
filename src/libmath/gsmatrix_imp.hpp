@@ -194,7 +194,7 @@ struct cgdata3 {
 template<class MT>
 void TGenericSparseMatrix<MT>::cg_loop1 (void *arg, int i1, int i2)
 {
-    register int i;
+    int i;
     struct cgdata1<MT> *data = (struct cgdata1<MT>*)arg;
     TVector<MT> &d = *data->d;
     TVector<MT> &q = *data->q;
@@ -211,7 +211,7 @@ template<class MT>
 void TGenericSparseMatrix<MT>::cg_loop2 (void *arg, int i1, int i2)
 {
     struct cgdata2<MT> *data = (struct cgdata2<MT>*)arg;
-    register int i;
+    int i;
     double local_dnew = 0.0;
     TVector<MT> &x = *data->x;
     TVector<MT> &r = *data->r;
@@ -232,7 +232,7 @@ template<class MT>
 void TGenericSparseMatrix<MT>::cg_loop3 (void *arg, int i1, int i2)
 {
     struct cgdata3<MT> *data = (struct cgdata3<MT>*)arg;
-    register int i;
+    int i;
     TVector<MT> &d = *data->d;
     TVector<MT> &r = *data->r;
     double beta = *data->beta;
