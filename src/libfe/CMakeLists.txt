@@ -32,14 +32,9 @@ target_sources(libfe PRIVATE    point.cc node.cc ndlist.cc element.cc ellist.cc 
 #
 
 install(TARGETS libfe
-        CONFIGURATIONS Release
-        LIBRARY DESTINATION release/lib
-        RUNTIME DESTINATION release/bin)
-
-install(TARGETS libfe
-        CONFIGURATIONS Debug
-        LIBRARY DESTINATION debug/lib
-        RUNTIME DESTINATION debug/bin)
+        ARCHIVE DESTINATION lib
+        LIBRARY DESTINATION lib
+        RUNTIME DESTINATION bin)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

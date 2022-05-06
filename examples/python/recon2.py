@@ -1,9 +1,12 @@
-# This example builds on recon2.py by adding a
-# regularisation term.
+# This example solves a simple 2-D reconstruction problem
+# for absorption and scattering parameter distributions
+# on a coarse mesh from data generated on a fine mesh
+# It uses a nonlinear conjugate gradient solver where the
+# gradient is obtained by direct computation.
 #
 # Note: run this with
 #
-#     ipython -pylab recon3.py
+#     ipython -pylab recon2.py
 #
 # to avoid python blocking on opening the figure
 
@@ -22,26 +25,22 @@ import matplotlib.animation as animation
 plt.ion()
 
 itrmax = 100  # max number of nonlinear iterations
-tolCG = 1e-7
 resetCG = 10
 grd = np.array([100, 100])
-noiselevel = 0.01
-tau = 1e-3
-beta = 0.01
+noiselevel = 0 # 0.01
 
 # ---------------------------------------------------
 # Objective function
 def objective(proj,data,sd,logx):
     err_data = np.sum(np.power((data-proj)/sd, 2))
-    err_prior = regul.Value(logx)
-    return err_data + err_prior
+    return err_data
 
 
 # ---------------------------------------------------
 # Objective function for line search callback
 def objective_ls(logx):
     x = np.exp(logx)
-    slen = x.shape[0]/2
+    slen = int(x.shape[0]/2)
     scmua = x[0:slen]
     sckap = x[slen:2*slen]
     smua = scmua/cm
@@ -57,8 +56,8 @@ def objective_ls(logx):
 # ---------------------------------------------------
 # Projections from fields
 def projection(phi, mvec):
-    gamma = mvec.transpose() * phi
-    gamma = np.reshape(gamma, (-1, 1), 'F')
+    gamma = mvec.T * phi
+    gamma = np.reshape(gamma, (-1), 'F')
     lgamma = np.log(gamma)
     lnamp = lgamma.real
     phase = lgamma.imag
@@ -68,14 +67,11 @@ def projection(phi, mvec):
 # ---------------------------------------------------
 # Image error
 def imerr(im1, im2):
-    im1 = np.reshape(im1, -1, 1)
-    im2 = np.reshape(im2, -1, 1)
+    im1 = np.reshape(im1, (-1, 1))
+    im2 = np.reshape(im2, (-1, 1))
     err = np.sum(np.power(im1-im2, 2))/np.sum(np.power(im2, 2))
     return err
 
-
-# PyToast environment
-execfile(os.getenv("TOASTDIR") + "/ptoast_install.py")
 import toast
 
 # Set the file paths
@@ -90,22 +86,14 @@ musfile = meshdir + "tgt_mus_ellips_tri10.nim" # nodal target scattering
 c0 = 0.3        # speed of light in vacuum [mm/ps]
 refind = 1.4    # refractive index in medium (homogeneous)
 cm = c0/refind  # speed of light in medium
-freq = 100      # modulation frequency [MHz]
 
-qtype  = 'Neumann'      # source type
-qprof  = 'Gaussian'     # source profile
-qwidth = 2              # source width
-mprof  = 'Gaussian'     # detector profile
-mwidth = 2              # detector width
 
 # ---------------------------------------------------
 # Generate target data
-
-# Set up mesh geometry
 mesh_fwd = toast.Mesh(meshfile1)
 mesh_fwd.ReadQM(qmfile)
-qvec = mesh_fwd.Qvec(type=qtype, shape=qprof, width=qwidth)
-mvec = mesh_fwd.Mvec(shape=mprof, width=mwidth, ref=refind)
+qvec = mesh_fwd.Qvec(type='Neumann', shape='Gaussian', width=2)
+mvec = mesh_fwd.Mvec(shape='Gaussian', width=2, ref=refind)
 nlen = mesh_fwd.NodeCount()
 nqm = qvec.shape[1] * mvec.shape[1]
 ndat = nqm*2
@@ -113,9 +101,10 @@ ndat = nqm*2
 # Target parameters
 mua = mesh_fwd.ReadNim(muafile)
 mus = mesh_fwd.ReadNim(musfile)
-ref = np.ones((1, nlen)) * refind
+ref = np.ones(nlen) * refind
+freq = 100  # MHz
 
-# Parameter plotting ranges
+# Target ranges (for display)
 mua_min = 0.015 # np.min(mua)
 mua_max = 0.055 # np.max(mua)
 mus_min = 1     # np.min(mus)
@@ -138,13 +127,11 @@ bmus_tgt = np.reshape(basis_fwd.Map('M->B', mus), grd)
 
 
 # ---------------------------------------------------
-# Solve inverse problem
-
-# Set up mesh geometry
+# Set up inverse problem
 mesh_inv = toast.Mesh(meshfile2)
 mesh_inv.ReadQM(qmfile)
-qvec = mesh_inv.Qvec(type=qtype, shape=qprof, width=qwidth)
-mvec = mesh_inv.Mvec(shape=mprof, width=mwidth, ref=refind)
+qvec = mesh_inv.Qvec(type='Neumann', shape='Gaussian', width=2)
+mvec = mesh_inv.Mvec(shape='Gaussian', width=2, ref=refind)
 nlen = mesh_inv.NodeCount()
 
 # Initial parameter estimates
@@ -152,6 +139,7 @@ mua = np.ones(nlen) * 0.025
 mus = np.ones(nlen) * 2
 kap = 1/(3*(mua+mus))
 ref = np.ones(nlen) * refind
+freq = 100
 
 # Solution basis
 basis_inv = toast.Raster(mesh_inv, grd)
@@ -177,14 +165,8 @@ scmua = basis_inv.Map('B->S', bcmua)
 sckap = basis_inv.Map('B->S', bckap)
 
 # Vector of unknowns
-x = np.asmatrix(np.concatenate((scmua, sckap))).transpose()
+x = np.concatenate((scmua, sckap))
 logx = np.log(x)
-slen = x.shape[0]/2
-
-# Create regularisation object
-#pdb.set_trace()
-#hreg = regul.Make ("TK1", hraster, logx, tau);
-regul = toast.Regul("TV", basis_inv, logx, tau, beta=beta);
 
 # Initial error
 err0 = objective(proj, data, sd, logx)
@@ -197,79 +179,40 @@ errmus = np.array([imerr(bmus, bmus_tgt)])
 itr = 1
 step = 1.0
 
-hfig1=plt.figure(1)
-plt.show()
-plt.figure(2)
+hfig=plt.figure()
 plt.show()
 
-while itr <= itrmax and err > tolCG*err0 and errp-err > tolCG:
+while itr <= itrmax:
     errp = err
     
     r = -toast.Gradient(mesh_inv.Handle(), basis_inv.Handle(),
                      qvec, mvec, mua, mus, ref, freq, data, sd)
-    r = matrix(r).transpose()
-    r = np.multiply(r, x)  # parameter scaling
-
-    rr = -regul.Gradient(logx)
-    rr = np.transpose(np.matrix(rr))
-
-    r = r + rr
-    
-    plt.figure(2)
-    plt.clf()
-    plt.subplot(2,2,1)
-    im = plt.imshow (np.reshape (basis_inv.Map('S->B', rr[0:slen]), grd))
-    im.axes.get_xaxis().set_visible(False)
-    im.axes.get_yaxis().set_visible(False)
-    plt.title("mua prior gradient")
-    plt.colorbar()
-
-    plt.subplot(2,2,2)
-    im = plt.imshow (np.reshape (basis_inv.Map('S->B', rr[slen:slen*2]), grd))
-    im.axes.get_xaxis().set_visible(False)
-    im.axes.get_yaxis().set_visible(False)
-    plt.title("kap prior gradient")
-    plt.colorbar()
-
-    plt.subplot(2,2,3)
-    im = plt.imshow (np.reshape (basis_inv.Map('S->B', r[0:slen]), grd))
-    im.axes.get_xaxis().set_visible(False)
-    im.axes.get_yaxis().set_visible(False)
-    plt.title("mua tot gradient")
-    plt.colorbar()
-
-    plt.subplot(2,2,4)
-    im = plt.imshow (np.reshape (basis_inv.Map('S->B', r[slen:slen*2]), grd))
-    im.axes.get_xaxis().set_visible(False)
-    im.axes.get_yaxis().set_visible(False)
-    plt.title("kap tot gradient")
-    plt.colorbar()
-
-    plt.draw()
+    r = np.multiply(r, x)
     
     if itr > 1:
         delta_old = delta_new
-        delta_mid = np.dot(r.transpose(), s)
+        delta_mid = r.T @ s
         
     s = r # replace this with preconditioner
 
     if itr == 1:
         d = s
-        delta_new = np.dot(r.transpose(), d)
+        delta_new = r.T @ d
         delta0 = delta_new
     else:
-        delta_new = np.dot(r.transpose(), s)
+        delta_new = r.T @ s
         beta = (delta_new-delta_mid) / delta_old
         if itr % resetCG == 0 or beta <= 0:
             d = s
         else:
             d = s + d*beta
 
-    delta_d = np.dot(d.transpose(), d)
+    delta_d = d.T @ d
     step,err = toast.Linesearch(logx, d, step, err, objective_ls)
 
     logx = logx + d*step
     x = np.exp(logx)
+    slen = int(x.shape[0]/2)
     scmua = x[0:slen]
     sckap = x[slen:2*slen]
     smua = scmua/cm
@@ -286,46 +229,43 @@ while itr <= itrmax and err > tolCG*err0 and errp-err > tolCG:
     errmus = np.concatenate((errmus, [imerr(bmus, bmus_tgt)]))
     print ("Iteration "+str(itr)+", objective "+str(err))
 
-    plt.figure(1)
     plt.clf()
-    hfig1.suptitle("Iteration "+str(itr))
+    hfig.suptitle("Iteration "+str(itr))
 
-
-
-    ax1 = hfig1.add_subplot(231)
+    ax1 = hfig.add_subplot(231)
     im = ax1.imshow(bmua_tgt, vmin=mua_min, vmax=mua_max)
     im.axes.get_xaxis().set_visible(False)
     im.axes.get_yaxis().set_visible(False)
     ax1.set_title("mua target")
     plt.colorbar(im)
 
-    ax2 = hfig1.add_subplot(232)
+    ax2 = hfig.add_subplot(232)
     im = ax2.imshow(bmus_tgt, vmin=mus_min, vmax=mus_max)
     im.axes.get_xaxis().set_visible(False)
     im.axes.get_yaxis().set_visible(False)
     ax2.set_title("mus target")
     plt.colorbar(im)
 
-    ax3 = hfig1.add_subplot(234)
+    ax3 = hfig.add_subplot(234)
     im = ax3.imshow(bmua, vmin=mua_min, vmax=mua_max)
     im.axes.get_xaxis().set_visible(False)
     im.axes.get_yaxis().set_visible(False)
     ax3.set_title("mua recon")
     plt.colorbar(im)
 
-    ax4 = hfig1.add_subplot(235)
+    ax4 = hfig.add_subplot(235)
     im = ax4.imshow(bmus, vmin=mus_min, vmax=mus_max)
     im.axes.get_xaxis().set_visible(False)
     im.axes.get_yaxis().set_visible(False)
     ax4.set_title("mus recon")
     plt.colorbar(im)
 
-    ax5 = hfig1.add_subplot(233)
+    ax5 = hfig.add_subplot(233)
     im = ax5.semilogy(erri)
     ax5.set_title("objective function")
     plt.xlabel("iteration")
     
-    ax6 = hfig1.add_subplot(236)
+    ax6 = hfig.add_subplot(236)
     im = ax6.semilogy(errmua)
     im = ax6.semilogy(errmus)
     ax6.set_title("rel. image error")
@@ -335,6 +275,4 @@ while itr <= itrmax and err > tolCG*err0 and errp-err > tolCG:
     plt.pause(0.05)
     
     itr = itr+1
-
-#plt.ioff()
 

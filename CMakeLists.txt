@@ -25,7 +25,7 @@ if(WIN32)
     endif()
 endif()
 
-# MacOS
+# MacOS and Linux
 #
 if(APPLE OR UNIX)
     # Make builds quieter for development
@@ -35,7 +35,8 @@ if(APPLE OR UNIX)
         add_compile_options(-Wno-format-truncation)
     endif()
     
-    # Fix rpaths on install to point to the same directory
+    # Fix rpaths on install to point to the lib subdirectory and the same directory
+    # to support both normal installations (e.g. MATLAB) and Python packages
     set(CMAKE_SKIP_BUILD_RPATH FALSE)
     set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
     if(APPLE)
@@ -47,16 +48,7 @@ if(APPLE OR UNIX)
     
 endif()
 
-
-# Linux
-#
-if(UNIX)
-
-endif()
-
 # Libraries
-
-
 add_subdirectory(src/libmath)
 add_subdirectory(src/libfe)
 add_subdirectory(src/libstoast)
@@ -69,6 +61,13 @@ add_subdirectory(src/bintools)
 # MATLAB (mex) interface
 add_subdirectory(src/matlab2)
 
+# Python interface 
+#
+# Note that the python interface is simply an install target, which writes the source
+# files into the distribution directory, compilation is performed using python tools
+# in order to enable binary wheels to be built using, e.g., cibuildwheel. For a local
+# build one may execute, e.g., `python setup.py bdist_wheel` in the output directory.
+add_subdirectory(src/python)
 
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})

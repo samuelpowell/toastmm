@@ -20,14 +20,8 @@ target_include_directories(libfdot PRIVATE ../../extern/eigen-3.4.0)    # Eigen 
 target_sources(libfdot PRIVATE FDOTFwd.cc MLEMSolver.cc	matrixFreeSolver.cc muaSolver.cc util.cc)
 
 install(TARGETS libfdot
-        CONFIGURATIONS Release RelWithDebInfo
-        LIBRARY DESTINATION release/lib
-        RUNTIME DESTINATION release/bin)
-
-install(TARGETS libfdot
-        CONFIGURATIONS Debug
-        LIBRARY DESTINATION debug/lib
-        RUNTIME DESTINATION debug/bin)
+        LIBRARY DESTINATION lib
+        RUNTIME DESTINATION bin)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

@@ -11,8 +11,6 @@ from numpy.random import rand
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
-# PyToast environment
-execfile(os.getenv("TOASTDIR") + "/ptoast_install.py")
 
 # Import the toast modules
 import toast
@@ -44,26 +42,26 @@ nq = qvec.shape[0]
 # Homogeneous parameter distributions
 for bkg in range(2):
     if bkg==0:
-        mua = np.ones ((1,nlen)) * 0.025
-        mus = np.ones ((1,nlen)) * 2.0
+        mua = np.ones (nlen) * 0.025
+        mus = np.ones (nlen) * 2.0
     else:
-        mua = np.matrix(mesh.ReadNim (muafile))
-        mus = np.matrix(mesh.ReadNim (musfile))
+        mua = mesh.ReadNim (muafile)
+        mus = mesh.ReadNim (musfile)
         
-    ref = np.ones ((1,nlen)) * 1.4
+    ref = np.ones (nlen) * 1.4
     freq = 100
 
     # Calculate fields and projections
     dphi = mesh.Fields(None, qvec, mua, mus, ref, freq)
     aphi = mesh.Fields(None, mvec, mua, mus, ref, freq)
-    proj = np.reshape(mvec.transpose() * dphi, (-1, 1), 'F')
+    proj = np.reshape(mvec.T * dphi, (-1), 'F')
 
     # Calculate Jacobian matrix
     J = mesh.Jacobian(basis.Handle(), dphi, aphi, proj)
 
     # Extract sensitivity regions for a single source-detector pair
-    slen = J.shape[1]/2
-    nqm = J.shape[0]/2
+    slen = int(J.shape[1]/2)
+    nqm = int(J.shape[0]/2)
     J8_lnamp = J[10,:]
     J8_phase = J[10+nqm]
     J8_lnamp_mua = J8_lnamp[0:slen-1]

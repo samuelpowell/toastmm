@@ -31,15 +31,8 @@ if(Matlab_FOUND)
         target_link_libraries(toastmex ${Matlab_MEX_LIBRARY} ${Matlab_MX_LIBRARY})
 
         install(TARGETS toastmex
-                CONFIGURATIONS Release RelWithDebInfo 
-                LIBRARY DESTINATION release/lib
-                RUNTIME DESTINATION release/bin)
-
-        install(TARGETS toastmex
-                CONFIGURATIONS Debug#
-
-                LIBRARY DESTINATION debug/lib
-                RUNTIME DESTINATION debug/bin)
+                LIBRARY DESTINATION lib
+                RUNTIME DESTINATION bin)
 
         set(CPACK_PROJECT_NAME ${PROJECT_NAME})
         set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

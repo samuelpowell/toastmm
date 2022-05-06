@@ -56,8 +56,8 @@ def objective_ls(logx):
 # ---------------------------------------------------
 # Projections from fields
 def projection(phi, mvec):
-    gamma = mvec.transpose() * phi
-    gamma = np.reshape(gamma, (-1, 1), 'F')
+    gamma = mvec.T * phi
+    gamma = np.reshape(gamma, (-1), 'F')
     lgamma = np.log(gamma)
     lnamp = lgamma.real
     phase = lgamma.imag
@@ -67,14 +67,12 @@ def projection(phi, mvec):
 # ---------------------------------------------------
 # Image error
 def imerr(im1, im2):
-    im1 = np.reshape(im1, -1, 1)
-    im2 = np.reshape(im2, -1, 1)
+    im1 = np.reshape(im1, (-1, 1))
+    im2 = np.reshape(im2, (-1, 1))
     err = np.sum(np.power(im1-im2, 2))/np.sum(np.power(im2, 2))
     return err
 
 
-# PyToast environment
-exec(compile(open(os.getenv("TOASTDIR") + "/ptoast_install.py", "rb").read(), os.getenv("TOASTDIR") + "/ptoast_install.py", 'exec'))
 import toast
 
 # Set the file paths
@@ -104,7 +102,7 @@ ndat = nqm*2
 # Target parameters
 mua = mesh_fwd.ReadNim(muafile)
 mus = mesh_fwd.ReadNim(musfile)
-ref = np.ones((1, nlen)) * refind
+ref = np.ones(nlen) * refind
 freq = 100  # MHz
 
 # Target ranges (for display)
@@ -164,7 +162,7 @@ scmua = basis_inv.Map('B->S', bcmua)
 sckap = basis_inv.Map('B->S', bckap)
 
 # Vector of unknowns
-x = np.asmatrix(np.concatenate((scmua, sckap))).transpose()
+x = np.concatenate((scmua, sckap))
 logx = np.log(x)
 
 # Initial error
@@ -185,33 +183,33 @@ while itr <= itrmax:
     errp = err
     dphi = mesh_inv.Fields(None, qvec, mua, mus, ref, freq)
     aphi = mesh_inv.Fields(None, mvec, mua, mus, ref, freq)
-    proj = np.reshape(mvec.transpose() * dphi, (-1, 1), 'F')
+    proj = np.reshape(mvec.T * dphi, (-1), 'F')
     J = mesh_inv.Jacobian(basis_inv.Handle(), dphi, aphi, proj)
 
     #Gradient of cost function
     proj = np.concatenate ((np.log(proj).real, np.log(proj).imag))
-    r = matrix(J).transpose() * (2*(data-proj)/sd**2)
-    r = np.multiply(r, x)
+    r = J.T @ (2*(data-proj)/sd**2)
+    r = np.multiply(r.flatten(), x)
 
     if itr > 1:
         delta_old = delta_new
-        delta_mid = np.dot(r.transpose(), s)
+        delta_mid = r.T @ s
         
     s = r # replace this with preconditioner
 
     if itr == 1:
         d = s
-        delta_new = np.dot(r.transpose(), d)
+        delta_new = r.T @ d
         delta0 = delta_new
     else:
-        delta_new = np.dot(r.transpose(), s)
+        delta_new = r.T @ s
         beta = (delta_new-delta_mid) / delta_old
         if itr % resetCG == 0 or beta <= 0:
             d = s
         else:
             d = s + d*beta
 
-    delta_d = np.dot(d.transpose(), d)
+    delta_d = d.T @ d
     step,err = toast.Linesearch(logx, d, step, err, objective_ls)
 
     logx = logx + d*step
@@ -231,7 +229,7 @@ while itr <= itrmax:
     erri = np.concatenate((erri, [err]))
     errmua = np.concatenate((errmua, [imerr(bmua, bmua_tgt)]))
     errmus = np.concatenate((errmus, [imerr(bmus, bmus_tgt)]))
-    print(("Iteration "+str(itr)+", objective "+str(err)))
+    print ("Iteration "+str(itr)+", objective "+str(err))
 
     plt.clf()
     hfig.suptitle("Iteration "+str(itr))

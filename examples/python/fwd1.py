@@ -11,8 +11,6 @@ from scipy.sparse import linalg
 from numpy.random import rand
 import matplotlib.pyplot as plt
 
-# PyToast environment
-execfile(os.getenv("TOASTDIR") + "/ptoast_install.py")
 import toast
 
 # Set the file paths
@@ -26,9 +24,9 @@ mesh.ReadQM(qmfile)
 nlen = mesh.NodeCount()
 
 # Homogeneous parameter distributions
-mua = np.ones ((1,nlen)) * 0.025
-mus = np.ones ((1,nlen)) * 2.0
-ref = np.ones ((1,nlen)) * 1.4
+mua = np.ones (nlen) * 0.025
+mus = np.ones (nlen) * 2.0
+ref = np.ones (nlen) * 1.4
 freq = 100
 
 # Set up the linear system
@@ -41,7 +39,7 @@ nq = qvec.shape[1]
 phi = np.empty(qvec.shape,dtype='complex128')
 for q in range(nq):
     qq = qvec[:,q].todense()
-    res = linalg.minres(smat,qq,tol=1e-12)
+    res = linalg.gmres(smat,qq,tol=1e-12)
     phi[:,q] = res[0]
 
 # Project to boundary

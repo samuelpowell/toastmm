@@ -179,7 +179,13 @@ public:
     // Resize matrix and zero all elements
     // obsolete, use Zero(r,c) instead
 
-    inline void Zero () { memset (val, 0, rc*sizeof(MT)); }
+    inline void Zero () { 
+        //memset (val, 0, rc*sizeof(MT)); 
+        for(int i = 0; i < rc; ++i)
+        {
+            val[i] = 0;
+        }
+    }
     // Zero all elements
 
     inline void Zero (int n) { New_dirty(n,n); Zero(); }

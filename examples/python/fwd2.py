@@ -14,8 +14,6 @@ import matplotlib.animation as animation
 
 plt.ion()
 
-# PyToast environment
-execfile(os.getenv("TOASTDIR") + "/ptoast_install.py")
 import toast
 
 # Set the file paths
@@ -32,13 +30,13 @@ nlen = mesh.NodeCount()
 nlist,elist,eltp = mesh.Data()
 
 grd = np.array([64,64])
-basis = toast.Raster(mesh, grd);
+basis = toast.Raster(mesh, grd)
 
 # Homogeneous parameter distributions
 refind = 1.4
-mua = np.ones ((1,nlen)) * 0.025
-mus = np.ones ((1,nlen)) * 2.0
-ref = np.ones ((1,nlen)) * refind
+mua = np.ones (nlen) * 0.025
+mus = np.ones (nlen) * 2.0
+ref = np.ones (nlen) * refind
 freq = 100
 
 # Set up the linear system
@@ -57,20 +55,20 @@ for q in range(nq):
     ims.append((plt.imshow(bphi.real),))
 
 im_ani = animation.ArtistAnimation(fig1, ims, interval=50, repeat_delay=3000, blit=True)
-
 plt.show()
 
 
 # Display fields
+fig2 = plt.figure()
 plt.subplot(1,2,1)
 im = plt.imshow(bphi.real)
 plt.title('log amplitude')
 plt.colorbar()
-#plt.draw()
-#plt.show()
 plt.subplot(1,2,2)
 im = plt.imshow(bphi.imag)
 plt.title('phase')
 plt.colorbar()
 plt.show()
+
+
 

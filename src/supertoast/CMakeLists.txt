@@ -45,12 +45,7 @@ target_link_libraries(test_basis libfe libmath libstoast)
 
 
 install(TARGETS fwdfem fwdfem_cw fwdfem_tpsf supertoast supertoast_mw supertoast_cw_mw test_basis
-        CONFIGURATIONS Release RelWithDebInfo 
-        RUNTIME DESTINATION release/bin)
-
-install(TARGETS fwdfem fwdfem_cw fwdfem_tpsf supertoast supertoast_mw supertoast_cw_mw test_basis 
-        CONFIGURATIONS Debug
-        RUNTIME DESTINATION debug/bin)
+        RUNTIME DESTINATION bin)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
