@@ -34,7 +34,7 @@ install(DIRECTORY toast DESTINATION ${CMAKE_INSTALL_PREFIX}/python)
 
 # Copy files required for build
 #
-list(APPEND PYTOAST_BUILD_FILES ../../arch.h
+list(APPEND PYTOAST_BUILD_FILES ../../include/arch.h
                                 pyproject.toml
                                 toastmodule.cc)
 

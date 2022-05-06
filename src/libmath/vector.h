@@ -865,8 +865,6 @@ public:
 #if defined(_WIN32)
     template <class VT> friend TVector<VT> operator+ (const VT &s,
         const TVector<VT> &v);
-#elif (GCC_VERSION < 30404) // old-style definitions
-    friend TVector<VT> operator+ <> (const VT &s, const TVector<VT> &v);
 #else
     friend TVector<VT> (::operator+ <>) (const VT &s, const TVector<VT> &v);
 #endif
@@ -887,8 +885,6 @@ public:
 #if defined(_WIN32)
     template<class VT> friend TVector<VT> operator- (const VT &s,
         const TVector<VT> &v);
-#elif (GCC_VERSION < 30404) // old-style definitions
-    friend TVector<VT> operator- <> (const VT &s, const TVector<VT> &v);
 #else
     friend TVector<VT> (::operator- <>) (const VT &s, const TVector<VT> &v);
 #endif
@@ -908,8 +904,6 @@ public:
 #if defined(_WIN32)
     template<class VT> friend TVector<VT> operator* (const VT &s,
         const TVector<VT> &v);
-#elif (GCC_VERSION < 30404) // old-style definitions
-    friend TVector<VT> operator* <> (const VT &s, const TVector<VT> &v);
 #else
     friend TVector<VT> (::operator* <>) (const VT &s, const TVector<VT> &v);
 #endif
@@ -930,8 +924,6 @@ public:
     template<class VT> friend TVector<VT> operator/ (const VT &s,
         const TVector<VT> &v);
     // JK also works (TVector::operator/ )
-#elif (GCC_VERSION < 30404) // old-style definitions
-    friend TVector<VT> operator/ <> (const VT &s, const TVector<VT> &v);
 #else
     friend TVector<VT> (::operator/ <>) (const VT &s, const TVector<VT> &v);
 #endif

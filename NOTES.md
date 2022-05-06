@@ -69,6 +69,9 @@ Aim: simplify codebase, ensuring that all code is builds and is used
      - Arugement checking throughout module
      - Move from np.matrix to np.ndarray through module and in examples
      - Reorganise examples
+ - Clean up part two
+   - Refactor headers
+   - Remove unused eigpair.cc, arpack.cc, crmatric.cc (LU)
 
 # TODO
 

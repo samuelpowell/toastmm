@@ -4,14 +4,9 @@ project(libstoast VERSION 0.1.0)
 add_library(libstoast SHARED)
 set_target_properties(libstoast PROPERTIES PREFIX "")
 
-# Manged by headers
-# target_compile_definitions(libstoast PRIVATE NEED_EXPLICIT_INSTANTIATION)
-
-target_include_directories(libstoast PRIVATE ../../)                               # For toastdef
-target_include_directories(libstoast PRIVATE ../../include)                        # For blasnames for toastdef
-target_include_directories(libstoast PUBLIC ../../extern/eigen-3.4.0)             # Eigen for solvers, etc.
-
-target_include_directories(libstoast INTERFACE .)     # Provide headers for dependents
+target_include_directories(libstoast PRIVATE ../../include)            # For blasnames, toastdef, arch
+target_include_directories(libstoast PUBLIC ../../extern/eigen-3.4.0)  # Eigen for solvers, etc.
+target_include_directories(libstoast INTERFACE .)                      # Provide headers for dependents
 
 # Standard build
 #
@@ -29,17 +24,8 @@ target_sources(libstoast PRIVATE    solution.cc mwsolution.cc source.cc fwdsolve
                                     raster_cpx_tree.cc raster_cpx_tree_tri.cc
                                     sh.cc tetsplit.cc projector.cc camera.cc GLProjector.cc)
 
-                                    
-# Unsupported optional 
-#
-# ENABLE_MPI: jacobian_mpi.cc
-#                          
 
 target_link_libraries(libstoast libfe libmath)
-
-if(OpenMP_CXX_FOUND)
-    target_link_libraries(libstoast OpenMP::OpenMP_CXX)
-endif()
 
 install(TARGETS libstoast
         ARCHIVE DESTINATION lib

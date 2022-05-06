@@ -28,8 +28,6 @@
 #include "nr.h"
 
 #include <complex>
-//#include "complex.h"
-//#include "scomplex.h"
 
 #include "vector.h"
 #include "matrix.h"
@@ -44,8 +42,6 @@
 #include "cr_cholesky.h"
 #include "precon.h"
 #include "gmres.h"
-#include "eigpair.h"
-#include "arpack.h"
 #include "fourn.h" // only needed if using C version rather than C++
 
 #ifdef TOAST_THREAD
