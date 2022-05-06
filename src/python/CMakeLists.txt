@@ -69,7 +69,7 @@ if(WIN32)
 endif()
 
 if(APPLE OR UNIX)
-    if(APPLE AND NOT UNIX)
+    if(APPLE)
         list(APPEND PYTOAST_LIBS ${CMAKE_INSTALL_PREFIX}/lib/libmath.dylib
                                  ${CMAKE_INSTALL_PREFIX}/lib/libfe.dylib
                                  ${CMAKE_INSTALL_PREFIX}/lib/libstoast.dylib)
