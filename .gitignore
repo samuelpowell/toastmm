@@ -17,3 +17,10 @@ test/**/*.fem
 script/matlab/demos/*.dat
 script/matlab/demos/*.mat
 
+# Notebooks
+.ipynb_checkpoints
+*.ipynb
+
+# Python build outputs
+*.egg-info
+*.whl

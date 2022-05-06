@@ -42,14 +42,9 @@ if(OpenMP_CXX_FOUND)
 endif()
 
 install(TARGETS libstoast
-        CONFIGURATIONS Release
-        LIBRARY DESTINATION release/lib
-        RUNTIME DESTINATION release/bin)
-
-install(TARGETS libstoast
-        CONFIGURATIONS Debug
-        LIBRARY DESTINATION debug/lib
-        RUNTIME DESTINATION debug/bin)
+        ARCHIVE DESTINATION lib
+        LIBRARY DESTINATION lib
+        RUNTIME DESTINATION bin)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

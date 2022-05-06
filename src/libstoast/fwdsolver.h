@@ -405,8 +405,7 @@ public:
     PreconType precontp;    ///< preconditioner
 
     // Eigen replacement for SuperLU
-    Eigen::SparseMatrix<T> *FF;         // Column major copy of input matrix
-    Eigen::SparseLU<Eigen::SparseMatrix<T>, Eigen::COLAMDOrdering<int> > *ES;
+    Eigen::SparseLU<Eigen::SparseMatrix<T>, Eigen::COLAMDOrdering<int> > csolver;
 
 protected:
     void Setup (int nth=1);

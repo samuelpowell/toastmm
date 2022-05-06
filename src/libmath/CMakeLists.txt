@@ -35,14 +35,9 @@ target_sources(libmath PRIVATE  mathdef.cc util.cc timing.cc vector.cc gsmatrix.
 # COMPUTE_FLOPS
 
 install(TARGETS libmath
-        CONFIGURATIONS Release RelWithDebInfo
-        LIBRARY DESTINATION release/lib
-        RUNTIME DESTINATION release/bin)
-
-install(TARGETS libmath
-        CONFIGURATIONS Debug
-        LIBRARY DESTINATION debug/lib
-        RUNTIME DESTINATION debug/bin)
+        ARCHIVE DESTINATION lib
+        LIBRARY DESTINATION lib
+        RUNTIME DESTINATION bin)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
