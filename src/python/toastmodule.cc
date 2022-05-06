@@ -4,6 +4,7 @@
 #include <numpy/arrayobject.h>
 
 #include <fstream>
+#include <iostream>
 
 #include "../common/objmgr.h"
 #include "arch.h"
