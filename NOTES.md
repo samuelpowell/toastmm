@@ -59,11 +59,16 @@ Aim: simplify codebase, ensuring that all code is builds and is used
  - Cleanup code
    - Remove unused variables
    - Replace sprintf -> snprintf for some security
- - Python module
-   - Rework build script to provide for isolated build
-   - Arugement checking throughout module
-   - Move from np.matrix to np.ndarray through module and in examples
-   - Reorganise examples
+ - Python interface development
+   - Complete refactor of python build with view to CI builds of wheels
+   - CMake target configures a setuptools script with full paths, installs dynamic and import libraries in the tree for automatic installation
+   - CMake install target provides a tree that can be built using `python -m pip wheel` or `python -m build` or `python setup.py bdist_wheel`. The former are isolated builds.
+   - Update all reconstruction scripts, noting
+     - (silent) errors when basis mapping input are not rank-1
+     - Jacobians take handles to bases, rathter than just taking the basis
+     - Arugement checking throughout module
+     - Move from np.matrix to np.ndarray through module and in examples
+     - Reorganise examples
 
 # TODO
 
