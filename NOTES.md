@@ -56,10 +56,14 @@ Aim: simplify codebase, ensuring that all code is builds and is used
    - Remove unused `TOASTLIB` define
    - Remove expiry functions (not used) and defines
    - Remove USE_SPLBLAS (unued)
-- Cleanup code
+ - Cleanup code
    - Remove unused variables
    - Replace sprintf -> snprintf for some security
-
+ - Python module
+   - Rework build script to provide for isolated build
+   - Arugement checking throughout module
+   - Move from np.matrix to np.ndarray through module and in examples
+   - Reorganise examples
 
 # TODO
 
@@ -74,9 +78,3 @@ Aim: simplify codebase, ensuring that all code is builds and is used
  - Resolve `TOAST_THREAD`, `TOAST_THREAD_LEVEL`, `TOAST_THREAD_MATLAB_GRADIENT`, `TOAST_THREAD_MATLAB_QMVEC`, `TOAST_THREAD_ASSEMBLE`
  - MEX 64-bit update (https://uk.mathworks.com/help/matlab/matlab_external/upgrading-mex-files-to-use-64-bit-api.html)
 
-
-# Python notes
-
- - local testing uisng venv (3.9.12)
-   - `pip install setuptools numpy wheel`
-   - for running demos `pip install scipy matplotlib`
