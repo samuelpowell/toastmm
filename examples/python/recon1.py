@@ -73,14 +73,13 @@ def imerr(im1, im2):
     return err
 
 
-# PyToast environment
 import toast
 
 # Set the file paths
 meshdir = os.path.expandvars("$TOASTDIR/test/2D/meshes/")
 meshfile1 = meshdir + "ellips_tri10.msh"  # mesh for target data generation
 meshfile2 = meshdir + "circle25_32.msh"   # mesh for reconstruction
-qmfile = meshdir + "circle25_32x32.qm"    # source-detector filegit
+qmfile = meshdir + "circle25_32x32.qm"    # source-detector file
 muafile = meshdir + "tgt_mua_ellips_tri10.nim" # nodal target absorption
 musfile = meshdir + "tgt_mus_ellips_tri10.nim" # nodal target scattering
 
@@ -230,7 +229,7 @@ while itr <= itrmax:
     erri = np.concatenate((erri, [err]))
     errmua = np.concatenate((errmua, [imerr(bmua, bmua_tgt)]))
     errmus = np.concatenate((errmus, [imerr(bmus, bmus_tgt)]))
-    print(("Iteration "+str(itr)+", objective "+str(err)))
+    print ("Iteration "+str(itr)+", objective "+str(err))
 
     plt.clf()
     hfig.suptitle("Iteration "+str(itr))
