@@ -72,8 +72,8 @@ public:
 
     void Initialise (const NodeList &nlist);
 
-    BYTE Type() const { return ELID_TET4; }
-    BYTE VtkType() const { return 10; }
+    unsigned char Type() const { return ELID_TET4; }
+    unsigned char VtkType() const { return 10; }
     unsigned long GetCaps () const { return ELCAPS_SUBSAMPLING; }
     int nNode() const { return 4; }
     int nSide() const { return 4; }

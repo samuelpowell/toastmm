@@ -29,7 +29,7 @@ public:
 
     void Initialise (const NodeList& nlist);
 
-    BYTE Type (void) const { return ELID_WDG6; }
+    unsigned char Type (void) const { return ELID_WDG6; }
     unsigned long GetCaps () const { return 0; }
     int nNode (void) const { return 6; }
     int nSide (void) const { return 5; }

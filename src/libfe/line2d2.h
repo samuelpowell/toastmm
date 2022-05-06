@@ -47,7 +47,7 @@ public:
 
     void Initialise (const NodeList& nlist);
 
-    BYTE Type () const { return ELID_LINE2D2; }
+    unsigned char Type () const { return ELID_LINE2D2; }
     // returns element type id
 
     unsigned long GetCaps () const { return ELCAPS_SUBSAMPLING; }
