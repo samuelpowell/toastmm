@@ -1,4 +1,6 @@
 // -*- C++ -*-
+#define Py_LIMITED_API 0x030500F0
+
 #include <Python.h>
 #include <numpy/arrayobject.h>
 
