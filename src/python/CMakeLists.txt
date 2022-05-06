@@ -27,9 +27,10 @@ configure_file(setup.py.in setup.py @ONLY)
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.py DESTINATION ${CMAKE_INSTALL_PREFIX}/python)
 
-# Install python source
+# Install python source, associated driver scripts, documentation, etc.
 #
 install(DIRECTORY toast DESTINATION ${CMAKE_INSTALL_PREFIX}/python)
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/script/python DESTINATION ${CMAKE_INSTALL_PREFIX})       
 
 # Copy files required for build
 #
@@ -37,7 +38,7 @@ list(APPEND PYTOAST_BUILD_FILES ../../include/arch.h
                                 pyproject.toml
                                 toastmodule.cc)
 
-                                # Install python build system files
+# Install python build system files
 foreach ( file ${PYTOAST_BUILD_FILES} )
     get_filename_component( dir ${file} DIRECTORY )
     install( FILES ${file} DESTINATION ${CMAKE_INSTALL_PREFIX}/python )
