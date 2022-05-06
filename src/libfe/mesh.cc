@@ -934,7 +934,7 @@ int Mesh::RegionBoundaries (IDenseMatrix &idx)
     int nmaxsurf = 0;
     int nmaxsurfvtx = 0;
     for (el = 0; el < elen(); el++) {
-	Element *pel = elist[i];
+	Element *pel = elist[el];	// SP: this was indexed by uninitialised 'i'
 	nmaxsurf += pel->nSide();
 	for (j = 0; j < pel->nSide(); j++)
 	    nmaxsurfvtx = max(nmaxsurfvtx, pel->nSideNode(j));

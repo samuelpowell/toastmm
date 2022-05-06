@@ -29,9 +29,13 @@ if(Matlab_FOUND)
         target_link_libraries(toastmex libfdot)
         target_link_libraries(toastmex ${Matlab_MEX_LIBRARY} ${Matlab_MX_LIBRARY})
 
+        # Install the output dynamic library
         install(TARGETS toastmex
-                LIBRARY DESTINATION lib
-                RUNTIME DESTINATION bin)
+                LIBRARY DESTINATION matlab
+                RUNTIME DESTINATION matlab)
+
+        # Install associated driver scripts, documentation, etc.
+        install(DIRECTORY ${CMAKE_SOURCE_DIR}/script/matlab DESTINATION ${CMAKE_INSTALL_PREFIX})                
 
         set(CPACK_PROJECT_NAME ${PROJECT_NAME})
         set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
