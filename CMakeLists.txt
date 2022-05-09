@@ -29,7 +29,7 @@ endif()
 #
 if(APPLE OR UNIX)
     # Make builds quieter for development
-    add_compile_options(-Wno-deprecated-register -Wno-unused-result)
+    add_compile_options(-Wno-comment -Wno-unused-variable -Wno-unused-result)
 
     if(NOT APPLE)
         add_compile_options(-Wno-format-truncation)
