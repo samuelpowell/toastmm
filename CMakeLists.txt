@@ -51,6 +51,7 @@ endif()
 # Libraries
 add_subdirectory(src/libmath)
 add_subdirectory(src/libfe)
+add_subdirectory(src/libraster)
 add_subdirectory(src/libstoast)
 add_subdirectory(src/libfdot)
 

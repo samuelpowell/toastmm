@@ -16,14 +16,11 @@ if(Matlab_FOUND)
 
         target_include_directories(toastmex PRIVATE Matlab_INCLUDE_DIRS)                                        
         target_include_directories(toastmex PRIVATE ../../include)                     # For blasnames, toastdef, arch
-        target_include_directories(toastmex PRIVATE ../libmath)                        # For mathlib.h
-        target_include_directories(toastmex PRIVATE ../libstoast)                      # For stoastlib.h
-        target_include_directories(toastmex PRIVATE ../libfe)                          # For felib.h
-        target_include_directories(toastmex PRIVATE ../libfdot)                        # For FDOTFwd.h
-        target_include_directories(toastmex PRIVATE ../../extern/liblbfgs/include)     # For lbfgs
-        target_include_directories(toastmex PRIVATE ../../extern/eigen-3.4.0)
 
         # Add link libraries (note that plain version must be used as it has been in the FindMatlab)
+        target_link_libraries(toastmex libmath)
+        target_link_libraries(toastmex libfe)
+        target_link_libraries(toastmex libraster)
         target_link_libraries(toastmex libstoast)
         target_link_libraries(toastmex liblbfgs)
         target_link_libraries(toastmex libfdot)
