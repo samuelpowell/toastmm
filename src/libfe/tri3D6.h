@@ -59,7 +59,7 @@ public:
 
     void Initialise (const NodeList& nlist);
 
-    BYTE Type () const { return ELID_TRI3D6; }
+    unsigned char Type () const { return ELID_TRI3D6; }
     // returns element type id
 
     int Dimension (void) const { return 3; }

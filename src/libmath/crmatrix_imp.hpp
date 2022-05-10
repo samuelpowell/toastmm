@@ -1196,9 +1196,9 @@ void TCompRowMatrix<MT>::Ax (const TVector<MT> &x, TVector<MT> &b,
 	this->cols, x.Dim());
 
     int r, i2;
-    register int i = rowptr[r1];
-    register idxtype *pcolidx = colidx+i;
-    register MT br, *pval = this->val+i;
+    int i = rowptr[r1];
+    idxtype *pcolidx = colidx+i;
+    MT br, *pval = this->val+i;
 
     if (b.Dim() != this->rows) b.New (this->rows);
 
@@ -1230,10 +1230,10 @@ inline void TCompRowMatrix<double>::Ax_cplx (
     if (b.Dim() != rows) b.New (rows);
 
     int r, i2;
-    register int i;
-	register idxtype *pcolidx = colidx;
-    register double *pval = val;
-    register double b_re, b_im;
+    int i;
+	idxtype *pcolidx = colidx;
+    double *pval = val;
+    double b_re, b_im;
 
     for (r = i = 0; r < rows;) {
 	i2 = rowptr[r+1];

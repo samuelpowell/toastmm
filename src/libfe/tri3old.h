@@ -35,7 +35,7 @@ public:
 
     void Initialise (const NodeList& nlist);
 
-    BYTE Type () const { return ELID_TRI3OLD; }
+    unsigned char Type () const { return ELID_TRI3OLD; }
     // returns element type id
 
     unsigned long GetCaps () const { return ELCAPS_SUBSAMPLING; }

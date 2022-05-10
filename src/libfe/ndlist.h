@@ -54,7 +54,7 @@ public:
     int TotBnd (void) const;
     // returns the number of boundary nodes in the list  OLD!
 
-    int NumberOf (BYTE bndtype) const;
+    int NumberOf (unsigned char bndtype) const;
     // returns the number of nodes of type bndtype in the list, where bndtype is
     // any of the following: BND_NONE, BND_DIRICHLET, BND_NEUMANN, BND_CAUCHY,
     // BND_ANY

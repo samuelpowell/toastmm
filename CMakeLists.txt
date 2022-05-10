@@ -4,7 +4,7 @@ project(toastmm VERSION 0.1.0)
 include(CTest)
 enable_testing()
 
-set(CMAKE_CXX_STANDARD 98)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/dist)
 
 # liblbfgs
@@ -21,7 +21,7 @@ add_subdirectory(extern/liblbfgs)
 if(WIN32)
     if(MSVC)
         # Make builds quieter for development
-        add_compile_options(/wd4244 /wd4996 /wd4267 /wd4251 /wd4910 /wd4661)
+        add_compile_options(/wd4244 /wd4996 /wd4267 /wd4251 /wd4910 /wd4661 /wd4305)
     endif()
 endif()
 
@@ -29,7 +29,7 @@ endif()
 #
 if(APPLE OR UNIX)
     # Make builds quieter for development
-    add_compile_options(-Wno-deprecated-register -Wno-unused-result)
+    add_compile_options(-Wno-comment -Wno-unused-variable -Wno-unused-result)
 
     if(NOT APPLE)
         add_compile_options(-Wno-format-truncation)

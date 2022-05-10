@@ -69,7 +69,7 @@ public:
 
     void Initialise (const NodeList &nlist);
 
-    BYTE Type () const { return ELID_TRI10; }
+    unsigned char Type () const { return ELID_TRI10; }
     unsigned long GetCaps () const { return 0; }
     int nNode () const { return 10; }
     int nSide () const { return 3; }

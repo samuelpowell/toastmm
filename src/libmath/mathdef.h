@@ -26,7 +26,6 @@
 
 // matrix/vector index types
 typedef int idxtype;
-//typedef long idxtype;
 
 // some constants ===========================================================
 
@@ -36,20 +35,7 @@ const double Pi05 = Pi*0.5;
 const double Rad  = Pi/180.0;
 const double Deg  = 180.0/Pi;
 
-// type definitions =========================================================
-
-typedef unsigned char BYTE;
-
 // macros ===================================================================
-
-//#ifndef __MINMAX_DEFINED
-//namespace toast {
-//    template<class T>
-//    inline T min (const T x, const T y) { return (x < y) ? x : y; }
-//    template<class T>
-//    inline T max (const T x, const T y) { return (x > y) ? x : y; }
-//}
-//#endif
 
 typedef enum {
     DEEP_COPY,
@@ -78,20 +64,6 @@ inline bool pow (bool base, bool e)
 inline int pow (int base, int e)
 { return (int)pow ((double)base, (double)e); }
 
-// inline float pow (float base, float e)
-// { return (float)pow ((double)base, (double)e); }
-
-
-
-
-//inline float conj(float a)
-//{ return a; }
-
-//inline double conj(double a)
-//{ return a; }
-
-
-
 // SP 24.01.15: OS X LIBC++ provides definitions of conj
 // for real types which return a std::complex. This is incompatible
 // with the gmres defined in gmres_imp.hpp. The following function
@@ -109,8 +81,6 @@ namespace toast {
     { return std::conj(a);}
     
 }
-
-
 
 inline bool iszero (double d)
 { return d == 0.0; }
@@ -159,9 +129,5 @@ inline int binomial_coeff (int n, int r)
 inline double rad (double deg) { return deg*Rad; }
 inline double deg (double rad) { return rad*Deg; }
 
-#ifdef __BORLANDC__			// BorlandC doesn't know about atanh
-inline double atanh (double x)
-{ return 0.5 * log ((1.0+x) / (1.0-x)); }	// valid for |x| < 1
-#endif
 
 #endif

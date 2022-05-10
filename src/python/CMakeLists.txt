@@ -16,7 +16,6 @@ get_target_property(LIBSTOAST_INCLUDES  libstoast   INTERFACE_INCLUDE_DIRECTORIE
 foreach(dir ${ROOT_INCLUDES} ${LIBMATH_INCLUDES} ${LIBFE_INCLUDES} ${LIBSTOAST_INCLUDES})
     string(APPEND PYTOAST_INCLUDE_STRING "'${dir}',")
 endforeach()
-message(STATUS ${PYTOAST_INCLUDE_STRING})
 
 if(CMAKE_BUILD_TYPE MATCHES Debug)
     set(PYTOAST_DEBUG_FLAG "True")
@@ -26,22 +25,23 @@ endif()
 
 configure_file(setup.py.in setup.py @ONLY)
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.py DESTINATION ${CMAKE_INSTALL_PREFIX}/python)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.py DESTINATION ${CMAKE_INSTALL_PREFIX}/python/src)
 
-# Install python source
+# Install python source, associated driver scripts, documentation, etc.
 #
-install(DIRECTORY toast DESTINATION ${CMAKE_INSTALL_PREFIX}/python)
+install(DIRECTORY toast DESTINATION ${CMAKE_INSTALL_PREFIX}/python/src)
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/script/python DESTINATION ${CMAKE_INSTALL_PREFIX})       
 
 # Copy files required for build
 #
-list(APPEND PYTOAST_BUILD_FILES ../../arch.h
+list(APPEND PYTOAST_BUILD_FILES ../../include/arch.h
                                 pyproject.toml
                                 toastmodule.cc)
 
-                                # Install python build system files
+# Install python build system files
 foreach ( file ${PYTOAST_BUILD_FILES} )
     get_filename_component( dir ${file} DIRECTORY )
-    install( FILES ${file} DESTINATION ${CMAKE_INSTALL_PREFIX}/python )
+    install( FILES ${file} DESTINATION ${CMAKE_INSTALL_PREFIX}/python/src )
 endforeach()
 
 # Install libraries 
@@ -55,7 +55,7 @@ if(WIN32)
                              ${CMAKE_INSTALL_PREFIX}/bin/libstoast.dll)
 
     foreach ( file ${PYTOAST_LIBS} )
-        install( FILES ${file} DESTINATION ${CMAKE_INSTALL_PREFIX}/python/toast )
+        install( FILES ${file} DESTINATION ${CMAKE_INSTALL_PREFIX}/python/src/toast )
     endforeach()
 
     list(APPEND PYTOAST_IMPORT_LIBS ${CMAKE_INSTALL_PREFIX}/lib/libmath.lib
@@ -63,7 +63,7 @@ if(WIN32)
                                     ${CMAKE_INSTALL_PREFIX}/lib/libstoast.lib)
 
     foreach ( file ${PYTOAST_IMPORT_LIBS} )
-        install( FILES ${file} DESTINATION ${CMAKE_INSTALL_PREFIX}/python/toast/lib )
+        install( FILES ${file} DESTINATION ${CMAKE_INSTALL_PREFIX}/python/src/toast/lib )
     endforeach()
 
 endif()
@@ -80,7 +80,7 @@ if(APPLE OR UNIX)
     endif()
 
     foreach ( file ${PYTOAST_LIBS} )
-        install( FILES ${file} DESTINATION ${CMAKE_INSTALL_PREFIX}/python/toast/lib )
+        install( FILES ${file} DESTINATION ${CMAKE_INSTALL_PREFIX}/python/src/toast/lib )
     endforeach()
 endif()
 

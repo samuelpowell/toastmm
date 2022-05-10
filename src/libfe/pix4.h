@@ -48,8 +48,8 @@ public:
 
     void Initialise (const NodeList &nlist);
 
-    inline BYTE Type() const { return ELID_PIX4; }
-    BYTE VtkType() const { return 8; }
+    inline unsigned char Type() const { return ELID_PIX4; }
+    unsigned char VtkType() const { return 8; }
     inline unsigned long GetCaps() const { return 0; }
     inline int nNode() const { return 4; }
     inline int nSide() const { return 4; }
