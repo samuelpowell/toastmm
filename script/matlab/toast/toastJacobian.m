@@ -1,4 +1,4 @@
-function p = toastJacobian
+function J = toastJacobian(hmesh,hbasis,varargin)
 %toastJacobian        - Generate an unscaled frequecny-domain Jacobian matrix
 %
 % Synopsis: J = toastJacobian (hMesh, hBasis, qvec, mvec, mua, mus, ref,
@@ -38,3 +38,34 @@ function p = toastJacobian
 % basis. n in that case is equal to the number of nodes.
 %
 % J is unscaled on return.
+
+if isobject(hbasis)
+    hb = hbasis.handle;
+else
+    hb = 0;
+end
+
+if nargin==5
+    dphi = varargin{1};
+    aphi = varargin{2};
+    proj = varargin{3};
+    J = toastmex(uint32(53),hmesh.handle,hb,dphi,aphi,proj);
+else
+    qvec = varargin{1};
+    mvec = varargin{2};
+    mua = varargin{3};
+    mus = varargin{4};
+    ref = varargin{5};
+    freq = varargin{6};
+    solver = 'direct';
+    tol = 1e-8;
+    if nargin >= 9
+        solver = varargin{7};
+        if nargin >= 10
+            tol = varargin{8};
+        end
+    end
+    J = toastmex(uint32(53),hmesh.handle,hb,qvec,mvec,mua,mus,ref,freq,solver,tol);
+end
+
+end

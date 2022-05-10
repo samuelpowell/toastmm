@@ -49,7 +49,7 @@ public:
 
     void Initialise (const NodeList &nlist);
 
-    BYTE Type () const { return ELID_TRI10_IP; }
+    unsigned char Type () const { return ELID_TRI10_IP; }
     unsigned long GetCaps () const { return ELCAPS_CURVED_BOUNDARY; }
     int nNode () const { return 10; }
     int nSide () const { return 3; }

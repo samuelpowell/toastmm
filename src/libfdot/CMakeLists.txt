@@ -8,12 +8,8 @@ target_link_libraries(libfdot PRIVATE libmath)
 target_link_libraries(libfdot PRIVATE libfe)
 target_link_libraries(libfdot PRIVATE libstoast)
 
-# Managed by headers
-# target_compile_definitions(libmath PRIVATE NEED_EXPLICIT_INSTANTIATION)
-
-target_include_directories(libfdot PRIVATE ../../)                      # For toastdef
-target_include_directories(libfdot PRIVATE ../../include)               # For blasnames for toastdef
-target_include_directories(libfdot PRIVATE ../../extern/eigen-3.4.0)    # Eigen for solvers, etc.
+target_include_directories(libfdot PRIVATE ../../include)            # For blasnames, toastdef, arch
+target_include_directories(libfdot PRIVATE ../../extern/eigen-3.4.0) # Eigen for solvers, etc.
 
 # Standard build
 #

@@ -54,13 +54,13 @@ class Raster:
                     intermediate basis.
         """
         self.mesh = mesh
-        if grd.dtype != np.int32:
-            grd = np.array(grd,dtype=np.int32)
+        if grd.dtype != int:
+            grd = np.array(grd,dtype=int)
         self.grd = grd
         if intgrd is None:
             intgrd = np.copy(grd)
-        elif intgrd.dtype != np.int32:
-            intgrd = np.array(intgrd, dtype=np.int32)
+        elif intgrd.dtype != int:
+            intgrd = np.array(intgrd, dtype=int)
         self.Clear()
         self.handle = toastmod.MakeRaster(mesh.handle,grd,intgrd)
 

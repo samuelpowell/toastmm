@@ -73,10 +73,10 @@ public:
      */
     void Initialise (const NodeList& nlist);
 
-    BYTE Type () const { return ELID_TRI3; }
+    unsigned char Type () const { return ELID_TRI3; }
     // returns element type id
 
-    BYTE VtkType() const { return 5; }
+    unsigned char VtkType() const { return 5; }
 
     unsigned long GetCaps () const { return ELCAPS_SUBSAMPLING; }
     // Return element capability flags

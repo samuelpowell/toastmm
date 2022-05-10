@@ -105,11 +105,7 @@ void OutputProgramInfo (std::ostream &os);
 #endif
 
 // handling of template instantiation
-#ifdef __BORLANDC__
-#define INSTTEMPLATE
-#else
 #define INSTTEMPLATE template
-#endif
 
 // error routines
 MATHLIB void SetErrorhandler (void (*ErrorFunc)(char*));

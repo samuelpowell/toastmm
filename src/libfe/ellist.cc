@@ -193,7 +193,7 @@ istream& operator>> (istream& i, ElementList& elist)
 ostream& operator<< (ostream& o, ElementList& elist)
 {
     o << "ElementList " << elist.Length << endl;
-    for (register int el=0; el<elist.Length; el++) o << *elist.List[el];
+    for (int el=0; el<elist.Length; el++) o << *elist.List[el];
     return o;
 }
 

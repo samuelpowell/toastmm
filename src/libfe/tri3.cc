@@ -907,7 +907,7 @@ void Triangle3::Bisect (Mesh *mesh, int side, int newnode,
     // if neighbour subdivision data had not been provided, now subdivide
     // the neighbour
     if (unsplit_nbr) {
-	Element *e1, *e2;
+	Element *e1 = 0, *e2 = 0;
 	for (i = 0; i < unsplit_nbr->nSide(); i++)
 	    if (unsplit_nbr->sdnbhr[i] == this) break;
 	unsplit_nbr->SplitSide (mesh, i, newnode, sib, this, e1, e2);

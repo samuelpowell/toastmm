@@ -1,10 +1,6 @@
 #ifndef __BLASNAMES_H
 #define __BLASNAMES_H
 
-#if (!defined(_WIN32))&&(!defined(_WIN64))
-#define TOASTLOCAL_BLAS_NAMES
-#endif
-
 #ifdef TOASTLOCAL_BLAS_NAMES
 #define sasum_  toast_sasum_
 #define isamax_ toast_isamax_

@@ -3,17 +3,9 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifdef __BORLANDC__
-#include <strstrea.h>
-#include <conio.h>
-#include <process.h>
 
-typedef unsigned pid_t;
-#else
 #include <sstream>
 //#include <unistd.h>
-
-#endif
 #include <time.h>
 #include <fstream.h>
 #include <iomanip.h>

@@ -50,7 +50,7 @@ public:
 
     void Initialise (const NodeList &nlist);
 
-    inline BYTE Type() const { return ELID_VOX27; }
+    inline unsigned char Type() const { return ELID_VOX27; }
     inline unsigned long GetCaps() const { return 0; }
     inline int nNode() const { return 27; }
     inline int nSide() const { return 6; }

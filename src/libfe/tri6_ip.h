@@ -48,7 +48,7 @@ public:
 
     void Initialise (const NodeList& nlist);
 
-    BYTE Type() const { return ELID_TRI6_IP; }
+    unsigned char Type() const { return ELID_TRI6_IP; }
     unsigned long GetCaps () const { return ELCAPS_CURVED_BOUNDARY; }
     int nNode() const { return 6; }
     int nSide() const { return 3; }

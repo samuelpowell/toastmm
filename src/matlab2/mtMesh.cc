@@ -907,7 +907,7 @@ void MatlabToast::MeshRefine (int nlhs, mxArray *plhs[], int nrhs,
     void(*RefineFunc)(Mesh*,bool*);
     Mesh *mesh = (Mesh*)GETMESH_SAFE(0);
     int i, nv, nlen = mesh->nlen(), elen = mesh->elen();
-    BYTE eltp = mesh->elist[0]->Type();
+    unsigned char eltp = mesh->elist[0]->Type();
     switch (eltp) {
     case ELID_TRI3:
         RefineFunc = RefineTriangle3Mesh;

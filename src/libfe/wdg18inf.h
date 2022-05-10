@@ -22,7 +22,7 @@ public:
     ~Wedge18inf () { delete []Node; }
 
     void Initialise (const NodeList &nlist);
-    BYTE Type() const { return ELID_WDG18INF; }
+    unsigned char Type() const { return ELID_WDG18INF; }
 
     int nNode() const { return 6; }
     // only the 6 nodes of the triangular base are stored

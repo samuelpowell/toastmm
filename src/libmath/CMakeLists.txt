@@ -4,28 +4,19 @@ project(libmath VERSION 0.1.0)
 add_library(libmath SHARED)
 set_target_properties(libmath PROPERTIES PREFIX "")
 
-# Managed by headers
-# target_compile_definitions(libmath PRIVATE NEED_EXPLICIT_INSTANTIATION)
-
-target_include_directories(libmath PRIVATE ../../)            # For toastdef
-target_include_directories(libmath PRIVATE ../../include)     # For blasnames for toastdef
-
+target_include_directories(libmath PRIVATE ../../include)     # For blasnames, toastdef, arch
 target_include_directories(libmath INTERFACE .)     # Provide headers for dependents
 
 # Standard build
 #
-# Removed: arpach.cc, crmatrix.cc
+# Removed: crmatrix.cc
 #
 target_sources(libmath PRIVATE  mathdef.cc util.cc timing.cc vector.cc gsmatrix.cc 
                                 scrmatrix.cc crmatrix_cm.cc precon.cc nr.cc error.cc cr_cholesky.cc 
                                 fourn.cc ilutoast.cc util.cc timing.cc mathdef.cc)
 
-
-
-
 # Unsupported optional 
 #
-# USE_BLZPACK: eigpair.cc
 # ENABLE_PTHREAD: task.cc vector_MT.cc
 
 # Assorted header defines to resolve
@@ -42,3 +33,4 @@ install(TARGETS libmath
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 include(CPack)
+

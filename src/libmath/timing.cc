@@ -4,7 +4,9 @@
 #include "timing.h"
 
 #if defined(_WIN32) || defined(_WIN64)
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <winsock.h>
 #else
 #include <sys/times.h>
 #include <sys/time.h>

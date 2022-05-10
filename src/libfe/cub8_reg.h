@@ -43,7 +43,7 @@ public:
 
     void Initialise (const NodeList &nlist);
 
-    BYTE Type() const { return ELID_CUB8_REG; }
+    unsigned char Type() const { return ELID_CUB8_REG; }
     int nNode() const { return 8; }
     int nSide() const { return 6; }
     int nSideNode (int /*side*/) const { return 4; }

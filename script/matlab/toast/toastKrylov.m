@@ -1,4 +1,4 @@
-function p = toastKrylov
+function p = toastKrylov(x,J,g,M,lambda,hreg,tol)
 %toastKrylov          - Solve linear system Hx=g with impicit representation of H.
 %
 % Synopsis: z = toastKrylov (x, J, g, M, lambda, hReg, tol)
@@ -18,3 +18,20 @@ function p = toastKrylov
 %
 % where J is the Jacobian, M is a diagonal scaling matrix, psi is the
 % regularisation term, and lambda is the LM control parameter.
+if nargin < 7
+    tol = 1e-8;
+    if nargin < 6
+        hreg = 0;
+	if nargin < 5
+	    lambda = 0;
+	end
+    end
+end
+
+if isobject(hreg)
+    hr = hreg.handle;
+else
+    hr = 0;
+end
+
+p = toastmex(uint32(55),x,J,g,M,lambda,hr,tol);

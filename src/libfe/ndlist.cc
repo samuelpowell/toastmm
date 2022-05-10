@@ -116,7 +116,7 @@ int NodeList::TotBnd (void) const
     return bnd;
 }
 
-int NodeList::NumberOf (BYTE bndtype) const
+int NodeList::NumberOf (unsigned char bndtype) const
 {
     int n, bnd;
 

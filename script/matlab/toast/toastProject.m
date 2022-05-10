@@ -33,7 +33,7 @@ elseif nargin < 9
 end
 
 % Calculate system matrix
-smat = toastSysmat (hMesh, mua, mus, ref, omega);
+smat = dotSysmat (hMesh, mua, mus, ref, omega);
 
 % Solve linear system for log complex field and apply boundary operator
 switch upper(solver)
@@ -46,7 +46,10 @@ switch upper(solver)
         nm = size(mvec,2);
 
         % incomplete LU factorisation of smat
-        [L U] = luinc(smat,1e-2);
+        %ilu_setup.type = 'ilutp';
+        %ilu_setup.droptol = 1e-2;
+        ilu_setup.type = 'nofill';
+        [L U] = ilu(smat,ilu_setup);
         
         for i=1:nq
             [phi,flag] = bicgstab(smat,qvec(:,i),tol,1000,L,U);
@@ -56,7 +59,11 @@ switch upper(solver)
 end
 
 % Strip off unused source-detector combinations
-lgamma = lgamma(toastDataLinkList (hMesh));
+lgamma = lgamma(hMesh.DataLinkList());
 
 % Rearrange data in terms of log amplitude and phase shift blocks
-proj = [real(lgamma);imag(lgamma)];
+if omega > 0
+    proj = [real(lgamma);imag(lgamma)];
+else
+    proj = lgamma;
+end

@@ -24,7 +24,7 @@ public:
 
     void Initialise (const NodeList &nlist);
 
-    BYTE Type () const { return ELID_TRI3QR; }
+    unsigned char Type () const { return ELID_TRI3QR; }
     // returns element type id
 
     int nNode() const { return 3; }
