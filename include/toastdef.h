@@ -15,7 +15,7 @@
 
 // Windows DLL import/export declerations
 //
-#if defined(_WIN32) || defined(_WIN64)
+#if (defined(_WIN32) || defined(_WIN64)) && !defined(TOAST_STATIC)
 #define DLLEXPORT __declspec(dllexport)
 #define DLLIMPORT __declspec(dllimport)
 #define DLLEXTERN extern

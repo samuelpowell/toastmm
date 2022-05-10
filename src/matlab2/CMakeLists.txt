@@ -3,44 +3,45 @@ project(toastmex VERSION 0.1.0)
 
 find_package(Matlab 7.16)
 
+
+
 if(Matlab_FOUND)
 
-        message(STATUS "MATLAB located, toast MATLAB interface will be built")
+  message(STATUS "MATLAB located, toast MATLAB interface will be built")
 
-        matlab_add_mex(NAME toastmex    SHARED R2017b
-                                        SRC toastmex.cc 
-                                        matlabtoast.cc mexutil.cc util.cc 
-                                        mtMesh.cc mtElement.cc mtQMvec.cc mtBasis.cc mtField.cc mtGradient.cc
-                                        mtJacobian.cc mtRegul.cc toastlbfgs.cc mtSysmat_basis.cc
-                                        matlabfdot.cc mtProjector.cc )
+  matlab_add_mex(NAME toastmex    SHARED R2017b
+                                  SRC toastmex.cc 
+                                  matlabtoast.cc mexutil.cc util.cc 
+                                  mtMesh.cc mtElement.cc mtQMvec.cc mtBasis.cc mtField.cc mtGradient.cc
+                                  mtJacobian.cc mtRegul.cc toastlbfgs.cc mtSysmat_basis.cc
+                                  matlabfdot.cc mtProjector.cc )
 
-        target_include_directories(toastmex PRIVATE Matlab_INCLUDE_DIRS)                                        
-        target_include_directories(toastmex PRIVATE ../../include)                     # For blasnames, toastdef, arch
+  target_include_directories(toastmex PRIVATE Matlab_INCLUDE_DIRS)                                        
+  target_include_directories(toastmex PRIVATE ../../include)    # For blasnames, toastdef, arch
 
-        # Add link libraries (note that plain version must be used as it has been in the FindMatlab)
-        target_link_libraries(toastmex libmath)
-        target_link_libraries(toastmex libfe)
-        target_link_libraries(toastmex libraster)
-        target_link_libraries(toastmex libstoast)
-        target_link_libraries(toastmex liblbfgs)
-        target_link_libraries(toastmex libfdot)
-        target_link_libraries(toastmex ${Matlab_MEX_LIBRARY} ${Matlab_MX_LIBRARY})
+  # Add link libraries (note that plain version must be used as it has been in the FindMatlab)
+  target_link_libraries(toastmex libmath)
+  target_link_libraries(toastmex libfe)
+  target_link_libraries(toastmex libraster)
+  target_link_libraries(toastmex libstoast)
+  target_link_libraries(toastmex liblbfgs)
+  target_link_libraries(toastmex libfdot)
+  target_link_libraries(toastmex ${Matlab_MEX_LIBRARY} ${Matlab_MX_LIBRARY})
 
-        # Install the output dynamic library
-        install(TARGETS toastmex
-                LIBRARY DESTINATION matlab
-                RUNTIME DESTINATION matlab)
+  # Install the output dynamic library
+  install(TARGETS toastmex
+          LIBRARY DESTINATION matlab/toast2
+          RUNTIME DESTINATION matlab/toast2)
 
-        # Install associated driver scripts, documentation, etc.
-        install(DIRECTORY ${CMAKE_SOURCE_DIR}/script/matlab DESTINATION ${CMAKE_INSTALL_PREFIX})                
+  # Install associated driver scripts, documentation, etc.
+  install(DIRECTORY ${CMAKE_SOURCE_DIR}/script/matlab DESTINATION ${CMAKE_INSTALL_PREFIX})                
 
-        set(CPACK_PROJECT_NAME ${PROJECT_NAME})
-        set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
-        include(CPack)
+  set(CPACK_PROJECT_NAME ${PROJECT_NAME})
+  set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
+  include(CPack)
 
 else()
 
-        message(STATUS "MATLAB not found, toast MATLAB interface will not be built")
+    message(STATUS "MATLAB not found, toast MATLAB interface will not be built")
 
 endif()
-

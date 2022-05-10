@@ -1,10 +1,13 @@
 cmake_minimum_required(VERSION 3.0.0)
 project(pytoast VERSION 0.1.0)
 
+
 # Configure setup.py
 #
-# We encode the full path to headers in the setup file in order to ensure that the 
-# build is relocatable.
+# We encode the full path to headers and the static libraries in the setup file in order that
+# the build can be performed in an isolated environment (on the same host).
+
+# Library headers
 #
 # Note that we include the libmath includes in addition to the interface includes
 # in order to pull in the full root path (required for toastdef.h arch.h)
@@ -21,6 +24,26 @@ foreach(dir ${ROOT_INCLUDES}
 
     string(APPEND PYTOAST_INCLUDE_STRING "'${dir}',")
 endforeach()
+
+# Library link directories
+#
+get_target_property(LIBMATH_DIR    libmath      BINARY_DIR)
+get_target_property(LIBFE_DIR      libfe        BINARY_DIR)
+get_target_property(LIBRASTER_DIR  libraster    BINARY_DIR)
+get_target_property(LIBSTOAST_DIR  libstoast    BINARY_DIR)
+
+foreach(dir ${LIBMATH_DIR} 
+            ${LIBFE_DIR} 
+            ${LIBRASTER_DIR}
+            ${LIBSTOAST_DIR})
+    if(WIN32)
+        # Very ugly hack because I can't access ARCHIVE_CUI
+        string(APPEND PYTOAST_LIBRARY_STRING "'${dir}/Release',")
+    else()
+        string(APPEND PYTOAST_LIBRARY_STRING "'${dir}',")
+    endif()
+endforeach()
+
 
 if(CMAKE_BUILD_TYPE MATCHES Debug)
     set(PYTOAST_DEBUG_FLAG "True")
@@ -48,57 +71,6 @@ foreach ( file ${PYTOAST_BUILD_FILES} )
     get_filename_component( dir ${file} DIRECTORY )
     install( FILES ${file} DESTINATION ${CMAKE_INSTALL_PREFIX}/python/src )
 endforeach()
-
-# Install built libraries (shared build only)
-#
-# We place the built toast libraries in the module in order that seuptools will install
-# these are project files. 
-#
-# Note this is obviously horrible hence why a static build is default!
-#
-if(BUILD_SHARED_LIBS)
-
-    if(WIN32)
-        list(APPEND PYTOAST_LIBS ${CMAKE_INSTALL_PREFIX}/bin/libmath.dll
-                                ${CMAKE_INSTALL_PREFIX}/bin/libfe.dll
-                                ${CMAKE_INSTALL_PREFIX}/bin/libstoast.dll
-                                ${CMAKE_INSTALL_PREFIX}/bin/libraster.dll)
-
-        foreach ( file ${PYTOAST_LIBS} )
-            install( FILES ${file} DESTINATION ${CMAKE_INSTALL_PREFIX}/python/src/toast )
-        endforeach()
-
-        list(APPEND PYTOAST_IMPORT_LIBS ${CMAKE_INSTALL_PREFIX}/lib/libmath.lib
-                                        ${CMAKE_INSTALL_PREFIX}/lib/libfe.lib
-                                        ${CMAKE_INSTALL_PREFIX}/lib/libstoast.lib
-                                        ${CMAKE_INSTALL_PREFIX}/lib/libraster.lib)
-
-        foreach ( file ${PYTOAST_IMPORT_LIBS} )
-            install( FILES ${file} DESTINATION ${CMAKE_INSTALL_PREFIX}/python/src/toast/lib )
-        endforeach()
-
-    endif()
-
-    if(APPLE OR UNIX)
-        if(APPLE)
-            list(APPEND PYTOAST_LIBS ${CMAKE_INSTALL_PREFIX}/lib/libmath.dylib
-                                    ${CMAKE_INSTALL_PREFIX}/lib/libfe.dylib
-                                    ${CMAKE_INSTALL_PREFIX}/lib/libraster.dylib
-                                    ${CMAKE_INSTALL_PREFIX}/lib/libstoast.dylib)
-        else()
-            list(APPEND PYTOAST_LIBS ${CMAKE_INSTALL_PREFIX}/lib/libmath.so
-                                    ${CMAKE_INSTALL_PREFIX}/lib/libfe.so
-                                    ${CMAKE_INSTALL_PREFIX}/lib/libraster.so
-                                    ${CMAKE_INSTALL_PREFIX}/lib/libstoast.so)
-        endif()
-
-        foreach ( file ${PYTOAST_LIBS} )
-            install( FILES ${file} DESTINATION ${CMAKE_INSTALL_PREFIX}/python/src/toast/lib )
-        endforeach()
-    endif()
-
-endif()
-
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
