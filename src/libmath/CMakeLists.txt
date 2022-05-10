@@ -5,7 +5,7 @@ add_library(libmath SHARED)
 set_target_properties(libmath PROPERTIES PREFIX "")
 
 target_include_directories(libmath PRIVATE ../../include)     # For blasnames, toastdef, arch
-target_include_directories(libmath INTERFACE .)     # Provide headers for dependents
+target_include_directories(libmath INTERFACE .)               # Provide headers for dependents
 
 # Standard build
 #

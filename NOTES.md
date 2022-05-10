@@ -73,6 +73,7 @@ Aim: simplify codebase, ensuring that all code is builds and is used
    - Refactor headers
    - Remove unused eigpair.cc, arpack.cc, crmatric.cc (LU)
    - Python interface integer refactor
+ - Refactor raster out of libstoast and into its own module (libraster)
 
 # TODO
 
