@@ -59,8 +59,12 @@ extern unsigned int flops_mul;
 
 #endif // !NO_MATH_HEADERS
 
-//#define SQR(x) ((x)*(x))
-#define CUBE(x) ((x)*(x)*(x))
+#ifndef SQR
+#define SQR(_X) ((_X)*(_X))
+#endif
+#ifndef CUBE
+#define CUBE(_X) ((_X)*(_X)*(_X))
+#endif
 
 // The template implementation headers
 #include "vector_imp.hpp"
