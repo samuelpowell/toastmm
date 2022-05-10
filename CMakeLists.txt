@@ -7,6 +7,8 @@ enable_testing()
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/dist)
 
+set(BUILD_SHARED_LIBS NO)
+
 # liblbfgs
 set(LBFGS_USE_SSE ON)
 set(LBFGS_lib_TARGET_NAME liblbfgs)

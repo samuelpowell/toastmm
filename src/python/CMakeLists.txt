@@ -49,48 +49,54 @@ foreach ( file ${PYTOAST_BUILD_FILES} )
     install( FILES ${file} DESTINATION ${CMAKE_INSTALL_PREFIX}/python/src )
 endforeach()
 
-# Install libraries 
+# Install built libraries (shared build only)
 #
 # We place the built toast libraries in the module in order that seuptools will install
 # these are project files. 
 #
-if(WIN32)
-    list(APPEND PYTOAST_LIBS ${CMAKE_INSTALL_PREFIX}/bin/libmath.dll
-                             ${CMAKE_INSTALL_PREFIX}/bin/libfe.dll
-                             ${CMAKE_INSTALL_PREFIX}/bin/libstoast.dll
-                             ${CMAKE_INSTALL_PREFIX}/bin/libraster.dll)
+# Note this is obviously horrible hence why a static build is default!
+#
+if(BUILD_SHARED_LIBS)
 
-    foreach ( file ${PYTOAST_LIBS} )
-        install( FILES ${file} DESTINATION ${CMAKE_INSTALL_PREFIX}/python/src/toast )
-    endforeach()
+    if(WIN32)
+        list(APPEND PYTOAST_LIBS ${CMAKE_INSTALL_PREFIX}/bin/libmath.dll
+                                ${CMAKE_INSTALL_PREFIX}/bin/libfe.dll
+                                ${CMAKE_INSTALL_PREFIX}/bin/libstoast.dll
+                                ${CMAKE_INSTALL_PREFIX}/bin/libraster.dll)
 
-    list(APPEND PYTOAST_IMPORT_LIBS ${CMAKE_INSTALL_PREFIX}/lib/libmath.lib
-                                    ${CMAKE_INSTALL_PREFIX}/lib/libfe.lib
-                                    ${CMAKE_INSTALL_PREFIX}/lib/libstoast.lib
-                                    ${CMAKE_INSTALL_PREFIX}/lib/libraster.lib)
+        foreach ( file ${PYTOAST_LIBS} )
+            install( FILES ${file} DESTINATION ${CMAKE_INSTALL_PREFIX}/python/src/toast )
+        endforeach()
 
-    foreach ( file ${PYTOAST_IMPORT_LIBS} )
-        install( FILES ${file} DESTINATION ${CMAKE_INSTALL_PREFIX}/python/src/toast/lib )
-    endforeach()
+        list(APPEND PYTOAST_IMPORT_LIBS ${CMAKE_INSTALL_PREFIX}/lib/libmath.lib
+                                        ${CMAKE_INSTALL_PREFIX}/lib/libfe.lib
+                                        ${CMAKE_INSTALL_PREFIX}/lib/libstoast.lib
+                                        ${CMAKE_INSTALL_PREFIX}/lib/libraster.lib)
 
-endif()
+        foreach ( file ${PYTOAST_IMPORT_LIBS} )
+            install( FILES ${file} DESTINATION ${CMAKE_INSTALL_PREFIX}/python/src/toast/lib )
+        endforeach()
 
-if(APPLE OR UNIX)
-    if(APPLE)
-        list(APPEND PYTOAST_LIBS ${CMAKE_INSTALL_PREFIX}/lib/libmath.dylib
-                                 ${CMAKE_INSTALL_PREFIX}/lib/libfe.dylib
-                                 ${CMAKE_INSTALL_PREFIX}/lib/libraster.dylib
-                                 ${CMAKE_INSTALL_PREFIX}/lib/libstoast.dylib)
-    else()
-        list(APPEND PYTOAST_LIBS ${CMAKE_INSTALL_PREFIX}/lib/libmath.so
-                                 ${CMAKE_INSTALL_PREFIX}/lib/libfe.so
-                                 ${CMAKE_INSTALL_PREFIX}/lib/libraster.so
-                                 ${CMAKE_INSTALL_PREFIX}/lib/libstoast.so)
     endif()
 
-    foreach ( file ${PYTOAST_LIBS} )
-        install( FILES ${file} DESTINATION ${CMAKE_INSTALL_PREFIX}/python/src/toast/lib )
-    endforeach()
+    if(APPLE OR UNIX)
+        if(APPLE)
+            list(APPEND PYTOAST_LIBS ${CMAKE_INSTALL_PREFIX}/lib/libmath.dylib
+                                    ${CMAKE_INSTALL_PREFIX}/lib/libfe.dylib
+                                    ${CMAKE_INSTALL_PREFIX}/lib/libraster.dylib
+                                    ${CMAKE_INSTALL_PREFIX}/lib/libstoast.dylib)
+        else()
+            list(APPEND PYTOAST_LIBS ${CMAKE_INSTALL_PREFIX}/lib/libmath.so
+                                    ${CMAKE_INSTALL_PREFIX}/lib/libfe.so
+                                    ${CMAKE_INSTALL_PREFIX}/lib/libraster.so
+                                    ${CMAKE_INSTALL_PREFIX}/lib/libstoast.so)
+        endif()
+
+        foreach ( file ${PYTOAST_LIBS} )
+            install( FILES ${file} DESTINATION ${CMAKE_INSTALL_PREFIX}/python/src/toast/lib )
+        endforeach()
+    endif()
+
 endif()
 
 
