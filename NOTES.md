@@ -72,6 +72,7 @@ Aim: simplify codebase, ensuring that all code is builds and is used
  - Clean up part two
    - Refactor headers
    - Remove unused eigpair.cc, arpack.cc, crmatric.cc (LU)
+   - Python interface integer refactor
 
 # TODO
 
@@ -85,4 +86,5 @@ Aim: simplify codebase, ensuring that all code is builds and is used
  - Remove MESA based projection
  - Resolve `TOAST_THREAD`, `TOAST_THREAD_LEVEL`, `TOAST_THREAD_MATLAB_GRADIENT`, `TOAST_THREAD_MATLAB_QMVEC`, `TOAST_THREAD_ASSEMBLE`
  - MEX 64-bit update (https://uk.mathworks.com/help/matlab/matlab_external/upgrading-mex-files-to-use-64-bit-api.html)
+ - Review all useage of integers in Python interface to ensure consistency across word lengths 
 
