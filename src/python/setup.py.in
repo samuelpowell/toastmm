@@ -25,7 +25,7 @@ elif sys.platform == 'linux':
     lib_names = ['math','fe','stoast','raster']
     link_dir = ['toast/lib']
     link_args = ''
-    compile_args = ['-std=c++98','-Wno-comment', '-DTOAST_STATIC', '-fPIC']
+    compile_args = ['-std=c++11','-Wno-comment', '-DTOAST_STATIC', '-fPIC']
     pkg_files = {'toast': ['lib/*.so']}
 elif sys.platform == 'darwin':
     lib_names = ['math','fe','stoast','raster']
