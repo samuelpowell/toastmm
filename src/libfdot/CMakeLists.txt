@@ -1,7 +1,12 @@
 cmake_minimum_required(VERSION 3.0.0)
 project(libfdot VERSION 0.1.0)
 
-add_library(libfdot SHARED)
+if(BUILD_SHARED_LIBS)
+        add_library(libfdot SHARED)
+else()
+        add_library(libfdot STATIC)
+endif()
+
 set_target_properties(libfdot PROPERTIES PREFIX "")
 
 target_link_libraries(libfdot PRIVATE libmath)

@@ -16,27 +16,23 @@ debug_flag = @PYTOAST_DEBUG_FLAG@
 # versions with the install RPATH in order that the libraries can be found. The
 # rpath of the toast extension itself has to be set accordingly.
 if sys.platform == 'win32':
-    lib_ext = '.dll'
-    lib_names = ['libmath','libfe','libstoast']
-    link_dir = ['toast/lib']
+    lib_names = ['libstoast', 'libraster', 'libfe', 'libmath']
+    compile_args = ['-DTOAST_STATIC']
     link_args = ''
-    compile_args = ''
-    pkg_files = {'toast': ['*.dll']}
+    pkg_files = ''
 elif sys.platform == 'linux':
-    lib_ext = '.so'
-    lib_names = ['math','fe','stoast']
-    link_dir = ['toast/lib']
-    link_args = ['-Wl,-rpath=$ORIGIN/lib']
-    compile_args = ['-std=c++98','-Wno-comment']
-    pkg_files = {'toast': ['lib/*.so']}
+    lib_names = ['stoast', 'raster','fe', 'math']
+    compile_args = ['-std=c++11','-Wno-comment', '-DTOAST_STATIC', '-fPIC']
+    link_args = ''
+    pkg_files = ''
 elif sys.platform == 'darwin':
-    lib_ext = '.dylib'
-    lib_names = ['math','fe','stoast']
-    link_dir = ['toast/lib']
-    link_args = ['-Wl,-rpath=@loader_path/lib']
-    pkg_files = {'toast': ['lib/*.dylib']}
+    lib_names = ['stoast', 'raster', 'fe', 'math']
+    compile_args = ['-DTOAST_STATIC']
+    link_args = ''
+    pkg_files = ''
 else:
     raise Exception('Unknown platform')
+
 
 if debug_flag:
     compile_args.extend(['-O0','-g'])
@@ -47,7 +43,7 @@ module1 = Extension('toast.toastmod',
                     include_dirs = [pyinc,
                                     npinc,
                                     @PYTOAST_INCLUDE_STRING@],
-                    library_dirs = link_dir,
+                    library_dirs = [@PYTOAST_LIBRARY_STRING@],
                     libraries = lib_names,
                     extra_link_args = link_args,
                     extra_compile_args = compile_args,
@@ -71,6 +67,6 @@ setup(
     },
     ext_modules = [module1],
     packages=['toast'],
-    package_data = pkg_files,
-    include_package_data=True
+    #package_data = pkg_files,
+    #include_package_data=True
 )

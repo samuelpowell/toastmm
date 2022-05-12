@@ -1,7 +1,12 @@
 cmake_minimum_required(VERSION 3.0.0)
 project(libraster VERSION 0.1.0)
 
-add_library(libraster SHARED)
+if(BUILD_SHARED_LIBS)
+        add_library(libraster SHARED)
+else()
+        add_library(libraster STATIC)
+endif()
+
 set_target_properties(libraster PROPERTIES PREFIX "")
 
 target_include_directories(libraster PRIVATE ../../include)            # For blasnames, toastdef, arch

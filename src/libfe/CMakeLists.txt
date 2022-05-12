@@ -1,7 +1,12 @@
 cmake_minimum_required(VERSION 3.0.0)
 project(libfe VERSION 0.1.0)
 
-add_library(libfe SHARED)
+if(BUILD_SHARED_LIBS)
+        add_library(libfe SHARED)
+else()
+        add_library(libfe STATIC)
+endif()
+
 set_target_properties(libfe PROPERTIES PREFIX "")
 
 target_link_libraries(libfe PRIVATE libmath)
