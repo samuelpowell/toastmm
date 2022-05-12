@@ -10,6 +10,7 @@
 //	FVector = TVector<float>	('float')
 //	CVector = TVector<complex>	('complex')
 //	IVector = TVector<int>		('integer')
+//  LVector = TVector<long>     ('long')
 //	Vector  = TVector<double>	for backward compatibility
 // ==========================================================================
 
@@ -1079,5 +1080,6 @@ typedef TVector<float>           FVector;
 typedef TVector<std::complex<double> >  CVector;
 typedef TVector<std::complex<float> >   SCVector;
 typedef TVector<int>             IVector;
+typedef TVector<long>            LVector;
 
 #endif // !__VECTOR_H

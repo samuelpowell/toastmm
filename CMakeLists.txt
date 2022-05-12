@@ -4,8 +4,16 @@ project(toastmm VERSION 0.1.0)
 include(CTest)
 enable_testing()
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/dist)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+set(BUILD_SHARED_LIBS NO)
+
+if(NOT BUILD_SHARED_LIBS)
+    add_compile_definitions(TOAST_STATIC)
+    # set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+endif()
 
 # liblbfgs
 set(LBFGS_USE_SSE ON)
@@ -20,8 +28,14 @@ add_subdirectory(extern/liblbfgs)
 #
 if(WIN32)
     if(MSVC)
-        # Make builds quieter for development
-        add_compile_options(/wd4244 /wd4996 /wd4267 /wd4251 /wd4910 /wd4661 /wd4305)
+        if(BUILD_SHARED_LIBS)
+            # Shared library builds are ecxeptionally noise due to various unresolved import/export
+            # issues, we quieten this for now to concentrate on the bad stuff
+            add_compile_options(/wd4244 /wd4996 /wd4267 /wd4251 /wd4910 /wd4661 /wd4305)
+        else()
+            # Static build is okay but unsafe warnings should be addressed
+            add_compile_options(/wd4244 /wd4996)
+        endif()
     endif()
 endif()
 
@@ -59,16 +73,27 @@ add_subdirectory(src/libfdot)
 add_subdirectory(src/supertoast)
 add_subdirectory(src/bintools)
 
-# MATLAB (mex) interface
-add_subdirectory(src/matlab2)
-
-# Python interface 
+# Interfaces
 #
-# Note that the python interface is simply an install target, which writes the source
-# files into the distribution directory, compilation is performed using python tools
-# in order to enable binary wheels to be built using, e.g., cibuildwheel. For a local
-# build one may execute, e.g., `python setup.py bdist_wheel` in the output directory.
-add_subdirectory(src/python)
+# We only build the MATLAB and Python interfaces under a static configuration, as this 
+# removes significant overhead in managing e.g., rpaths, and bundling of dynamic libraries.
+#
+if(BUILD_SHARED_LIBS)
+  message(STATUS "Shared library build select, MATLAB & Python interfaces will not be built")
+else()
+
+    # MATLAB (mex) interface
+    add_subdirectory(src/matlab2)
+
+    # Python interface 
+    #
+    # Note that the python interface is simply an install target, which writes the source
+    # files into the distribution directory, compilation is performed using python tools
+    # in order to enable binary wheels to be built using, e.g., cibuildwheel. For a local
+    # build one may execute, e.g., `python setup.py bdist_wheel` in the output directory.
+    add_subdirectory(src/python)
+
+endif()
 
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})

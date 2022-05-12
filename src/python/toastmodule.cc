@@ -12,6 +12,12 @@
 #include "felib.h"
 #include "stoastlib.h"
 
+
+#define TOAST_NPY_INT NPY_INT   // The numpy type for integer output to Python
+typedef int nint;               // The C type for integer input from Python
+
+static_assert (sizeof(npy_int) == sizeof(nint),  "Numpy integer size mismatch");
+
 struct module_state {
   PyObject *error;
 };
@@ -64,32 +70,45 @@ ObjectManager<Regularisation> g_regmgr;
 // Helper functions
 
 // Assert a PyObject to be an array of specifed rank and type
-inline bool AssertArray(PyObject *arr, int ndim, int type) {
-  if (!PyArray_Check(arr) || PyArray_NDIM((PyArrayObject *)arr) != ndim || PyArray_TYPE((PyArrayObject *)arr) != type) {
+inline bool AssertArray(PyArrayObject *arr, int ndim, int type) {
+
+  int rank = PyArray_NDIM(arr);
+  if(rank != ndim) {
+    std::cerr << "Array rank mismatch, req: " << ndim << " got: " << rank << std::endl;
     return false;
   }
+  
+  int tp = PyArray_TYPE(arr);
+  if(!PyArray_EquivTypenums(tp, type)) {
+     std::cerr << "Array type mismatch, req: " << type << " got: " << tp << std::endl;
+     return false;
+  }
+
   return true;
 }
 
 // Assert a PyObect to be an array of specified rank, type, and dimensions
-inline bool AssertArrayDims(PyObject *arr, int type, int dim0) {
+inline bool AssertArrayDims(PyArrayObject *arr, int type, int dim0) {
   if (!AssertArray(arr, 1, type)) {
     return false;
   }
-  npy_intp *dims = PyArray_DIMS((PyArrayObject *)arr);
+  npy_intp *dims = PyArray_DIMS(arr);
   if (dims[0] != dim0) {
+    std::cerr << "Array dimension mismatch, reqd: " << dim0 << " got: " << dims[0] << std::endl;
     return false;
   }
   return true;
 }
 
 // Assert a PyObect to be an array of specified rank, type, and dimensions
-inline bool AssertArrayDims(PyObject *arr, int type, int dim0, int dim1) {
+inline bool AssertArrayDims(PyArrayObject *arr, int type, int dim0, int dim1) {
   if (!AssertArray(arr, 2, type)) {
     return false;
   }
-  npy_intp *dims = PyArray_DIMS((PyArrayObject *)arr);
+  npy_intp *dims = PyArray_DIMS(arr);
   if ((dims[0] != dim0) || (dims[1] != dim1)) {
+    std::cerr << "Array dimension mismatch, reqd: [" << dim0 << ", " << dim1 << "] got: [" 
+              << dims[0] << ", " << dims[1] << "]" << std::endl;
     return false;
   }
   return true;
@@ -205,8 +224,8 @@ static PyObject *mesh_data(PyObject *self, PyObject *args) {
   }
   npy_intp el_dims[2] = {elen, nnd};
 
-  PyObject *idx = PyArray_SimpleNew(2, el_dims, NPY_INT);
-  int *e, *el_data = (int *)PyArray_DATA((PyArrayObject *)idx);
+  PyObject *idx = PyArray_SimpleNew(2, el_dims, TOAST_NPY_INT);
+  nint *e, *el_data = (nint *)PyArray_DATA((PyArrayObject *)idx);
 
   // element index list
   // (0-based; value -1 indicates unused matrix entry)
@@ -220,8 +239,8 @@ static PyObject *mesh_data(PyObject *self, PyObject *args) {
   }
 
   // element type list (see element.h)
-  PyObject *eltp = PyArray_SimpleNew(1, el_dims, NPY_INT);
-  npy_int *et, *etp_data = (npy_int *)PyArray_DATA((PyArrayObject *)eltp);
+  PyObject *eltp = PyArray_SimpleNew(1, el_dims, TOAST_NPY_INT);
+  nint *et, *etp_data = (nint *)PyArray_DATA((PyArrayObject *)eltp);
 
   for (i = 0, et = etp_data; i < elen; i++) {
     *et++ = mesh->elist[i]->Type();
@@ -276,7 +295,7 @@ static PyObject *toast_surf_data(PyObject *self, PyObject *args) {
   }
   npy_intp face_dims[2] = {nface, nnd};
 
-  npy_int *id, *idx_data = new npy_int[nface * nnd];
+  nint *id, *idx_data = new nint[nface * nnd];
   for (j = 0, id = idx_data; j < nface; j++) {
     Element *pel = mesh->elist[bndellist[j]];
     sd = bndsdlist[j];
@@ -291,17 +310,17 @@ static PyObject *toast_surf_data(PyObject *self, PyObject *args) {
       *id++ = bn;
     }
   }
-  PyObject *face = PyArray_SimpleNewFromData(2, face_dims, NPY_INT, idx_data);
+  PyObject *face = PyArray_SimpleNewFromData(2, face_dims, TOAST_NPY_INT, idx_data);
 
   // generate nodal permutation index list
-  npy_int *p, *perm_data = new int[nbnd];
+  nint *p, *perm_data = new nint[nbnd];
   for (i = 0, p = perm_data; i < nlen; i++) {
     if (bndidx[i] >= 0) {
       *p++ = i;
     }
   }
   npy_intp perm_dim = nbnd;
-  PyObject *perm = PyArray_SimpleNewFromData(1, &perm_dim, NPY_INT, perm_data);
+  PyObject *perm = PyArray_SimpleNewFromData(1, &perm_dim, TOAST_NPY_INT, perm_data);
 
   // cleanup
   delete[] bndidx;
@@ -548,18 +567,18 @@ static PyObject *toast_raster_matrix(PyObject *self, PyObject *args) {
   npy_intp nrp = matrix->nRows() + 1;
 
   // Allocate the numpy arrays for the CSR matrix
-  PyObject *py_rp = PyArray_SimpleNew(1, &nrp, NPY_INT);
-  PyObject *py_ci = PyArray_SimpleNew(1, &nnz, NPY_INT);
+  PyObject *py_rp = PyArray_SimpleNew(1, &nrp, TOAST_NPY_INT);
+  PyObject *py_ci = PyArray_SimpleNew(1, &nnz, TOAST_NPY_INT);
   PyObject *py_vl = PyArray_SimpleNew(1, &nnz, NPY_DOUBLE);
 
   // Copy the data over
-  npy_int *rp = (int *)PyArray_DATA((PyArrayObject *)py_rp);
+  nint *rp = (nint *)PyArray_DATA((PyArrayObject *)py_rp);
   for (i = 0; i < nrp; i++) {
-    rp[i] = (npy_int) rowptr[i];
+    rp[i] = rowptr[i];
   }
-  npy_int *ci = (int *)PyArray_DATA((PyArrayObject *)py_ci);
+  nint *ci = (nint *)PyArray_DATA((PyArrayObject *)py_ci);
   for (i = 0; i < nnz; i++) {
-    ci[i] = (npy_int) colidx[i];
+    ci[i] = colidx[i];
   }
   double *val = (double *)PyArray_DATA((PyArrayObject *)py_vl);
   for (i = 0; i < nnz; i++) {
@@ -582,8 +601,8 @@ static PyObject *toast_raster_sol2basis(PyObject *self, PyObject *args) {
   GETRASTER(raster, hraster);
 
   npy_intp slen = raster->SLen();
-  PyObject *py_s2b = PyArray_SimpleNew(1, &slen, NPY_INT);
-  int *sol2basis = (int *)PyArray_DATA((PyArrayObject *)py_s2b);
+  PyObject *py_s2b = PyArray_SimpleNew(1, &slen, TOAST_NPY_INT);
+  nint *sol2basis = (nint *)PyArray_DATA((PyArrayObject *)py_s2b);
   for (i = 0; i < raster->SLen(); i++) {
     sol2basis[i] = raster->Sol2Basis(i);  // raster->Sol2Basis(i) or raster->GetBasisIdx(i) ??
   }
@@ -603,8 +622,8 @@ static PyObject *toast_raster_basis2sol(PyObject *self, PyObject *args) {
   GETRASTER(raster, hraster);
 
   npy_intp blen = raster->BLen();
-  PyObject *py_b2s = PyArray_SimpleNew(1, &blen, NPY_INT);
-  int *basis2sol = (int *)PyArray_DATA((PyArrayObject *)py_b2s);
+  PyObject *py_b2s = PyArray_SimpleNew(1, &blen, TOAST_NPY_INT);
+  nint *basis2sol = (nint *)PyArray_DATA((PyArrayObject *)py_b2s);
   for (i = 0; i < raster->SLen(); i++) {
     basis2sol[i] = raster->Basis2Sol(i);
   }
@@ -614,9 +633,12 @@ static PyObject *toast_raster_basis2sol(PyObject *self, PyObject *args) {
 // ===========================================================================
 
 static PyObject *toast_make_mesh(PyObject *self, PyObject *args) {
-  PyObject *py_ndlist, *py_ellist, *py_eltp;
+  PyArrayObject *py_ndlist, *py_ellist, *py_eltp;
 
-  if (!PyArg_ParseTuple(args, "OOO", &py_ndlist, &py_ellist, &py_eltp)) {
+  if (!PyArg_ParseTuple(args, "O!O!O!", 
+                              &PyArray_Type, &py_ndlist, 
+                              &PyArray_Type, &py_ellist,
+                              &PyArray_Type, &py_eltp)) {
     return NULL;
   }
 
@@ -626,25 +648,25 @@ static PyObject *toast_make_mesh(PyObject *self, PyObject *args) {
     PyErr_SetString(PyExc_ValueError, "vertices must be a two-dimensional array of doubles");
     return NULL;
   }
-  npy_intp *node_dims = PyArray_DIMS((PyArrayObject *)py_ndlist);
+  npy_intp *node_dims = PyArray_DIMS(py_ndlist);
   int nvtx = node_dims[0];
   int dim = node_dims[1];
-  double *vtx = (double *)PyArray_DATA((PyArrayObject *)py_ndlist);
+  double *vtx = (double *)PyArray_DATA(py_ndlist);
 
-  if (!AssertArray(py_ellist, 2, NPY_INT)) {
+  if (!AssertArray(py_ellist, 2, TOAST_NPY_INT)) {
     PyErr_SetString(PyExc_ValueError, "elements must be a two-dimensional array of integers");
     return NULL;
   }
-  npy_intp *ell_dims = PyArray_DIMS((PyArrayObject *)py_ellist);
+  npy_intp *ell_dims = PyArray_DIMS(py_ellist);
   int nel = ell_dims[0];
   int nnd0 = ell_dims[1];
-  npy_int *idx = (npy_int *)PyArray_DATA((PyArrayObject *)py_ellist);
+  nint *idx = (nint *)PyArray_DATA(py_ellist);
 
-  if (!AssertArrayDims(py_eltp, NPY_INT, nel)) {
+  if (!AssertArrayDims(py_eltp, TOAST_NPY_INT, nel)) {
     PyErr_SetString(PyExc_ValueError, "element types must be a one-dimensional array of integers");
     return NULL;
   }
-  npy_int *etp = (npy_int *)PyArray_DATA((PyArrayObject *)py_eltp);
+  nint *etp = (nint *)PyArray_DATA(py_eltp);
 
   Mesh *mesh = new QMMesh;
 
@@ -745,31 +767,33 @@ static PyObject *toast_make_raster(PyObject *self, PyObject *args) {
   int hmesh, hraster;
   QMMesh *mesh;
   RDenseMatrix *bb = 0;
-  PyObject *py_size, *py_size_intm;
+  PyArrayObject *py_size, *py_size_intm;
 
-  if (!PyArg_ParseTuple(args, "iOO", &hmesh, &py_size, &py_size_intm)) {
+  if (!PyArg_ParseTuple(args, "iO!O!", &hmesh, 
+                                       &PyArray_Type, &py_size, 
+                                       &PyArray_Type, &py_size_intm)) {
     return NULL;
   }
 
   GETMESH(mesh, hmesh);
   int mdim = mesh->Dimension();
-
-  if (!AssertArrayDims(py_size, NPY_INT, mdim)) {
+  
+  if (!AssertArrayDims(py_size, TOAST_NPY_INT, mdim)) {
     PyErr_SetString(PyExc_ValueError, "raster dimensions must be integeral and match mesh dimensionality");
     return NULL;
   }
-  npy_intp *dims = PyArray_DIMS((PyArrayObject *)py_size);
+  npy_intp *dims = PyArray_DIMS(py_size);
   int dim = dims[0];
-  npy_int *size = (npy_int *)PyArray_DATA((PyArrayObject *)py_size);
+  nint *size = (nint *)PyArray_DATA(py_size);
   IVector bdim(dim, size);
 
-  if (!AssertArrayDims(py_size_intm, NPY_INT, mdim)) {
+  if (!AssertArrayDims(py_size_intm, TOAST_NPY_INT, mdim)) {
     PyErr_SetString(PyExc_ValueError, "raster intermediate dimensions must be integeral and match mesh dimensionality");
     return NULL;
   }
-  npy_intp *dims_intm = PyArray_DIMS((PyArrayObject *)py_size_intm);
+  npy_intp *dims_intm = PyArray_DIMS(py_size_intm);
   int dim_intm = dims_intm[0];
-  npy_int *size_intm = (npy_int *)PyArray_DATA((PyArrayObject *)py_size_intm);
+  nint *size_intm = (nint *)PyArray_DATA(py_size_intm);
   IVector gdim(dim_intm, size_intm);
 
   Raster *raster;
@@ -869,9 +893,10 @@ static PyObject *toast_map_basis(PyObject *self, PyObject *args) {
   Raster *raster;
   const char *mapstr;
   char srcid, tgtid;
-  PyObject *py_srcvec;
+  PyArrayObject *py_srcvec;
 
-  if (!PyArg_ParseTuple(args, "isO", &hraster, &mapstr, &py_srcvec)) {
+  if (!PyArg_ParseTuple(args, "isO!", &hraster, &mapstr, 
+                                      &PyArray_Type, &py_srcvec)) {
     return NULL;
   }
 
@@ -892,13 +917,8 @@ static PyObject *toast_map_basis(PyObject *self, PyObject *args) {
     return NULL;
   }
 
-  if (!AssertArray(py_srcvec, 1, NPY_DOUBLE) && !AssertArray(py_srcvec, 1, NPY_CDOUBLE)) {
-    PyErr_SetString(PyExc_ValueError, "data to be mapped must be one-dimensional, double or complex double");
-    return NULL;
-  }
-
-  npy_intp *dims = PyArray_DIMS((PyArrayObject *)py_srcvec);
-  int dtype = PyArray_TYPE((PyArrayObject *)py_srcvec);
+  npy_intp *dims = PyArray_DIMS(py_srcvec);
+  int dtype = PyArray_TYPE(py_srcvec);
   int nsrc = dims[0];
   int ntgt;
   switch (tgtid) {
@@ -923,32 +943,44 @@ static PyObject *toast_map_basis(PyObject *self, PyObject *args) {
 
   switch (dtype) {
     case NPY_DOUBLE: {
-      double *src_data = (double *)PyArray_DATA((PyArrayObject *)py_srcvec);
+
+      if (!AssertArray(py_srcvec, 1, NPY_DOUBLE)) {
+        PyErr_SetString(PyExc_ValueError, "data to be mapped must be one-dimensional, double or complex double");
+        return NULL;
+      }
+
+      double *src_data = (double *)PyArray_DATA(py_srcvec);
       RVector tgt, src(nsrc, src_data);
       MapBasis(raster, srcid, tgtid, src, tgt);
-      double *tgt_data = (double *)PyArray_DATA((PyArrayObject *)py_tgtvec);
+      double *tgt_data = (double *)PyArray_DATA((PyArrayObject *) py_tgtvec);
       memcpy(tgt_data, tgt.data_buffer(), ntgt * sizeof(double));
     } break;
     case NPY_CDOUBLE: {
-      std::complex<double> *src_data = (std::complex<double> *)PyArray_DATA((PyArrayObject *)py_srcvec);
+
+      if (!AssertArray(py_srcvec, 1, NPY_CDOUBLE)) {
+        PyErr_SetString(PyExc_ValueError, "data to be mapped must be one-dimensional, double or complex double");
+        return NULL;
+      }
+
+      std::complex<double> *src_data = (std::complex<double> *)PyArray_DATA(py_srcvec);
       CVector tgt, src(nsrc, src_data);
       MapBasis(raster, srcid, tgtid, src, tgt);
-      std::complex<double> *tgt_data = (std::complex<double> *)PyArray_DATA((PyArrayObject *)py_tgtvec);
+      std::complex<double> *tgt_data = (std::complex<double> *)PyArray_DATA((PyArrayObject *) py_tgtvec);
       memcpy(tgt_data, tgt.data_buffer(), ntgt * sizeof(std::complex<double>));
     } break;
 #ifdef UNDEF
     case NPY_FLOAT: {
-      float *src_data = (float *)PyArray_DATA((PyArrayObject *)py_srcvec);
+      float *src_data = (float *)PyArray_DATA(py_srcvec);
       FVector tgt, src(nsrc, src_data);
       MapBasis(raster, srcid, tgtid, src, tgt);
-      float *tgt_data = (float *)PyArray_DATA((PyArrayObject *)py_tgtvec);
+      float *tgt_data = (float *)PyArray_DATA(py_tgtvec);
       memcpy(tgt_data, tgt.data_buffer(), ntgt * sizeof(float));
     } break;
     case NPY_CFLOAT: {
-      scomplex *src_data = (scomplex *)PyArray_DATA((PyArrayObject *)py_srcvec);
+      scomplex *src_data = (scomplex *)PyArray_DATA(py_srcvec);
       SCVector tgt, src(nsrc, src_data);
       MapBasis(raster, srcid, tgtid, src, tgt);
-      scomplex *tgt_data = (scomplex *)PyArray_DATA((PyArrayObject *)py_tgtvec);
+      scomplex *tgt_data = (scomplex *)PyArray_DATA(py_tgtvec);
       memcpy(tgt_data, tgt.data_buffer(), ntgt * sizeof(scomplex));
     } break;
 #endif
@@ -1039,9 +1071,10 @@ static PyObject *toast_read_nim(PyObject *self, PyObject *args) {
 
 static PyObject *toast_write_nim(PyObject *self, PyObject *args) {
   const char *nimname, *meshname;
-  PyObject *py_nim;
+  PyArrayObject *py_nim;
 
-  if (!PyArg_ParseTuple(args, "ssO", &nimname, &meshname, &py_nim)) {
+  if (!PyArg_ParseTuple(args, "ssO!", &nimname, &meshname, 
+                                      &PyArray_Type, &py_nim)) {
     return NULL;
   }
 
@@ -1078,9 +1111,12 @@ static PyObject *toast_sysmat_cw(PyObject *self, PyObject *args) {
 
   int i, hmesh;
   QMMesh *mesh;
-  PyObject *py_mua, *py_mus, *py_ref;
+  PyArrayObject *py_mua, *py_mus, *py_ref;
 
-  if (!PyArg_ParseTuple(args, "iOOO", &hmesh, &py_mua, &py_mus, &py_ref)) {
+  if (!PyArg_ParseTuple(args, "iO!O!O!", &hmesh, 
+                                         &PyArray_Type, &py_mua, 
+                                         &PyArray_Type, &py_mus, 
+                                         &PyArray_Type, &py_ref)) {
     return NULL;
   }
   GETMESH(mesh, hmesh);
@@ -1099,9 +1135,9 @@ static PyObject *toast_sysmat_cw(PyObject *self, PyObject *args) {
     PyErr_SetString(PyExc_ValueError, "ref must be a one-dimensional vector of doubles");
     return NULL;
   }
-  double *mua = (double *)PyArray_DATA((PyArrayObject *)py_mua);
-  double *mus = (double *)PyArray_DATA((PyArrayObject *)py_mus);
-  double *ref = (double *)PyArray_DATA((PyArrayObject *)py_ref);
+  double *mua = (double *)PyArray_DATA(py_mua);
+  double *mus = (double *)PyArray_DATA(py_mus);
+  double *ref = (double *)PyArray_DATA(py_ref);
 
   RVector prm(nlen);
 
@@ -1133,18 +1169,18 @@ static PyObject *toast_sysmat_cw(PyObject *self, PyObject *args) {
   npy_intp nrp = nlen + 1;
 
   // Allocate the numpy arrays for the CSR matrix
-  PyObject *py_rp = PyArray_SimpleNew(1, &nrp, NPY_INT);
-  PyObject *py_ci = PyArray_SimpleNew(1, &nnz, NPY_INT);
+  PyObject *py_rp = PyArray_SimpleNew(1, &nrp, TOAST_NPY_INT);
+  PyObject *py_ci = PyArray_SimpleNew(1, &nnz, TOAST_NPY_INT);
   PyObject *py_vl = PyArray_SimpleNew(1, &nnz, NPY_DOUBLE);
 
   // Copy the data over
-  npy_int *rp = (npy_int *)PyArray_DATA((PyArrayObject *)py_rp);
+  nint *rp = (nint *)PyArray_DATA((PyArrayObject *)py_rp);
   for (i = 0; i < nrp; i++) {
-    rp[i] = (npy_int) rowptr[i];
+    rp[i] = (int) rowptr[i];
   }
-  npy_int *ci = (npy_int *)PyArray_DATA((PyArrayObject *)py_ci);
+  nint *ci = (nint *)PyArray_DATA((PyArrayObject *)py_ci);
   for (i = 0; i < nnz; i++) {
-    ci[i] = (npy_int) colidx[i];
+    ci[i] = (int) colidx[i];
   }
   double *val = (double *)PyArray_DATA((PyArrayObject *)py_vl);
   for (i = 0; i < nnz; i++) {
@@ -1162,9 +1198,13 @@ static PyObject *toast_sysmat(PyObject *self, PyObject *args) {
   int i, hmesh;
   double freq;
   QMMesh *mesh;
-  PyObject *py_mua, *py_mus, *py_ref;
+  PyArrayObject *py_mua, *py_mus, *py_ref;
 
-  if (!PyArg_ParseTuple(args, "iOOOd", &hmesh, &py_mua, &py_mus, &py_ref, &freq)) {
+  if (!PyArg_ParseTuple(args, "iO!O!O!d", &hmesh, 
+                                          &PyArray_Type, &py_mua, 
+                                          &PyArray_Type, &py_mus, 
+                                          &PyArray_Type, &py_ref, 
+                                          &freq)) {
     return NULL;
   }
 
@@ -1185,9 +1225,9 @@ static PyObject *toast_sysmat(PyObject *self, PyObject *args) {
     PyErr_SetString(PyExc_ValueError, "ref must be a one-dimensional vector of doubles");
     return NULL;
   }
-  double *mua = (double *)PyArray_DATA((PyArrayObject *)py_mua);
-  double *mus = (double *)PyArray_DATA((PyArrayObject *)py_mus);
-  double *ref = (double *)PyArray_DATA((PyArrayObject *)py_ref);
+  double *mua = (double *)PyArray_DATA(py_mua);
+  double *mus = (double *)PyArray_DATA(py_mus);
+  double *ref = (double *)PyArray_DATA(py_ref);
 
   RVector prm(nlen);
 
@@ -1219,18 +1259,18 @@ static PyObject *toast_sysmat(PyObject *self, PyObject *args) {
   npy_intp nrp = nlen + 1;
 
   // Allocate the numpy arrays for the CSR matrix
-  PyObject *py_rp = PyArray_SimpleNew(1, &nrp, NPY_INT);
-  PyObject *py_ci = PyArray_SimpleNew(1, &nnz, NPY_INT);
+  PyObject *py_rp = PyArray_SimpleNew(1, &nrp, TOAST_NPY_INT);
+  PyObject *py_ci = PyArray_SimpleNew(1, &nnz, TOAST_NPY_INT);
   PyObject *py_vl = PyArray_SimpleNew(1, &nnz, NPY_CDOUBLE);
 
   // Copy the data over
-  npy_int *rp = (npy_int *)PyArray_DATA((PyArrayObject *)py_rp);
+  nint *rp = (nint *)PyArray_DATA((PyArrayObject *)py_rp);
   for (i = 0; i < nrp; i++) {
-    rp[i] = (npy_int) rowptr[i];
+    rp[i] = rowptr[i];
   }
-  npy_int *ci = (npy_int *)PyArray_DATA((PyArrayObject *)py_ci);
+  nint *ci = (nint *)PyArray_DATA((PyArrayObject *)py_ci);
   for (i = 0; i < nnz; i++) {
-    ci[i] = (npy_int) colidx[i];
+    ci[i] = colidx[i];
   }
   std::complex<double> *val = (std::complex<double> *)PyArray_DATA((PyArrayObject *)py_vl);
   for (i = 0; i < nnz; i++) {
@@ -1325,18 +1365,18 @@ static PyObject *toast_qvec(PyObject *self, PyObject *args, PyObject *keywds) {
   npy_intp nrp = qvec.nRows() + 1;
 
   // Allocate the numpy arrays for the CSR matrix
-  PyObject *py_rp = PyArray_SimpleNew(1, &nrp, NPY_INT);
-  PyObject *py_ci = PyArray_SimpleNew(1, &nnz, NPY_INT);
+  PyObject *py_rp = PyArray_SimpleNew(1, &nrp, TOAST_NPY_INT);
+  PyObject *py_ci = PyArray_SimpleNew(1, &nnz, TOAST_NPY_INT);
   PyObject *py_vl = PyArray_SimpleNew(1, &nnz, NPY_CDOUBLE);
 
   // Copy the data over
-  npy_int *rp = (npy_int *)PyArray_DATA((PyArrayObject *)py_rp);
+  nint *rp = (nint *)PyArray_DATA((PyArrayObject *)py_rp);
   for (i = 0; i < nrp; i++) {
-    rp[i] = (npy_int) rowptr[i];
+    rp[i] = rowptr[i];
   }
-  npy_int *ci = (npy_int *)PyArray_DATA((PyArrayObject *)py_ci);
+  nint *ci = (nint *)PyArray_DATA((PyArrayObject *)py_ci);
   for (i = 0; i < nnz; i++) {
-    ci[i] = (npy_int) colidx[i];
+    ci[i] = colidx[i];
   }
   std::complex<double> *val = (std::complex<double> *)PyArray_DATA((PyArrayObject *)py_vl);
   for (i = 0; i < nnz; i++) {
@@ -1440,18 +1480,18 @@ static PyObject *toast_mvec(PyObject *self, PyObject *args, PyObject *keywds) {
   npy_intp nrp = mvec.nRows() + 1;
 
   // Allocate the numpy arrays for the CSR matrix
-  PyObject *py_rp = PyArray_SimpleNew(1, &nrp, NPY_INT);
-  PyObject *py_ci = PyArray_SimpleNew(1, &nnz, NPY_INT);
+  PyObject *py_rp = PyArray_SimpleNew(1, &nrp, TOAST_NPY_INT);
+  PyObject *py_ci = PyArray_SimpleNew(1, &nnz, TOAST_NPY_INT);
   PyObject *py_vl = PyArray_SimpleNew(1, &nnz, NPY_CDOUBLE);
 
   // Copy the data over
-  npy_int *rp = (npy_int *)PyArray_DATA((PyArrayObject *)py_rp);
+  nint *rp = (nint *)PyArray_DATA((PyArrayObject *)py_rp);
   for (i = 0; i < nrp; i++) {
-    rp[i] = (npy_int) rowptr[i];
+    rp[i] = rowptr[i];
   }
-  npy_int *ci = (npy_int *)PyArray_DATA((PyArrayObject *)py_ci);
+  nint *ci = (nint *)PyArray_DATA((PyArrayObject *)py_ci);
   for (i = 0; i < nnz; i++) {
-    ci[i] = (npy_int) colidx[i];
+    ci[i] = colidx[i];
   }
   std::complex<double> *val = (std::complex<double> *)PyArray_DATA((PyArrayObject *)py_vl);
   for (i = 0; i < nnz; i++) {
@@ -1533,13 +1573,17 @@ static PyObject *toast_fields(PyObject *self, PyObject *args) {
   QMMesh *mesh;
   Raster *raster;
 
-  PyObject *py_qvec_vl, *py_qvec_rp, *py_qvec_ci;
-  PyObject *py_mua, *py_mus, *py_ref;
+  PyArrayObject *py_qvec_vl, *py_qvec_rp, *py_qvec_ci;
+  PyArrayObject *py_mua, *py_mus, *py_ref;
 
-  if (!PyArg_ParseTuple(args, "iiiOOOOOOd",
-                        &hmesh, &hraster,
-                        &nQ, &py_qvec_vl, &py_qvec_rp, &py_qvec_ci,
-                        &py_mua, &py_mus, &py_ref,
+  if (!PyArg_ParseTuple(args, "iiiO!O!O!O!O!O!d",
+                        &hmesh, &hraster, &nQ, 
+                        &PyArray_Type, &py_qvec_vl, 
+                        &PyArray_Type, &py_qvec_rp, 
+                        &PyArray_Type, &py_qvec_ci,
+                        &PyArray_Type, &py_mua, 
+                        &PyArray_Type, &py_mus, 
+                        &PyArray_Type, &py_ref,
                         &freq)) {
     return NULL;
   }
@@ -1553,11 +1597,11 @@ static PyObject *toast_fields(PyObject *self, PyObject *args) {
 
   int n = mesh->nlen();
 
-  if (!AssertArray(py_qvec_rp, 1, NPY_INT)) {
+  if (!AssertArray(py_qvec_rp, 1, TOAST_NPY_INT)) {
     PyErr_SetString(PyExc_ValueError, "qvec row pointer must be a one-dimensional vector of integers");
     return NULL;
   }
-  if (!AssertArray(py_qvec_ci, 1, NPY_INT)) {
+  if (!AssertArray(py_qvec_ci, 1, TOAST_NPY_INT)) {
     PyErr_SetString(PyExc_ValueError, "qvec column indices must be a one-dimensional vector of integers");
     return NULL;
   }
@@ -1565,9 +1609,9 @@ static PyObject *toast_fields(PyObject *self, PyObject *args) {
     PyErr_SetString(PyExc_ValueError, "qvec vals must be a one-dimensional vector of complex doubles");
     return NULL;
   }
-  npy_int *qrowptr = (npy_int *)PyArray_DATA((PyArrayObject *)py_qvec_rp);
-  npy_int *qcolidx = (npy_int *)PyArray_DATA((PyArrayObject *)py_qvec_ci);
-  std::complex<double> *qval = (std::complex<double> *)PyArray_DATA((PyArrayObject *)py_qvec_vl);
+  nint *qrowptr = (nint *)PyArray_DATA(py_qvec_rp);
+  nint *qcolidx = (nint *)PyArray_DATA(py_qvec_ci);
+  std::complex<double> *qval = (std::complex<double> *)PyArray_DATA(py_qvec_vl);
   CCompRowMatrix qvec(nQ, n, qrowptr, qcolidx, qval);
 
   if (!AssertArrayDims(py_mua, NPY_DOUBLE, n)) {
@@ -1582,13 +1626,13 @@ static PyObject *toast_fields(PyObject *self, PyObject *args) {
     PyErr_SetString(PyExc_ValueError, "ref must be a one-dimensional vector of doubles of length equal to mesh nodes");
     return NULL;
   }
-  double *mua_ptr = (double *)PyArray_DATA((PyArrayObject *)py_mua);
+  double *mua_ptr = (double *)PyArray_DATA(py_mua);
   RVector mua(n, mua_ptr);
 
-  double *mus_ptr = (double *)PyArray_DATA((PyArrayObject *)py_mus);
+  double *mus_ptr = (double *)PyArray_DATA(py_mus);
   RVector mus(n, mus_ptr);
 
-  double *ref_ptr = (double *)PyArray_DATA((PyArrayObject *)py_ref);
+  double *ref_ptr = (double *)PyArray_DATA(py_ref);
   RVector ref(n, ref_ptr);
 
   PyObject *dfield;
@@ -1635,12 +1679,14 @@ void CalcJacobian(QMMesh *mesh, Raster *raster,
 
 static PyObject *toast_jacobian(PyObject *self, PyObject *args) {
   int hmesh, hraster, i, j;
-  npy_intp *dims;
   QMMesh *mesh;
   Raster *raster;
-  PyObject *py_dphi, *py_aphi, *py_proj;
+  PyArrayObject *py_dphi, *py_aphi, *py_proj;
 
-  if (!PyArg_ParseTuple(args, "iiOOO", &hmesh, &hraster, &py_dphi, &py_aphi, &py_proj)) {
+  if (!PyArg_ParseTuple(args, "iiO!O!O!", &hmesh, &hraster, 
+                                          &PyArray_Type, &py_dphi,
+                                          &PyArray_Type, &py_aphi, 
+                                          &PyArray_Type, &py_proj)) {
     return NULL;
   }
 
@@ -1658,7 +1704,7 @@ static PyObject *toast_jacobian(PyObject *self, PyObject *args) {
     return NULL;
   }
 
-  std::complex<double> *dphi_ptr = (std::complex<double> *)PyArray_DATA((PyArrayObject *)py_dphi);
+  std::complex<double> *dphi_ptr = (std::complex<double> *)PyArray_DATA(py_dphi);
   CVector *dphi = new CVector[nq];
   for (i = 0; i < nq; i++) {
     dphi[i].New(n);
@@ -1673,7 +1719,7 @@ static PyObject *toast_jacobian(PyObject *self, PyObject *args) {
     return NULL;
   }
 
-  std::complex<double> *aphi_ptr = (std::complex<double> *)PyArray_DATA((PyArrayObject *)py_aphi);
+  std::complex<double> *aphi_ptr = (std::complex<double> *)PyArray_DATA(py_aphi);
   CVector *aphi = new CVector[nm];
   for (i = 0; i < nm; i++) {
     aphi[i].New(n);
@@ -1688,7 +1734,7 @@ static PyObject *toast_jacobian(PyObject *self, PyObject *args) {
     return NULL;
   }
 
-  std::complex<double> *proj_ptr = (std::complex<double> *)PyArray_DATA((PyArrayObject *)py_proj);
+  std::complex<double> *proj_ptr = (std::complex<double> *)PyArray_DATA(py_proj);
   CVector proj(nqm, proj_ptr, SHALLOW_COPY);
 
   PyObject *J;
@@ -1780,14 +1826,20 @@ static PyObject *toast_jacobian_optical(PyObject *self, PyObject *args) {
   Raster *raster;
   const char *solver;
   double freq, tol;
-  PyObject *py_qvec_vl, *py_qvec_rp, *py_qvec_ci;
-  PyObject *py_mvec_vl, *py_mvec_rp, *py_mvec_ci;
-  PyObject *py_mua, *py_mus, *py_ref;
+  PyArrayObject *py_qvec_vl, *py_qvec_rp, *py_qvec_ci;
+  PyArrayObject *py_mvec_vl, *py_mvec_rp, *py_mvec_ci;
+  PyArrayObject *py_mua, *py_mus, *py_ref;
 
-  if (!PyArg_ParseTuple(args, "iiOOOOOOOOOdsd", &hmesh, &hraster,
-                        &py_qvec_vl, &py_qvec_rp, &py_qvec_ci,
-                        &py_mvec_vl, &py_mvec_rp, &py_mvec_ci,
-                        &py_mua, &py_mus, &py_ref,
+  if (!PyArg_ParseTuple(args, "iiO!O!O!O!O!O!O!O!O!dsd", &hmesh, &hraster,
+                        &PyArray_Type, &py_qvec_vl,
+                        &PyArray_Type, &py_qvec_rp,
+                        &PyArray_Type, &py_qvec_ci,
+                        &PyArray_Type, &py_mvec_vl,
+                        &PyArray_Type, &py_mvec_rp,
+                        &PyArray_Type, &py_mvec_ci,
+                        &PyArray_Type, &py_mua,
+                        &PyArray_Type, &py_mus,
+                        &PyArray_Type, &py_ref,
                         &freq, &solver, &tol))
     return NULL;
 
@@ -1798,11 +1850,11 @@ static PyObject *toast_jacobian_optical(PyObject *self, PyObject *args) {
   int nQ = mesh->nQ;
   int nM = mesh->nM;
 
-  if (!AssertArray(py_qvec_rp, 1, NPY_INT)) {
+  if (!AssertArray(py_qvec_rp, 1, TOAST_NPY_INT)) {
     PyErr_SetString(PyExc_ValueError, "qvec row pointer must be a one-dimensional vector of integers");
     return NULL;
   }
-  if (!AssertArray(py_qvec_ci, 1, NPY_INT)) {
+  if (!AssertArray(py_qvec_ci, 1, TOAST_NPY_INT)) {
     PyErr_SetString(PyExc_ValueError, "qvec column indices must be a one-dimensional vector of integers");
     return NULL;
   }
@@ -1810,16 +1862,16 @@ static PyObject *toast_jacobian_optical(PyObject *self, PyObject *args) {
     PyErr_SetString(PyExc_ValueError, "qvec vals must be a one-dimensional vector of complex doubles");
     return NULL;
   }
-  npy_int *qrowptr = (npy_int *)PyArray_DATA((PyArrayObject *)py_qvec_rp);
-  npy_int *qcolidx = (npy_int *)PyArray_DATA((PyArrayObject *)py_qvec_ci);
-  std::complex<double> *qval = (std::complex<double> *)PyArray_DATA((PyArrayObject *)py_qvec_vl);
+  nint *qrowptr = (nint *)PyArray_DATA(py_qvec_rp);
+  nint *qcolidx = (nint *)PyArray_DATA(py_qvec_ci);
+  std::complex<double> *qval = (std::complex<double> *)PyArray_DATA(py_qvec_vl);
   CCompRowMatrix qvec(nQ, n, qrowptr, qcolidx, qval /*, SHALLOW_COPY*/);
 
-  if (!AssertArray(py_mvec_rp, 1, NPY_INT)) {
+  if (!AssertArray(py_mvec_rp, 1, TOAST_NPY_INT)) {
     PyErr_SetString(PyExc_ValueError, "mvec row pointer must be a one-dimensional vector of integers");
     return NULL;
   }
-  if (!AssertArray(py_mvec_ci, 1, NPY_INT)) {
+  if (!AssertArray(py_mvec_ci, 1, TOAST_NPY_INT)) {
     PyErr_SetString(PyExc_ValueError, "mvec column indices must be a one-dimensional vector of integers");
     return NULL;
   }
@@ -1827,9 +1879,9 @@ static PyObject *toast_jacobian_optical(PyObject *self, PyObject *args) {
     PyErr_SetString(PyExc_ValueError, "mvec vals must be a one-dimensional vector of complex doubles");
     return NULL;
   }
-  int *mrowptr = (int *)PyArray_DATA((PyArrayObject *)py_mvec_rp);
-  int *mcolidx = (int *)PyArray_DATA((PyArrayObject *)py_mvec_ci);
-  std::complex<double> *mval = (std::complex<double> *)PyArray_DATA((PyArrayObject *)py_mvec_vl);
+  nint *mrowptr = (nint *)PyArray_DATA(py_mvec_rp);
+  nint *mcolidx = (nint *)PyArray_DATA(py_mvec_ci);
+  std::complex<double> *mval = (std::complex<double> *)PyArray_DATA(py_mvec_vl);
   CCompRowMatrix mvec(nM, n, mrowptr, mcolidx, mval /*, SHALLOW_COPY*/);
 
   if (!AssertArrayDims(py_mua, NPY_DOUBLE, n)) {
@@ -1844,13 +1896,13 @@ static PyObject *toast_jacobian_optical(PyObject *self, PyObject *args) {
     PyErr_SetString(PyExc_ValueError, "mua must be a one-dimensional vector of doubles of length equal to mesh nodes");
     return NULL;
   }
-  double *mua_ptr = (double *)PyArray_DATA((PyArrayObject *)py_mua);
+  double *mua_ptr = (double *)PyArray_DATA(py_mua);
   RVector mua(n, mua_ptr, SHALLOW_COPY);
 
-  double *mus_ptr = (double *)PyArray_DATA((PyArrayObject *)py_mus);
+  double *mus_ptr = (double *)PyArray_DATA(py_mus);
   RVector mus(n, mus_ptr, SHALLOW_COPY);
 
-  double *ref_ptr = (double *)PyArray_DATA((PyArrayObject *)py_ref);
+  double *ref_ptr = (double *)PyArray_DATA(py_ref);
   RVector ref(n, ref_ptr, SHALLOW_COPY);
 
   PyObject *J;
@@ -1926,14 +1978,20 @@ static PyObject *toast_jacobianCW(PyObject *self, PyObject *args) {
   Raster *raster;
   const char *solver;
   double tol;
-  PyObject *py_qvec_vl, *py_qvec_rp, *py_qvec_ci;
-  PyObject *py_mvec_vl, *py_mvec_rp, *py_mvec_ci;
-  PyObject *py_mua, *py_mus, *py_ref;
+  PyArrayObject *py_qvec_vl, *py_qvec_rp, *py_qvec_ci;
+  PyArrayObject *py_mvec_vl, *py_mvec_rp, *py_mvec_ci;
+  PyArrayObject *py_mua, *py_mus, *py_ref;
 
-  if (!PyArg_ParseTuple(args, "iiOOOOOOOOOsd", &hmesh, &hraster,
-                        &py_qvec_vl, &py_qvec_rp, &py_qvec_ci,
-                        &py_mvec_vl, &py_mvec_rp, &py_mvec_ci,
-                        &py_mua, &py_mus, &py_ref,
+  if (!PyArg_ParseTuple(args, "iiO!O!O!O!O!O!O!O!O!sd", &hmesh, &hraster,
+                        &PyArray_Type, &py_qvec_vl,
+                        &PyArray_Type, &py_qvec_rp,
+                        &PyArray_Type, &py_qvec_ci,
+                        &PyArray_Type, &py_mvec_vl,
+                        &PyArray_Type, &py_mvec_rp,
+                        &PyArray_Type, &py_mvec_ci,
+                        &PyArray_Type, &py_mua,
+                        &PyArray_Type, &py_mus,
+                        &PyArray_Type, &py_ref,
                         &solver, &tol)) {
     return NULL;
   }
@@ -1945,11 +2003,11 @@ static PyObject *toast_jacobianCW(PyObject *self, PyObject *args) {
   int nQ = mesh->nQ;
   int nM = mesh->nM;
 
-  if (!AssertArray(py_qvec_rp, 1, NPY_INT)) {
+  if (!AssertArray(py_qvec_rp, 1, TOAST_NPY_INT)) {
     PyErr_SetString(PyExc_ValueError, "qvec row pointer must be a one-dimensional vector of integers");
     return NULL;
   }
-  if (!AssertArray(py_qvec_ci, 1, NPY_INT)) {
+  if (!AssertArray(py_qvec_ci, 1, TOAST_NPY_INT)) {
     PyErr_SetString(PyExc_ValueError, "qvec column indices must be a one-dimensional vector of integers");
     return NULL;
   }
@@ -1957,16 +2015,16 @@ static PyObject *toast_jacobianCW(PyObject *self, PyObject *args) {
     PyErr_SetString(PyExc_ValueError, "qvec vals must be a one-dimensional vector of doubles");
     return NULL;
   }
-  npy_int *qrowptr = (npy_int *)PyArray_DATA((PyArrayObject *)py_qvec_rp);
-  npy_int *qcolidx = (npy_int *)PyArray_DATA((PyArrayObject *)py_qvec_ci);
-  double *qval = (double *)PyArray_DATA((PyArrayObject *)py_qvec_vl);
+  nint *qrowptr = (nint *)PyArray_DATA(py_qvec_rp);
+  nint *qcolidx = (nint *)PyArray_DATA(py_qvec_ci);
+  double *qval = (double *)PyArray_DATA(py_qvec_vl);
   RCompRowMatrix qvec(nQ, n, qrowptr, qcolidx, qval /*, SHALLOW_COPY*/);
 
-  if (!AssertArray(py_mvec_rp, 1, NPY_INT)) {
+  if (!AssertArray(py_mvec_rp, 1, TOAST_NPY_INT)) {
     PyErr_SetString(PyExc_ValueError, "mvec row pointer must be a one-dimensional vector of integers");
     return NULL;
   }
-  if (!AssertArray(py_mvec_ci, 1, NPY_INT)) {
+  if (!AssertArray(py_mvec_ci, 1, TOAST_NPY_INT)) {
     PyErr_SetString(PyExc_ValueError, "mvec column indices must be a one-dimensional vector of integers");
     return NULL;
   }
@@ -1974,9 +2032,9 @@ static PyObject *toast_jacobianCW(PyObject *self, PyObject *args) {
     PyErr_SetString(PyExc_ValueError, "mvec vals must be a one-dimensional vector of doubles");
     return NULL;
   }
-  int *mrowptr = (int *)PyArray_DATA((PyArrayObject *)py_mvec_rp);
-  int *mcolidx = (int *)PyArray_DATA((PyArrayObject *)py_mvec_ci);
-  double *mval = (double *)PyArray_DATA((PyArrayObject *)py_mvec_vl);
+  nint *mrowptr = (nint *)PyArray_DATA(py_mvec_rp);
+  nint *mcolidx = (nint *)PyArray_DATA(py_mvec_ci);
+  double *mval = (double *)PyArray_DATA(py_mvec_vl);
   RCompRowMatrix mvec(nM, n, mrowptr, mcolidx, mval /*, SHALLOW_COPY*/);
 
   if (!AssertArrayDims(py_mua, NPY_DOUBLE, n)) {
@@ -1991,13 +2049,13 @@ static PyObject *toast_jacobianCW(PyObject *self, PyObject *args) {
     PyErr_SetString(PyExc_ValueError, "mua must be a one-dimensional vector of doubles of length equal to mesh nodes");
     return NULL;
   }
-  double *mua_ptr = (double *)PyArray_DATA((PyArrayObject *)py_mua);
+  double *mua_ptr = (double *)PyArray_DATA(py_mua);
   RVector mua(n, mua_ptr, SHALLOW_COPY);
 
-  double *mus_ptr = (double *)PyArray_DATA((PyArrayObject *)py_mus);
+  double *mus_ptr = (double *)PyArray_DATA(py_mus);
   RVector mus(n, mus_ptr, SHALLOW_COPY);
 
-  double *ref_ptr = (double *)PyArray_DATA((PyArrayObject *)py_ref);
+  double *ref_ptr = (double *)PyArray_DATA(py_ref);
   RVector ref(n, ref_ptr, SHALLOW_COPY);
 
   PyObject *J;
@@ -2161,19 +2219,27 @@ static PyObject *toast_gradient(PyObject *self, PyObject *args) {
   double freq;
   QMMesh *mesh;
   Raster *raster;
-  PyObject *py_qvec_vl, *py_qvec_rp, *py_qvec_ci;
-  PyObject *py_mvec_vl, *py_mvec_rp, *py_mvec_ci;
-  PyObject *py_mua, *py_mus, *py_ref;
-  PyObject *py_data, *py_sd;
+  PyArrayObject *py_qvec_vl, *py_qvec_rp, *py_qvec_ci;
+  PyArrayObject *py_mvec_vl, *py_mvec_rp, *py_mvec_ci;
+  PyArrayObject *py_mua, *py_mus, *py_ref;
+  PyArrayObject *py_data, *py_sd;
 
   const char *solver = "direct";  // for now
   const double tol = 1e-12;       // for now
 
-  if (!PyArg_ParseTuple(args, "iiOOOOOOOOOdOO", &hmesh, &hraster,
-                        &py_qvec_vl, &py_qvec_rp, &py_qvec_ci,
-                        &py_mvec_vl, &py_mvec_rp, &py_mvec_ci,
-                        &py_mua, &py_mus, &py_ref,
-                        &freq, &py_data, &py_sd)) {
+  if (!PyArg_ParseTuple(args, "iiO!O!O!O!O!O!O!O!O!dO!O!", &hmesh, &hraster,
+                        &PyArray_Type, &py_qvec_vl, 
+                        &PyArray_Type, &py_qvec_rp, 
+                        &PyArray_Type, &py_qvec_ci,
+                        &PyArray_Type, &py_mvec_vl, 
+                        &PyArray_Type, &py_mvec_rp,
+                        &PyArray_Type, &py_mvec_ci,
+                        &PyArray_Type, &py_mua, 
+                        &PyArray_Type, &py_mus,
+                        &PyArray_Type, &py_ref,
+                        &freq, 
+                        &PyArray_Type, &py_data, 
+                        &PyArray_Type, &py_sd)) {
     return NULL;
   }
 
@@ -2185,11 +2251,11 @@ static PyObject *toast_gradient(PyObject *self, PyObject *args) {
   int nM = mesh->nM;
   int nQM = mesh->nQM;
 
-  if (!AssertArray(py_qvec_rp, 1, NPY_INT)) {
+  if (!AssertArray(py_qvec_rp, 1, TOAST_NPY_INT)) {
     PyErr_SetString(PyExc_ValueError, "qvec row pointer must be a one-dimensional vector of integers");
     return NULL;
   }
-  if (!AssertArray(py_qvec_ci, 1, NPY_INT)) {
+  if (!AssertArray(py_qvec_ci, 1, TOAST_NPY_INT)) {
     PyErr_SetString(PyExc_ValueError, "qvec column indices must be a one-dimensional vector of integers");
     return NULL;
   }
@@ -2197,16 +2263,16 @@ static PyObject *toast_gradient(PyObject *self, PyObject *args) {
     PyErr_SetString(PyExc_ValueError, "qvec vals must be a one-dimensional vector of complex doubles");
     return NULL;
   }
-  npy_int *qrowptr = (npy_int *)PyArray_DATA((PyArrayObject *)py_qvec_rp);
-  npy_int *qcolidx = (npy_int *)PyArray_DATA((PyArrayObject *)py_qvec_ci);
-  std::complex<double> *qval = (std::complex<double> *)PyArray_DATA((PyArrayObject *)py_qvec_vl);
+  nint *qrowptr = (nint *)PyArray_DATA(py_qvec_rp);
+  nint *qcolidx = (nint *)PyArray_DATA(py_qvec_ci);
+  std::complex<double> *qval = (std::complex<double> *)PyArray_DATA(py_qvec_vl);
   CCompRowMatrix qvec(nQ, n, qrowptr, qcolidx, qval /*, SHALLOW_COPY*/);
 
-  if (!AssertArray(py_mvec_rp, 1, NPY_INT)) {
+  if (!AssertArray(py_mvec_rp, 1, TOAST_NPY_INT)) {
     PyErr_SetString(PyExc_ValueError, "mvec row pointer must be a one-dimensional vector of integers");
     return NULL;
   }
-  if (!AssertArray(py_mvec_ci, 1, NPY_INT)) {
+  if (!AssertArray(py_mvec_ci, 1, TOAST_NPY_INT)) {
     PyErr_SetString(PyExc_ValueError, "mvec column indices must be a one-dimensional vector of integers");
     return NULL;
   }
@@ -2214,9 +2280,9 @@ static PyObject *toast_gradient(PyObject *self, PyObject *args) {
     PyErr_SetString(PyExc_ValueError, "mvec vals must be a one-dimensional vector of complex doubles");
     return NULL;
   }
-  npy_int *mrowptr = (npy_int *)PyArray_DATA((PyArrayObject *)py_mvec_rp);
-  npy_int *mcolidx = (npy_int *)PyArray_DATA((PyArrayObject *)py_mvec_ci);
-  std::complex<double> *mval = (std::complex<double> *)PyArray_DATA((PyArrayObject *)py_mvec_vl);
+  nint *mrowptr = (nint *)PyArray_DATA(py_mvec_rp);
+  nint *mcolidx = (nint *)PyArray_DATA(py_mvec_ci);
+  std::complex<double> *mval = (std::complex<double> *)PyArray_DATA(py_mvec_vl);
   CCompRowMatrix mvec(nM, n, mrowptr, mcolidx, mval /*, SHALLOW_COPY*/);
 
   if (!AssertArrayDims(py_mua, NPY_DOUBLE, n)) {
@@ -2240,19 +2306,19 @@ static PyObject *toast_gradient(PyObject *self, PyObject *args) {
     PyErr_SetString(PyExc_ValueError, "SD must be a one-dimensional vector of doubles of length 2 x source x detector");
     return NULL;
   }
-  double *mua_ptr = (double *)PyArray_DATA((PyArrayObject *)py_mua);
+  double *mua_ptr = (double *)PyArray_DATA(py_mua);
   RVector mua(n, mua_ptr, SHALLOW_COPY);
 
-  double *mus_ptr = (double *)PyArray_DATA((PyArrayObject *)py_mus);
+  double *mus_ptr = (double *)PyArray_DATA(py_mus);
   RVector mus(n, mus_ptr, SHALLOW_COPY);
 
-  double *ref_ptr = (double *)PyArray_DATA((PyArrayObject *)py_ref);
+  double *ref_ptr = (double *)PyArray_DATA(py_ref);
   RVector ref(n, ref_ptr, SHALLOW_COPY);
 
-  double *data_ptr = (double *)PyArray_DATA((PyArrayObject *)py_data);
+  double *data_ptr = (double *)PyArray_DATA(py_data);
   RVector data(nQM * 2, data_ptr, SHALLOW_COPY);
 
-  double *sd_ptr = (double *)PyArray_DATA((PyArrayObject *)py_sd);
+  double *sd_ptr = (double *)PyArray_DATA(py_sd);
   RVector sd(nQM * 2, sd_ptr, SHALLOW_COPY);
 
   CFwdSolver FWS(mesh, solver, tol);
@@ -2296,11 +2362,13 @@ static PyObject *toast_regul(PyObject *self, PyObject *args, PyObject *keywds) {
   void *kapref = 0;
   bool istensor = false;  // reference diffusivity in tensor format?
   Raster *raster;
-  PyObject *py_x;
+  PyArrayObject *py_x;
 
   static const char *kwlist[] = {"regtype", "raster", "x", "tau", "beta", NULL};
 
-  if (!PyArg_ParseTupleAndKeywords(args, keywds, "siOd|d", (char **)kwlist, &regtype, &hraster, &py_x, &tau, &beta)) {
+  if (!PyArg_ParseTupleAndKeywords(args, keywds, "siO!d|d", (char **)kwlist, &regtype, &hraster, 
+                                                            &PyArray_Type, &py_x, 
+                                                            &tau, &beta)) {
     return NULL;
   }
   GETRASTER(raster, hraster);
@@ -2309,11 +2377,11 @@ static PyObject *toast_regul(PyObject *self, PyObject *args, PyObject *keywds) {
     PyErr_SetString(PyExc_ValueError, "x must be a one-dimensional vector of doubles");
     return NULL;
   }
-  npy_intp *x_dims = PyArray_DIMS((PyArrayObject *)py_x);
+  npy_intp *x_dims = PyArray_DIMS(py_x);
   int xlen = x_dims[0];
 
   RVector x0(xlen);
-  memcpy(x0.data_buffer(), PyArray_DATA((PyArrayObject *)py_x), xlen * sizeof(double));
+  memcpy(x0.data_buffer(), PyArray_DATA(py_x), xlen * sizeof(double));
 
   if (!strcasecmp(regtype, "TK0")) {
     RVector xs(x0.Dim());
@@ -2334,9 +2402,9 @@ static PyObject *toast_regul(PyObject *self, PyObject *args, PyObject *keywds) {
 static PyObject *toast_regul_value(PyObject *self, PyObject *args) {
   int hreg;
   Regularisation *reg;
-  PyObject *py_x;
+  PyArrayObject *py_x;
 
-  if (!PyArg_ParseTuple(args, "iO", &hreg, &py_x)) {
+  if (!PyArg_ParseTuple(args, "iO!", &hreg, &PyArray_Type, &py_x)) {
     return NULL;
   }
   GETREGUL(reg, hreg);
@@ -2345,11 +2413,11 @@ static PyObject *toast_regul_value(PyObject *self, PyObject *args) {
     PyErr_SetString(PyExc_ValueError, "x must be a one-dimensional vector of doubles");
     return NULL;
   }
-  npy_intp *x_dims = PyArray_DIMS((PyArrayObject *)py_x);
+  npy_intp *x_dims = PyArray_DIMS(py_x);
   int xlen = x_dims[0];
 
   RVector x(xlen);
-  memcpy(x.data_buffer(), PyArray_DATA((PyArrayObject *)py_x), xlen * sizeof(double));
+  memcpy(x.data_buffer(), PyArray_DATA(py_x), xlen * sizeof(double));
 
   double rval = reg->GetValue(x);
   return Py_BuildValue("d", rval);
@@ -2360,9 +2428,9 @@ static PyObject *toast_regul_value(PyObject *self, PyObject *args) {
 static PyObject *toast_regul_grad(PyObject *self, PyObject *args) {
   int hreg;
   Regularisation *reg;
-  PyObject *py_x;
+  PyArrayObject *py_x;
 
-  if (!PyArg_ParseTuple(args, "iO", &hreg, &py_x)) {
+  if (!PyArg_ParseTuple(args, "iO!", &hreg, &PyArray_Type, &py_x)) {
     return NULL;
   }
 
@@ -2372,11 +2440,11 @@ static PyObject *toast_regul_grad(PyObject *self, PyObject *args) {
     PyErr_SetString(PyExc_ValueError, "x must be a one-dimensional vector of doubles");
     return NULL;
   }
-  npy_intp *x_dims = PyArray_DIMS((PyArrayObject *)py_x);
+  npy_intp *x_dims = PyArray_DIMS(py_x);
   int xlen = x_dims[0];
 
   RVector x(xlen);
-  memcpy(x.data_buffer(), PyArray_DATA((PyArrayObject *)py_x), xlen * sizeof(double));
+  memcpy(x.data_buffer(), PyArray_DATA(py_x), xlen * sizeof(double));
 
   RVector grad(xlen);
   grad = reg->GetGradient(x);
@@ -2397,9 +2465,10 @@ static PyObject *toast_regul_grad(PyObject *self, PyObject *args) {
 static PyObject *toast_regul_hdiag(PyObject *self, PyObject *args) {
   int hreg;
   Regularisation *reg;
-  PyObject *py_x, *py_hdiag;
+  PyArrayObject *py_x;
+  PyObject *py_hdiag;
 
-  if (!PyArg_ParseTuple(args, "iO", &hreg, &py_x)) {
+  if (!PyArg_ParseTuple(args, "iO!", &hreg, &PyArray_Type, &py_x)) {
     return NULL;
   }
 
@@ -2409,7 +2478,7 @@ static PyObject *toast_regul_hdiag(PyObject *self, PyObject *args) {
     PyErr_SetString(PyExc_ValueError, "x must be a (one-dimensional) vector of doubles");
     return NULL;
   }
-  RVector x = CopyVector(py_x);
+  RVector x = CopyVector((PyObject *) py_x);
   RVector diag(x.Dim());
   diag = reg->GetHessianDiag(x);
   CopyVector(&py_hdiag, diag);
@@ -2437,12 +2506,12 @@ static PyObject *toast_element_dof(PyObject *self, PyObject *args) {
   Element *pel = mesh->elist[elid];
   npy_intp nnd = (npy_intp)pel->nNode();
 
-  PyObject *pydof = PyArray_SimpleNew(1, &nnd, NPY_INT);
-  npy_int *data = (npy_int *)PyArray_DATA((PyArrayObject *)pydof);
+  PyObject *pydof = PyArray_SimpleNew(1, &nnd, TOAST_NPY_INT);
+  nint *data = (nint *)PyArray_DATA((PyArrayObject *)pydof);
 
   for(int i = 0; i < nnd; nnd++)
   {
-    data[i] = (npy_int) pel->Node[i];
+    data[i] = pel->Node[i];
   }
   //memcpy(data, pel->Node, nnd * sizeof(int));
 
@@ -2493,10 +2562,10 @@ static PyObject *toast_element_region(PyObject *self, PyObject *args) {
   if (elid < 0) {
     // run over entire mesh
     npy_intp nel = (npy_intp)mesh->elen();
-    PyObject *pyelreg = PyArray_SimpleNew(1, &nel, NPY_INT);
-    npy_int *data = (npy_int *)PyArray_DATA((PyArrayObject *)pyelreg);
+    PyObject *pyelreg = PyArray_SimpleNew(1, &nel, TOAST_NPY_INT);
+    nint *data = (nint *)PyArray_DATA((PyArrayObject *)pyelreg);
     for (int i = 0; i < mesh->elen(); i++) {
-      data[i] = (npy_int) mesh->elist[i]->Region();
+      data[i] = mesh->elist[i]->Region();
     }
     return Py_BuildValue("N", pyelreg);
   } else {  // single element
@@ -2531,9 +2600,9 @@ static PyObject *toast_element_setregion(PyObject *self, PyObject *args) {
 static PyObject *toast_mesh_setregion(PyObject *self, PyObject *args) {
   int hmesh;
   QMMesh *mesh;
-  PyObject *py_reglist;
+  PyArrayObject *py_reglist;
 
-  if (!PyArg_ParseTuple(args, "iO", &hmesh, &py_reglist)) {
+  if (!PyArg_ParseTuple(args, "iO!", &hmesh, &PyArray_Type, &py_reglist)) {
     return NULL;
   }
 
@@ -2541,8 +2610,8 @@ static PyObject *toast_mesh_setregion(PyObject *self, PyObject *args) {
 
   std::cout << "Warning, dimensionality not checked" << std::endl;
 
-  npy_intp *dims = PyArray_DIMS((PyArrayObject *)py_reglist);
-  int *reg = (int *)PyArray_DATA((PyArrayObject *)py_reglist);
+  npy_intp *dims = PyArray_DIMS(py_reglist);
+  int *reg = (int *)PyArray_DATA(py_reglist);
 
   if (dims[0] * dims[1] < mesh->elen()) {
     return NULL;
@@ -2588,10 +2657,10 @@ static PyObject *toast_element_data(PyObject *self, PyObject *args) {
   }
 
   npy_intp el_dims = nnd;
-  PyObject *idx = PyArray_SimpleNew(1, &el_dims, NPY_INT);
-  npy_int *e, *el_data = (npy_int *)PyArray_DATA((PyArrayObject *)idx);
+  PyObject *idx = PyArray_SimpleNew(1, &el_dims, TOAST_NPY_INT);
+  nint *e, *el_data = (nint *)PyArray_DATA((PyArrayObject *)idx);
   for (i = 0, e = el_data; i < nnd; i++) {
-    *e++ = (npy_int) pel->Node[i];
+    *e++ = pel->Node[i];
   }
 
   return Py_BuildValue("OOi", nodelist, idx, pel->Type());
@@ -2603,9 +2672,10 @@ static PyObject *toast_element_mat(PyObject *self, PyObject *args) {
   int hmesh, elid, sideidx, i, j, k, l;
   QMMesh *mesh;
   const char *intstr;
-  PyObject *py_prm, *elmat = NULL;
+  PyArrayObject *py_prm;
+  PyObject *elmat = NULL;
 
-  if (!PyArg_ParseTuple(args, "iisOi", &hmesh, &elid, &intstr, &py_prm, &sideidx)) {
+  if (!PyArg_ParseTuple(args, "iisO!i", &hmesh, &elid, &intstr, &PyArray_Type, &py_prm, &sideidx)) {
     return NULL;
   }
 
@@ -2694,14 +2764,14 @@ static PyObject *toast_element_mat(PyObject *self, PyObject *args) {
       }
     }
   } else if (!strcmp(intstr, "PFF")) {
-    if (py_prm == Py_None) {
+    if ((PyObject *)py_prm == Py_None) {
       return NULL;
     }
-    RVector prm = RVector(mesh->nlen(), (double *)PyArray_DATA((PyArrayObject *)py_prm), SHALLOW_COPY);
+    RVector prm = RVector(mesh->nlen(), (double *)PyArray_DATA(py_prm), SHALLOW_COPY);
     RSymMatrix intPFF = pel->IntPFF(prm);
     npy_intp dims[2] = {nnd, nnd};
     elmat = PyArray_SimpleNew(2, dims, NPY_DOUBLE);
-    double *data = (double *)PyArray_DATA((PyArrayObject *)elmat);
+    double *data = (double *)PyArray_DATA((PyArrayObject *) elmat);
     for (i = 0; i < nnd; i++) {
       data[i * nnd + i] = intPFF(i, i);
       for (j = 0; j < i; j++) {
@@ -2709,10 +2779,10 @@ static PyObject *toast_element_mat(PyObject *self, PyObject *args) {
       }
     }
   } else if (!strcmp(intstr, "PDD")) {
-    if (py_prm == Py_None) {
+    if ((PyObject *) py_prm == Py_None) {
       return NULL;
     }
-    RVector prm = RVector(mesh->nlen(), (double *)PyArray_DATA((PyArrayObject *)py_prm), SHALLOW_COPY);
+    RVector prm = RVector(mesh->nlen(), (double *)PyArray_DATA(py_prm), SHALLOW_COPY);
     RSymMatrix intPDD = pel->IntPDD(prm);
     npy_intp dims[2] = {nnd, nnd};
     elmat = PyArray_SimpleNew(2, dims, NPY_DOUBLE);
@@ -2768,10 +2838,10 @@ static PyObject *toast_element_mat(PyObject *self, PyObject *args) {
       }
     }
   } else if (!strcmp(intstr, "BndPFF")) {
-    if (py_prm == Py_None) {
+    if ((PyObject *) py_prm == Py_None) {
       return NULL;
     }
-    RVector prm = RVector(mesh->nlen(), (double *)PyArray_DATA((PyArrayObject *)py_prm),
+    RVector prm = RVector(mesh->nlen(), (double *)PyArray_DATA(py_prm),
                           SHALLOW_COPY);
     npy_intp dims[2] = {nnd, nnd};
     elmat = PyArray_SimpleNew(2, dims, NPY_DOUBLE);
@@ -2800,8 +2870,8 @@ static PyObject *toast_element_mat(PyObject *self, PyObject *args) {
 static PyObject *toast_element_shapef(PyObject *self, PyObject *args) {
   int i, j, hmesh, elid, global = 0;
   QMMesh *mesh;
-  PyObject *py_pos;
-  if (!PyArg_ParseTuple(args, "iiO|i", &hmesh, &elid, &py_pos, &global)) {
+  PyArrayObject *py_pos;
+  if (!PyArg_ParseTuple(args, "iiO!|i", &hmesh, &elid, &PyArray_Type, &py_pos, &global)) {
     return NULL;
   }
 
@@ -2811,7 +2881,7 @@ static PyObject *toast_element_shapef(PyObject *self, PyObject *args) {
     return NULL;
   }
 
-  if (py_pos == Py_None) {
+  if ((PyObject *)py_pos == Py_None) {
     return NULL;
   }
 
@@ -2820,9 +2890,9 @@ static PyObject *toast_element_shapef(PyObject *self, PyObject *args) {
   Element *pel = mesh->elist[elid];
   int nn = pel->nNode();
 
-  double *pos = (double *)PyArray_DATA((PyArrayObject *)py_pos);
-  int nd = PyArray_NDIM((PyArrayObject *)py_pos);
-  npy_intp *dims = PyArray_DIMS((PyArrayObject *)py_pos);
+  double *pos = (double *)PyArray_DATA(py_pos);
+  int nd = PyArray_NDIM(py_pos);
+  npy_intp *dims = PyArray_DIMS(py_pos);
   if (dims[0] != dim) {
     return NULL;
   }
@@ -2850,8 +2920,8 @@ static PyObject *toast_element_shapef(PyObject *self, PyObject *args) {
 static PyObject *toast_element_shaped(PyObject *self, PyObject *args) {
   int i, j, k, hmesh, elid, global = 0;
   QMMesh *mesh;
-  PyObject *py_pos;
-  if (!PyArg_ParseTuple(args, "iiO|i", &hmesh, &elid, &py_pos, &global)) {
+  PyArrayObject *py_pos;
+  if (!PyArg_ParseTuple(args, "iiO!|i", &hmesh, &elid, &PyArray_Type, &py_pos, &global)) {
     return NULL;
   }
 
@@ -2861,18 +2931,14 @@ static PyObject *toast_element_shaped(PyObject *self, PyObject *args) {
     return NULL;
   }
 
-  if (py_pos == Py_None) {
-    return NULL;
-  }
-
   int dim = mesh->Dimension();
 
   Element *pel = mesh->elist[elid];
   int nn = pel->nNode();
 
-  double *pos = (double *)PyArray_DATA((PyArrayObject *)py_pos);
-  int nd = PyArray_NDIM((PyArrayObject *)py_pos);
-  npy_intp *dims = PyArray_DIMS((PyArrayObject *)py_pos);
+  double *pos = (double *)PyArray_DATA(py_pos);
+  int nd = PyArray_NDIM(py_pos);
+  npy_intp *dims = PyArray_DIMS(py_pos);
   if (dims[0] != dim) {
     return NULL;
   }
@@ -2986,8 +3052,7 @@ static struct PyModuleDef moduledef = {
     toastmod_clear,
     NULL};
 
-PyMODINIT_FUNC
-PyInit_toastmod(void) {
+PyMODINIT_FUNC PyInit_toastmod(void) {
   PyObject *module = PyModule_Create(&moduledef);
   import_array();
 

@@ -1,7 +1,12 @@
 cmake_minimum_required(VERSION 3.0.0)
 project(libmath VERSION 0.1.0)
 
-add_library(libmath SHARED)
+if(BUILD_SHARED_LIBS)
+        add_library(libmath SHARED)
+else()
+        add_library(libmath STATIC)
+endif()
+
 set_target_properties(libmath PROPERTIES PREFIX "")
 
 target_include_directories(libmath PRIVATE ../../include)     # For blasnames, toastdef, arch
