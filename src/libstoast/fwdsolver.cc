@@ -663,7 +663,7 @@ void TFwdSolver<std::complex<double> >::CalcFields (const CCompRowMatrix &qvec,
     } else {
 #if TOAST_THREAD
 
-        //dASSERT(g_tpool, ThreadPool not initialised);
+
         static CALCFIELDS_THREADDATA<std::complex<double> > thdata;
 	thdata.F      = F;
 	thdata.qvec   = &qvec;
@@ -672,11 +672,6 @@ void TFwdSolver<std::complex<double> >::CalcFields (const CCompRowMatrix &qvec,
 	thdata.tol    = iterative_tol;
 	thdata.maxit  = iterative_maxit;
 	thdata.res    = res;
-#ifdef UNDEF
-    int nq = qvec.nRows();
-	g_tpool->ProcessSequence (CalcFields_engine<std::complex<double> >, &thdata,
-				  0, nq, 1);
-#endif
 	Task::Multiprocess (CalcFields_engine<std::complex<double> >, &thdata);
 #else
         int nq = qvec.nRows();
@@ -718,7 +713,7 @@ void TFwdSolver<T>::CalcFields (const TCompRowMatrix<T> &qvec,
 	}
     } else {
 #if TOAST_THREAD
-        //dASSERT(g_tpool, ThreadPool not initialised);
+
         static CALCFIELDS_THREADDATA<T> thdata;
 	thdata.F      = F;
 	thdata.qvec   = &qvec;
@@ -727,9 +722,7 @@ void TFwdSolver<T>::CalcFields (const TCompRowMatrix<T> &qvec,
 	thdata.tol    = iterative_tol;
 	thdata.maxit  = iterative_maxit;
 	thdata.res    = res;
-#ifdef UNDEF
-	g_tpool->ProcessSequence (CalcFields_engine<T>, &thdata, 0, nq, 1);
-#endif
+
 	Task::Multiprocess (CalcFields_engine<T>, &thdata);
 #else
         TVector<T> *qv = new TVector<T>[nq];

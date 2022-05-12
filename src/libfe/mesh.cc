@@ -75,36 +75,16 @@ Mesh::~Mesh ()
     if (intersect_prm) delete intersect_prm;
 }
 
-#ifdef TOAST_PARALLEL
-void Mesh::Setup_engine (void *arg, int el0, int el1) {
-    Mesh *mesh = (Mesh*)arg;
-    ElementList &elist = mesh->elist;
-    NodeList &nlist = mesh->nlist;
-    for (int el = el0; el < el1; el++)
-        elist[el]->Initialise (nlist);
-}
-
-void Mesh::PostSetup_engine (void *arg, int el0, int el1) {
-    Mesh *mesh = (Mesh*)arg;
-    ElementList &elist = mesh->elist;
-    NodeList &nlist = mesh->nlist;
-    for (int el = el0; el < el1; el++)
-        elist[el]->PostInitialisation (nlist);
-}
-#endif
-
 void Mesh::Setup (bool mark_boundary)
 {
-    int i, j, el;
-
-#ifndef TOAST_PARALLEL
-    for (el = 0; el < elist.Len(); el++)
-	elist[el]->Initialise (nlist);
-#else
-    int grain = elist.Len()/(8*Task::GetThreadCount());
-    g_tpool->ProcessSequence (Mesh::Setup_engine, this, 0, elist.Len(), grain);
-#endif // TOAST_PARALLEL
-
+    int i, j;
+    const int nel  = elist.Len();
+    
+	// #pragma omp parallel for
+	for (int el = 0; el < nel; el++) {
+		elist[el]->Initialise (nlist);
+	}
+	
     if (mark_boundary)
         MarkBoundary();
     priv_ilen = 0;
@@ -115,14 +95,10 @@ void Mesh::Setup (bool mark_boundary)
     if (toastVerbosity > 0)
         cout << "--> Boundary nodes.." << priv_nbnd << endl;
 
-#ifndef TOAST_PARALLEL
-    for (el = 0; el < elist.Len(); el++)
-	elist[el]->PostInitialisation (nlist);
-#else
-    int grain = elist.Len()/(8*Task::GetThreadCount());
-    g_tpool->ProcessSequence (Mesh::PostSetup_engine, this, 0, elist.Len(),
-			      grain);
-#endif // TOAST_PARALLEL
+    // #pragma omp parallel for
+    for (int el = 0; el < nel; el++) {
+		elist[el]->PostInitialisation (nlist);
+	}
 
     fullsize = CalcFullSize ();
 

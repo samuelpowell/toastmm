@@ -31,7 +31,6 @@ endif()
 
 # Assorted header defines to resolve
 #
-# TOAST_PARALLEL
 # COMPUTE_FLOPS
 
 install(TARGETS libmath

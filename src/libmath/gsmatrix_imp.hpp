@@ -11,10 +11,6 @@
 #include "mathlib.h"
 #include "timing.h"
 
-#ifdef TOAST_PARALLEL
-#include "task.h"
-#endif
-
 using namespace std;
 
 // ==========================================================================
@@ -108,7 +104,6 @@ void QRSolve (const TGenericSparseMatrix<MT> &A, const TVector<MT> &c,
 // Conjugate gradient (CG) solver
 // ==========================================================================
 
-#ifndef CG_PARALLEL // **** serial implementation ****
 
 template<class MT>
 int CG (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
@@ -162,129 +157,7 @@ int CG (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
     return niter;
 }
 
-#else // **** threaded implementation **** : not currently preconditioned
 
-template<class MT>
-struct cgdata1 {
-    const TGenericSparseMatrix<MT> *A;
-    TVector<MT> *d;
-    TVector<MT> *q;
-    double *dq;
-    pthread_mutex_t *mutexp;
-};
-
-template<class MT>
-struct cgdata2 {
-    TVector<MT> *x;
-    TVector<MT> *r;
-    TVector<MT> *d;
-    TVector<MT> *q;
-    double *alpha;
-    double *dnew;
-    pthread_mutex_t *mutexp;
-};
-
-template<class MT>
-struct cgdata3 {
-    TVector<MT> *d;
-    TVector<MT> *r;
-    double *beta;
-};
-
-template<class MT>
-void TGenericSparseMatrix<MT>::cg_loop1 (void *arg, int i1, int i2)
-{
-    int i;
-    struct cgdata1<MT> *data = (struct cgdata1<MT>*)arg;
-    TVector<MT> &d = *data->d;
-    TVector<MT> &q = *data->q;
-    data->A->Ax(d, q, i1, i2);
-    double local_dq = 0.0;
-    for (i = i1; i < i2; i++)
-        local_dq += d[i] * q[i];
-    pthread_mutex_lock (data->mutexp);
-    *data->dq += local_dq;
-    pthread_mutex_unlock (data->mutexp);
-}
-
-template<class MT>
-void TGenericSparseMatrix<MT>::cg_loop2 (void *arg, int i1, int i2)
-{
-    struct cgdata2<MT> *data = (struct cgdata2<MT>*)arg;
-    int i;
-    double local_dnew = 0.0;
-    TVector<MT> &x = *data->x;
-    TVector<MT> &r = *data->r;
-    TVector<MT> &d = *data->d;
-    TVector<MT> &q = *data->q;
-    double alpha = *data->alpha;
-    for (i = i1; i < i2; i++) {
-        x[i] += d[i] * alpha;
-        r[i] -= q[i] * alpha;
-	local_dnew += r[i] * r[i];
-    }
-    pthread_mutex_lock (data->mutexp);
-    *data->dnew += local_dnew;
-    pthread_mutex_unlock (data->mutexp);
-}
-
-template<class MT>
-void TGenericSparseMatrix<MT>::cg_loop3 (void *arg, int i1, int i2)
-{
-    struct cgdata3<MT> *data = (struct cgdata3<MT>*)arg;
-    int i;
-    TVector<MT> &d = *data->d;
-    TVector<MT> &r = *data->r;
-    double beta = *data->beta;
-    for (i = i1; i < i2; i++) {
-        d[i] *= beta;
-	d[i] += r[i];
-    }
-}
-
-template<class MT>
-int CG (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
-    TVector<MT> &x, double &tol, TPreconditioner<MT> *precon, int maxit)
-{
-    dASSERT(A.nRows() == A.nCols(), "Matrix not square");
-    dASSERT(b.Dim() == A.nRows(), "Dimension mismatch");
-    dASSERT(x.Dim() == A.nRows(), "Dimension mismatch");
-
-    double dnew, dold, d0, alpha, beta = 0.0, dq;
-    int niter, dim = x.Dim();
-    if (!maxit) maxit = dim+1;
-    TVector<MT> r(dim), d(dim), q(dim);
-    r = b - (A*x);
-    d = r;
-    dnew = r & d;
-    d0 = tol*tol * dnew;
-
-    pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-    int grain = (dim+Task::GetThreadCount()-1)/Task::GetThreadCount();
-    struct cgdata1<MT> data1 = {&A, &d, &q, &dq, &mutex};
-    struct cgdata2<MT> data2 = {&x, &r, &d, &q, &alpha, &dnew, &mutex};
-    struct cgdata3<MT> data3 = {&d, &r, &beta};
-
-    for (niter = 0; niter < maxit && dnew > d0; niter++) {
-        dq = 0.0;
-	g_tpool->ProcessSequence (TGenericSparseMatrix<MT>::cg_loop1,
-				  &data1, 0, dim, grain);
-	alpha = dnew/dq;
-        dold  = dnew;
-	dnew  = 0.0;
-	cerr << "Starting loop2" << endl;
-	g_tpool->ProcessSequence (TGenericSparseMatrix<MT>::cg_loop2,
-				  &data2, 0, dim, grain);
-	cerr << "Finished loop2" << endl;
-	beta = dnew/dold;
-	g_tpool->ProcessSequence (TGenericSparseMatrix<MT>::cg_loop3,
-				  &data3, 0, dim, grain);
-    }
-    tol *= sqrt (dnew/d0);
-    return niter;
-}
-
-#endif // CG_PARALLEL
 
 template<> // specialisation: complex
 inline int CG<std::complex<double> > (const CGenericSparseMatrix &A,
