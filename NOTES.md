@@ -93,4 +93,5 @@ Aim: simplify codebase, ensuring that all code is builds and is used
  - Look at fwdsolver_mw.h instantiation requirements, determine appropriate preprocessor gaurd (e.g. Clang?)
  - Remove MESA based projection
  - MEX 64-bit update (https://uk.mathworks.com/help/matlab/matlab_external/upgrading-mex-files-to-use-64-bit-api.html)
+ - Resolve OPENMP compiler flag requirements
 
