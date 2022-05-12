@@ -9,17 +9,23 @@ set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/dist)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 set(BUILD_SHARED_LIBS NO)
+set(TOAST_THREAD ON)
 
 if(NOT BUILD_SHARED_LIBS)
     add_compile_definitions(TOAST_STATIC)
     # set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif()
 
+if(TOAST_THREAD)
+    add_compile_definitions(TOAST_THREAD)
+    find_package(Threads REQUIRED)
+    find_package(OpenMP REQUIRED)
+endif()
+
 # liblbfgs
 set(LBFGS_USE_SSE ON)
 set(LBFGS_lib_TARGET_NAME liblbfgs)
 add_subdirectory(extern/liblbfgs)
-
 
 # Toast architecture specific & rpath settings
 #

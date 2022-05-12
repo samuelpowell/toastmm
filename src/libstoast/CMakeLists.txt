@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.9.0)
 project(libstoast VERSION 0.1.0)
 
 if(BUILD_SHARED_LIBS)
@@ -24,6 +24,11 @@ target_sources(libstoast PRIVATE    source.cc fwdsolver.cc
 
 
 target_link_libraries(libstoast libfe libmath libraster)
+
+if(TOAST_THREAD)
+        # Enable threading in eigen
+        target_link_libraries(libstoast OpenMP::OpenMP_CXX)
+endif()
 
 install(TARGETS libstoast
         ARCHIVE DESTINATION lib

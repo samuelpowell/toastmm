@@ -586,7 +586,7 @@ void TFwdSolver<std::complex<double> >::CalcField (
 // ==========================================================================
 // CalcFields
 
-#if THREAD_LEVEL==2
+#if TOAST_THREAD
 
 template<class T>
 struct CALCFIELDS_THREADDATA {
@@ -632,7 +632,7 @@ template void CalcFields_engine<std::complex<double> > (task_data *td);
 template void CalcFields_engine<std::complex<float> > (task_data *td);
 #endif
 
-#endif // THREAD_LEVEL==2
+#endif // TOAST_THREAD
 
 template<>
 void TFwdSolver<std::complex<double> >::CalcFields (const CCompRowMatrix &qvec,
@@ -661,7 +661,7 @@ void TFwdSolver<std::complex<double> >::CalcFields (const CCompRowMatrix &qvec,
 	  //CalcField (qvec.Row(i), phi[i], res);
 	  }
     } else {
-#if THREAD_LEVEL==2
+#if TOAST_THREAD
 
         //dASSERT(g_tpool, ThreadPool not initialised);
         static CALCFIELDS_THREADDATA<std::complex<double> > thdata;
@@ -685,7 +685,7 @@ void TFwdSolver<std::complex<double> >::CalcFields (const CCompRowMatrix &qvec,
         IterativeSolve (*F, qv, phi, nq, iterative_tol, iterative_maxit,
             precon, res);
 	delete []qv;
-#endif // THREAD_LEVEL==2
+#endif // TOAST_THREAD
     }
 }
 
@@ -717,7 +717,7 @@ void TFwdSolver<T>::CalcFields (const TCompRowMatrix<T> &qvec,
 	    LOGOUT1_PROGRESS(i);
 	}
     } else {
-#if THREAD_LEVEL==2
+#if TOAST_THREAD
         //dASSERT(g_tpool, ThreadPool not initialised);
         static CALCFIELDS_THREADDATA<T> thdata;
 	thdata.F      = F;

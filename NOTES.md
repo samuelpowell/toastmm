@@ -75,7 +75,11 @@ Aim: simplify codebase, ensuring that all code is builds and is used
    - Python interface integer refactor
  - Refactor raster out of libstoast and into its own module (libraster)
  - Provide for static build of libraries to output single mex and toast modules without dependency 'challenges'
-  
+ - Multithreading
+    - Rework coarse parallelism to use C++ threads
+    - Enable TOAST_THREAD at THREAD_LEVEL_2 by default, providing routines that use THREAD_LEVEL 2, including parallel assembly, source/meas construction, some Jacobian calculations, iterative solvers over QM
+    - Remove THREAD_LEVEL_1 (which uses the thread pool, not yet ported), and make THREAD_LEVEL_2 == TOAST_THREAD
+    - Make Python interface multithreaded
 
 # TODO
 
@@ -84,10 +88,9 @@ Aim: simplify codebase, ensuring that all code is builds and is used
  - Investigate `warning C4910` on MSVC - some declspec conflict
  - Look at MEX config as per first item
  - Check `MESA_SUPPORT`
- - Make individual libraries properly CMake with interface exports, etc. to avoid replicating includes in e.g. matlab2#
+ - Make individual libraries properly CMake with interface exports, etc. to avoid replicating includes in e.g. matlab2
  - Look at fwdsolver_mw.h instantiation requirements, determine appropriate preprocessor gaurd (e.g. Clang?)
  - Remove MESA based projection
- - Resolve `TOAST_THREAD`, `TOAST_THREAD_LEVEL`, `TOAST_THREAD_MATLAB_GRADIENT`, `TOAST_THREAD_MATLAB_QMVEC`, `TOAST_THREAD_ASSEMBLE`
+ - Resolve `TOAST_PARALLEL`
  - MEX 64-bit update (https://uk.mathworks.com/help/matlab/matlab_external/upgrading-mex-files-to-use-64-bit-api.html)
- - Review all useage of integers in Python interface to ensure consistency across word lengths 
- - Python build needs to be reconfigured for static build
+

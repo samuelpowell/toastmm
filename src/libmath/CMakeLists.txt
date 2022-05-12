@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.9.0)
 project(libmath VERSION 0.1.0)
 
 if(BUILD_SHARED_LIBS)
@@ -20,13 +20,17 @@ target_sources(libmath PRIVATE  mathdef.cc util.cc timing.cc vector.cc gsmatrix.
                                 scrmatrix.cc crmatrix_cm.cc precon.cc nr.cc error.cc cr_cholesky.cc 
                                 fourn.cc ilutoast.cc util.cc timing.cc mathdef.cc)
 
-# Unsupported optional 
+# Otional 
 #
-# ENABLE_PTHREAD: task.cc vector_MT.cc
+if(TOAST_THREAD)
+        target_sources(libmath PRIVATE task.cc)
+        target_link_libraries(libmath PUBLIC Threads::Threads)
+        # Enable threading in Eigen
+        target_link_libraries(libmath PUBLIC OpenMP::OpenMP_CXX)
+endif()
 
 # Assorted header defines to resolve
 #
-# TOAST_THREAD
 # TOAST_PARALLEL
 # COMPUTE_FLOPS
 

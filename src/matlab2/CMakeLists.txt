@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.9.0)
 project(toastmex VERSION 0.1.0)
 
 find_package(Matlab 7.16)
@@ -27,6 +27,11 @@ if(Matlab_FOUND)
   target_link_libraries(toastmex liblbfgs)
   target_link_libraries(toastmex libfdot)
   target_link_libraries(toastmex ${Matlab_MEX_LIBRARY} ${Matlab_MX_LIBRARY})
+
+  if(TOAST_THREAD)
+        # Enable threading in eigen
+        target_link_libraries(toastmex OpenMP::OpenMP_CXX)
+  endif()
 
   # Install the output dynamic library
   install(TARGETS toastmex

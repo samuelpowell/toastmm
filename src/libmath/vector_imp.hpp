@@ -1274,8 +1274,6 @@ double l1norm (const TVector<float> &v)
 
 // ==========================================================================
 
-#if THREAD_LEVEL!=1 // threaded version implemented in vector_MT.cc
-
 template<class VT>
 double l2normsq (const TVector<VT> &v)
 {
@@ -1287,7 +1285,6 @@ double l2normsq (const TVector<VT> &v)
     return sum;
 }
 
-#endif // THREAD_LEVEL!=1
 
 template<class VT>
 double linfnorm (const TVector<VT> &v)

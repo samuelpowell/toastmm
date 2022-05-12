@@ -51,10 +51,6 @@ void SelectInitialParams (ParamParser &pp, const Mesh &mesh, Solution &msol);
 
 int main (int argc, char *argv[]) {
 
-#ifdef TOAST_THREAD
-    TPool_Init (NUMTHREAD);
-#endif
-
     const double c0 = 0.3;
     char meshname[256];
     int qprof, mprof;      // source/measurement profile

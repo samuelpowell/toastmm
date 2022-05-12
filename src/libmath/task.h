@@ -5,22 +5,12 @@
 
 #ifdef TOAST_THREAD
 
-#include <pthread.h>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
 
 #define NUMTHREAD 2
 
-
-#ifdef TOAST_PARALLEL
-#define INITMUTEX(m) pthread_mutex_t m = PTHREAD_MUTEX_INITIALIZER
-#define STATICINITMUTEX(m) static pthread_mutex_t m = PTHREAD_MUTEX_INITIALIZER
-#define MUTEXLOCK(m) pthread_mutex_lock (m)
-#define MUTEXUNLOCK(m) pthread_mutex_unlock (m)
-#else
-#define INITMUTEX(m)
-#define STATICINITMUTEX(m)
-#define MUTEXLOCK(m)
-#define MUTEXUNLOCK(m)
-#endif
 
 typedef struct {
     int proc;
@@ -60,20 +50,15 @@ public:
 
     static bool IsMultiprocessing() { return is_multiprocessing; }
 
-    inline static void UserMutex_lock() { 
-		int res = pthread_mutex_lock (&user_mutex);
-		dASSERT(!res, "Mutex could not be locked: %d", res);
-	}
-    inline static void UserMutex_unlock() {
-		int res = pthread_mutex_unlock (&user_mutex);
-		dASSERT(!res, "Mutex could not be unlocked: %d", res);
-	}
+    inline static void UserMutex_lock() { user_mutex.lock(); }
+
+    inline static void UserMutex_unlock() { user_mutex.unlock(); }
 
 private:
     static int nthread;
     static double ttime; // accumulated cpu time spent multiprocessing
     static double wtime; // accumulated wall clock time spent multiprocessing
-    static pthread_mutex_t user_mutex;
+    static std::mutex user_mutex;
     static bool is_multiprocessing;  // we are currently in Multiprocess
 };
 
@@ -92,12 +77,12 @@ typedef struct tpool_work {
 typedef struct tpool {
     int num_threads;                // number of threads
     int queue_size;                 // current queue size
-    pthread_t *threads;             // array of worker threads
+    std::thread *threads;             // array of worker threads
     tpool_work_t *queue_head, *queue_tail;
 
-    pthread_mutex_t queue_lock;
-    pthread_cond_t queue_not_empty;
-    pthread_cond_t thread_done;
+    std::mutex queue_lock;
+    std::condition_variable queue_not_empty;
+    std::condition_variable thread_done;
 } tpool_t;
 
 class ThreadPool {
@@ -112,12 +97,12 @@ public:
     // to each task
     // Function returns when complete sequence is processed
 
-    inline void LockUserMutex() { pthread_mutex_lock (&user_lock); }
-    inline void UnlockUserMutex() { pthread_mutex_unlock (&user_lock); }
+    inline void LockUserMutex() { user_lock.lock(); }
+    inline void UnlockUserMutex() { user_lock.unlock(); }
 
 private:
     tpool_t *tpool;              // pool properties
-    pthread_mutex_t user_lock;   // user-space mutex
+    std::mutex user_lock;   // user-space mutex
 };
 
 
@@ -127,16 +112,16 @@ private:
 typedef struct {
     void(*task)(int,void*);
     void *context;
-    pthread_mutex_t mutex;  // general-purpose mutex to be used by workers
+    std::mutex mutex;  // general-purpose mutex to be used by workers
 } THREAD_GLOBAL;
 
 typedef struct {
     int nth;                      // thread index
-    pthread_t thread;             // thread handle
-    pthread_mutex_t wakeup_mutex; // locked by worker during task processing
-    pthread_mutex_t done_mutex;
-    pthread_cond_t wakeup_cond;
-    pthread_cond_t done_cond;
+    std::thread thread;             // thread handle
+    std::mutex wakeup_mutex; // locked by worker during task processing
+    std::mutex done_mutex;
+    std::condition_variable wakeup_cond;
+    std::condition_variable done_cond;
     bool wakeup;
     bool done;
     THREAD_GLOBAL *tg;           // pointer to global pool data
@@ -149,8 +134,8 @@ public:
     static void Initialise (int num_threads);
     static ThreadPool2 *Pool() { return g_tpool2; }
 
-    void MutexLock() { pthread_mutex_lock (&tg.mutex); }
-    void MutexUnlock() { pthread_mutex_unlock (&tg.mutex); }
+    void MutexLock() { tg.mutex.lock(); }
+    void MutexUnlock() { tg.mutex.unlock(); }
     inline int NumThread() const { return nthread; }
 
     void Invoke (void(*func)(int,void*), void *context);
