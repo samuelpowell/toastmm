@@ -25,8 +25,8 @@ if sys.platform == 'win32':
     pkg_files = ''
 elif sys.platform == 'linux':
     lib_names = ['pthread', 'stoast', 'raster','fe', 'math']
-    compile_args = ['-std=c++11','-Wno-comment', '-DTOAST_STATIC', '-fPIC', '-fopenmp']
-    link_args = ['-fopenmp']
+    compile_args = ['-std=c++11','-Wno-comment', '-DTOAST_STATIC', '-fPIC']
+    link_args = ''
     pkg_files = ''
 elif sys.platform == 'darwin':
     lib_names = ['stoast', 'raster', 'fe', 'math']

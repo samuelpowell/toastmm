@@ -27,7 +27,7 @@ target_link_libraries(libstoast libfe libmath libraster)
 
 if(TOAST_THREAD)
         # Enable threading in eigen
-        target_link_libraries(libstoast OpenMP::OpenMP_CXX)
+        # target_link_libraries(libstoast OpenMP::OpenMP_CXX)
 endif()
 
 install(TARGETS libstoast

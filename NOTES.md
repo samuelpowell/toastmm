@@ -17,6 +17,8 @@ Aim: working one-liner build, without external dependencies, on all platforms
 
 ## Threading
 
+Aim: ensure multithreading where possible, but avoid contention
+
  - manage threading within toast, and optional BLAS
 
 ## Remove features and unused code
@@ -80,7 +82,7 @@ Aim: simplify codebase, ensuring that all code is builds and is used
     - Enable `TOAST_THREAD` at `THREAD_LEVEL_2` by default, providing parallel assembly, source/meas construction, some Jacobian calculations, iterative solvers over QM
     - Remove `THREAD_LEVEL_1` (which uses the thread pool, not ported), and make `THREAD_LEVEL_2 == TOAST_THREAD`, remove vector_MT.
     - Enable multi-threading in Python interface
-    - Thread pool based parallelism replaced with OpenMP, removing the `TOAST_PARALLEL` define, parallel CG implementation, thread pool implementation.
+    - Thread pool based parallelism removed as used in limited places. Will consider reimplementation with OpenMP or standard library implementation: `TOAST_PARALLEL` define, parallel CG implementation, thread pool implementation.
 
 # TODO
 
@@ -93,5 +95,5 @@ Aim: simplify codebase, ensuring that all code is builds and is used
  - Look at fwdsolver_mw.h instantiation requirements, determine appropriate preprocessor gaurd (e.g. Clang?)
  - Remove MESA based projection
  - MEX 64-bit update (https://uk.mathworks.com/help/matlab/matlab_external/upgrading-mex-files-to-use-64-bit-api.html)
- - Resolve OPENMP compiler flag requirements
+
 

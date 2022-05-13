@@ -30,7 +30,7 @@ if(Matlab_FOUND)
 
   if(TOAST_THREAD)
         # Enable threading in eigen
-        target_link_libraries(toastmex OpenMP::OpenMP_CXX)
+        # target_link_libraries(toastmex OpenMP::OpenMP_CXX)
   endif()
 
   # Install the output dynamic library

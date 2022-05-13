@@ -19,7 +19,7 @@ endif()
 if(TOAST_THREAD)
     add_compile_definitions(TOAST_THREAD)
     find_package(Threads REQUIRED)
-    find_package(OpenMP REQUIRED)
+    # find_package(OpenMP REQUIRED)
 endif()
 
 # liblbfgs
