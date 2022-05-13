@@ -502,7 +502,7 @@ void GenerateJacobian_mesh (const QMMesh *mesh,
 // This computes a 'raw' Jacobian dy/dx without any data or parameter scaling
 // (y: cw intensity, x: mua and/or kappa)
 
-#if THREAD_LEVEL==2
+#if TOAST_THREAD
 
 struct GENJAC_CW_GRID_THREADDATA {
     const Raster *raster;
@@ -605,7 +605,7 @@ void GenerateJacobian_cw_grid_engine (task_data *td)
     }
 }
 
-#endif // THREAD_LEVEL
+#endif // TOAST_THREAD
 
 void GenerateJacobian_cw_grid (const Raster *raster, const QMMesh *mesh,
     const RVector *dphi, const RVector *aphi,
@@ -623,7 +623,7 @@ void GenerateJacobian_cw_grid (const Raster *raster, const QMMesh *mesh,
 
     double t0 = walltic();
 
-#if THREAD_LEVEL==2
+#if TOAST_THREAD
     int nqm  = mesh->nQM;
     if (Jmua) Jmua->New (nqm, slen);
     if (Jkap) Jkap->New (nqm, slen);
@@ -717,7 +717,7 @@ void GenerateJacobian_cw_grid (const Raster *raster, const QMMesh *mesh,
 	    delete []cafield_grad[i];
 	delete []cafield_grad;
     }
-#endif // !THREAD_LEVEL
+#endif // TOAST_THREAD
 
     // scale with voxel size
     double sz = 1.0;

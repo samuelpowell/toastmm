@@ -433,7 +433,7 @@ protected:
     TVector<T> *pphi;       ///< work buffer for field calculation
     bool unwrap_phase;      ///< use phase unwrapping?
 
-#if THREAD_LEVEL==2
+#if TOAST_THREAD
     int nthread;
 #endif
 };

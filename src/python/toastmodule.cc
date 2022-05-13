@@ -8,7 +8,8 @@
 #include <iostream>
 
 #include "../common/objmgr.h"
-#include "arch.h"
+#include "toastdef.h"
+#include "mathlib.h"
 #include "felib.h"
 #include "stoastlib.h"
 
@@ -3055,6 +3056,10 @@ static struct PyModuleDef moduledef = {
 PyMODINIT_FUNC PyInit_toastmod(void) {
   PyObject *module = PyModule_Create(&moduledef);
   import_array();
+
+#ifdef TOAST_THREAD
+	Task_Init (0);
+#endif
 
   if (module == NULL)
     return NULL;

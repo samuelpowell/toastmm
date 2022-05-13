@@ -158,8 +158,9 @@ void MatlabToast::ElMat (int nlhs, mxArray *plhs[], int nrhs,
 
     int idx = (int)mxGetScalar(prhs[1]) - 1; // convert to zero-based
     Element *pel = mesh->elist[idx];
-    int i, j, k, l, m, nnd = pel->nNode();
-    int dim = mesh->Dimension();
+    int i, j, k, l, m;
+		mwSize nnd = (mwSize) pel->nNode();
+    mwSize dim = (mwSize) mesh->Dimension();
     int nprm = 3;
 
     mxGetString (prhs[2], cbuf, 256);
@@ -426,14 +427,14 @@ void MatlabToast::ShapeGrad (int nlhs, mxArray *plhs[], int nrhs,
 
     Mesh *mesh = GETMESH_SAFE(0);
     int elen = mesh->elen();
-    int dim  = mesh->Dimension();
+    mwSize dim  = (mwSize) mesh->Dimension();
     bool isglobal = false;
 
     // element index
     int idx = (int)(floor(mxGetScalar (prhs[1])-0.5));
     ASSERTARG(idx >= 0 && idx < elen, 2, "Invalid element index");
     Element *pel = mesh->elist[idx];
-    int nn = pel->nNode();
+    mwSize nn = (mwSize) pel->nNode();
 
     double *ppt = mxGetPr (prhs[2]);
 
@@ -446,7 +447,7 @@ void MatlabToast::ShapeGrad (int nlhs, mxArray *plhs[], int nrhs,
 
     // evaluation points
     const mwSize *gdim = mxGetDimensions (prhs[2]);
-    int npoint = gdim[0];
+    mwSize npoint = (mwSize) gdim[0];
     ASSERTARG(gdim[1] == dim, 1, "Invalid point dimensions");
 
     mwSize dims[3] = {nn, dim, npoint};

@@ -1055,115 +1055,6 @@ MT TCompRowMatrix<MT>::GetNext (int &r, int &c) const
 
 // ==========================================================================
 
-#if THREAD_LEVEL==1
-
-#ifdef OLD_AX_ENGINE
-template<class MT>
-void *Ax_engine (void *context)
-{
-    typedef struct {
-        pthread_t ht;
-	const TCompRowMatrix<MT> *A;
-	const TVector<MT> *x;
-	TVector<MT> *b;
-        int ith;
-    } THDATA;
-    THDATA *thdata = (THDATA*)context;
-    const TCompRowMatrix<MT> *A = thdata->A;
-    const TVector<MT> *x = thdata->x;
-    TVector<MT> *b = thdata->b;
-    int r0 = (thdata->ith*b->Dim())/NUMTHREAD;
-    int r1 = ((thdata->ith+1)*b->Dim())/NUMTHREAD;
-    MT br;
-    const MT *A_val = A->ValPtr();
-    const MT *x_val = x->data_buffer();
-    MT *b_val = b->data_buffer();
-    int r, i = A->rowptr[r0], i2;
-    int *colidx = A->colidx;
-
-    for (r = r0; r < r1;) {
-	i2 = A->rowptr[r+1];
-	for (br = (MT)0; i < i2; i++)
-	    br += A_val[i] * x_val[colidx[i]];
-	b_val[r++] = br;
-    }
-    return NULL;
-}
-#else
-template<class MT>
-void Ax_engine (int ith, void *context)
-{
-    typedef struct {
-	const TCompRowMatrix<MT> *A;
-	const TVector<MT> *x;
-	TVector<MT> *b;
-    } THDATA;
-    THDATA *thdata = (THDATA*)context;
-    const TCompRowMatrix<MT> *A = thdata->A;
-    const TVector<MT> *x = thdata->x;
-    TVector<MT> *b = thdata->b;
-    TVector<MT> b_local(b->Dim());
-
-    MT br;
-    const MT *A_val = A->ValPtr();
-    const MT *x_val = x->data_buffer();
-    MT *b_val = b->data_buffer();
-    MT *b_local_val = b_local.data_buffer();
-    int r, i = ith, i2;
-    int stride = ThreadPool2::Pool()->NumThread();
-    int *colidx = A->colidx;
-
-    for (r = 0; r < A->nRows();) {
-	i2 = A->rowptr[r+1];
-	for (br = (MT)0; i < i2; i += stride)
-	    br += A_val[i] * x_val[colidx[i]];
-	b_local_val[r++] = br;
-    }
-
-    // add contribution to global b
-    ThreadPool2::Pool()->MutexLock();
-    for (r = 0; r < A->nRows(); r++)
-        b_val[r] += b_local_val[r];
-    ThreadPool2::Pool()->MutexUnlock();
-
-    //ThreadPool2::Pool()->MutexLock();
-    //cerr << "Ax done, thread " << ith << endl;
-    //ThreadPool2::Pool()->MutexUnlock();
-}
-#endif
-
-#ifdef NEED_EXPLICIT_INSTANTIATION
-template void Ax_engine<double> (int ith, void *context);
-template void Ax_engine<float> (int ith, void *context);
-template void Ax_engine<complex> (int ith, void *context);
-template void Ax_engine<scomplex> (int ith, void *context);
-template void Ax_engine<int> (int ith, void *context);
-#endif
-
-template<class MT>
-void TCompRowMatrix<MT>::Ax (const TVector<MT> &x, TVector<MT> &b) const
-{
-    dASSERT(x.Dim() == this->cols,
-	"Parameter 1 invalid size (expected %d, actual %d)",
-        this->cols, x.Dim());
-    if (b.Dim() != this->rows) b.New(this->rows);
-
-    static struct {
-	const TCompRowMatrix<MT> *A;
-	const TVector<MT> *x;
-	TVector<MT> *b;
-    } thdata;
-
-    thdata.A = this;
-    thdata.x = &x;
-    thdata.b = &b;
-    
-    b.Clear();
-    ThreadPool2::Pool()->Invoke (Ax_engine<MT>, &thdata);
-}
-
-#else
-
 template<class MT>
 void TCompRowMatrix<MT>::Ax (const TVector<MT> &x, TVector<MT> &b) const
 {
@@ -1182,8 +1073,6 @@ void TCompRowMatrix<MT>::Ax (const TVector<MT> &x, TVector<MT> &b) const
 	b[r++] = br;
     }
 }
-#endif // THREAD_LEVEL==1
-
 
 // ==========================================================================
 

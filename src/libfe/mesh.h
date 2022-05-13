@@ -675,9 +675,7 @@ private:
 
     BndIntersectParam *ComputeBndIntersectParam();
     
-#ifdef TOAST_PARALLEL
-    static void Setup_engine (void*,int,int);
-#endif
+
 };
 
     int MakeNodalFreedomArray (int *&nf, int nlen, int dofnod, bool *rest);

@@ -76,7 +76,7 @@ int Raster_Pixel2::SutherlandHodgman (int el, int xgrid, int ygrid,
 // --------------------------------------------------------------------------
 // Engine for parallel computation
 
-#if THREAD_LEVEL==2
+#if TOAST_THREAD
 struct CREATEMIXEDMASSMAT_TRI_PASS2_THREADDATA {
     const Raster_Pixel2 *raster;
     RCompRowMatrix *Buv;
@@ -193,7 +193,7 @@ void CreateBuv_tri_pass2_engine (task_data *td)
 	v[i] += vloc[i];
     Task::UserMutex_unlock();
 }
-#endif // THREAD_LEVEL
+#endif 
 
 RCompRowMatrix *Raster_Pixel2::CreateBuv_tri () const
 {
@@ -274,7 +274,7 @@ RCompRowMatrix *Raster_Pixel2::CreateBuv_tri () const
     delete []njmax;
 
     // pass 2: fill the matrix
-#if THREAD_LEVEL==2 // call parallel engine
+#if TOAST_THREAD
     static CREATEMIXEDMASSMAT_TRI_PASS2_THREADDATA thdata;
     thdata.raster = this;
     thdata.Buv = Buv;
@@ -283,7 +283,7 @@ RCompRowMatrix *Raster_Pixel2::CreateBuv_tri () const
     thdata.bbmin = &bbmin;
     thdata.bbmax = &bbmax;
     Task::Multiprocess (CreateBuv_tri_pass2_engine, &thdata);
-#else // !THREAD_LEVEL: serial computation
+#else 
     for (el = 0; el < nel; el++) {
 	Element *pel = meshptr->elist[el];
 
