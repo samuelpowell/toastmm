@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.9.0)
 project(libfe VERSION 0.1.0)
 
 if(BUILD_SHARED_LIBS)
@@ -26,10 +26,6 @@ target_sources(libfe PRIVATE    point.cc node.cc ndlist.cc element.cc ellist.cc 
                                 ordmmd.cc rcm.cc meshopt.cc nim.cc 
                                 refine_mesh.cc)
 
-# Unsupported optional 
-#
-# ENABLE_MPI: mesh_mpi.cc
-#
 
 install(TARGETS libfe
         ARCHIVE DESTINATION lib

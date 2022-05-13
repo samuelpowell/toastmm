@@ -2,9 +2,6 @@
 #include <fstream>
 #include <iostream>
 #include <iomanip>
-//#include "slu_zdefs.h"
-//#include "supermatrix.h"
-//#include "zsp_defs.h"
 #include "fwdsolver.h"
 #include "source.h"
 #include "timing.h"

@@ -16,10 +16,6 @@
 #ifndef __GSMATRIX_H
 #define __GSMATRIX_H
 
-#ifdef TOAST_PARALLEL
-//#define CG_PARALLEL
-#endif
-
 #ifdef DBG_TIMING
 extern double cgtime;
 #endif
@@ -317,11 +313,7 @@ protected:
     int nbuf;  // data block allocation size
     int nval;  // data block entry count (<= nbuf)
 
-#ifdef CG_PARALLEL
-    static void cg_loop1(void*,int,int);
-    static void cg_loop2(void*,int,int);
-    static void cg_loop3(void*,int,int);
-#endif
+
 
 //private:
 //    static IterativeMethod itmethod_general;

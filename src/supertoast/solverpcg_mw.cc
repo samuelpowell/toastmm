@@ -581,7 +581,7 @@ void ATA_dense (const Raster &raster, const RDenseMatrix &a,
 // Doesn't seem to provide any runtime benefit in the current form
 // Also may be responsible for occasional (non-reproducible) CTDs
 
-#if THREAD_LEVEL==2
+#if TOAST_THREAD
 
 struct SINGLEGRADIENT_THREADDATA {
     const QMMesh *mesh;

@@ -48,10 +48,6 @@
 #include "task.h"
 #endif
 
-#ifdef TOAST_PARALLEL
-#include "task.h"
-#endif
-
 #ifdef COMPUTE_FLOPS
 extern unsigned int flops_add;
 extern unsigned int flops_mul;

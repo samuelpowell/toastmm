@@ -175,7 +175,7 @@ void SetVersion (const char *vstr)
 const char *Version (const char *type, const char *date)
 {
     sprintf (fullversionstr, "TOAST%s distribution [%s] - Build %s\n(c) Martin Schweiger and Simon Arridge\n", TOAST_VERSION, type, date);
-#ifdef TOAST_PARALLEL
+#ifdef TOAST_THREAD
     strcat (fullversionstr, "Running parallel (pthreads) version\n");
 #endif
     //if (versionstr[0]) sprintf (fullversionstr, "%s version %s, build %s",

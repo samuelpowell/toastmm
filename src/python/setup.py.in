@@ -11,6 +11,9 @@ npinc = np.get_include()
 # Debug flag
 debug_flag = @PYTOAST_DEBUG_FLAG@
 
+# Threading flag
+thread_flag = @PYTOAST_THREAD_FLAG@
+
 # We pull the libraries from the release distribution install output. On Windows
 # it would be fine to get these from the build tree, but on other OS we want the
 # versions with the install RPATH in order that the libraries can be found. The
@@ -21,7 +24,7 @@ if sys.platform == 'win32':
     link_args = ''
     pkg_files = ''
 elif sys.platform == 'linux':
-    lib_names = ['stoast', 'raster','fe', 'math']
+    lib_names = ['pthread', 'stoast', 'raster','fe', 'math']
     compile_args = ['-std=c++11','-Wno-comment', '-DTOAST_STATIC', '-fPIC']
     link_args = ''
     pkg_files = ''
@@ -36,6 +39,9 @@ else:
 
 if debug_flag:
     compile_args.extend(['-O0','-g'])
+
+if thread_flag:
+    compile_args.extend(['-DTOAST_THREAD'])
 
 # Define the toast C extension
 #
