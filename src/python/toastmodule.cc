@@ -152,6 +152,10 @@ static PyObject *mesh_read(PyObject *self, PyObject *args) {
 
   QMMesh *mesh = new QMMesh;
   std::ifstream ifs(meshname);
+  if(!ifs) {
+    PyErr_SetString(PyExc_ValueError, "Mesh file could not be opened");
+    return NULL;
+  }
   ifs >> *mesh;
 
   mesh->Setup();
@@ -173,6 +177,10 @@ static PyObject *mesh_write(PyObject *self, PyObject *args) {
 
   GETMESH(mesh, hmesh);
   std::ofstream ofs(meshname);
+  if(!ofs) {
+    PyErr_SetString(PyExc_ValueError, "Mesh file could not be opened");
+    return NULL;
+  }
   ofs << *mesh;
 
   Py_RETURN_NONE;
@@ -1007,6 +1015,10 @@ static PyObject *toast_readqm(PyObject *self, PyObject *args) {
   GETMESH(mesh, hmesh);
 
   std::ifstream ifs(qmname);
+  if(!ifs) {
+    PyErr_SetString(PyExc_ValueError, "QM file could not be opened");
+    return NULL;
+  }
   mesh->LoadQM(ifs);
 
   std::cout << "QM: " << mesh->nQ << " sources, " << mesh->nM
