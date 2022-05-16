@@ -16,12 +16,11 @@ import matplotlib.animation as animation
 import toast
 
 # Set the file paths
-meshdir = os.path.expandvars("$TOASTDIR/test/2D/meshes/")
-#meshfile = meshdir + "circle25_32.msh"
-meshfile = meshdir + "ellips_tri10.msh"
-qmfile = meshdir + "circle25_32x32.qm"
-muafile = meshdir + "tgt_mua_ellips_tri10.nim"
-musfile = meshdir + "tgt_mus_ellips_tri10.nim"
+meshdir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "meshes")
+meshfile = os.path.join(meshdir, "ellips_tri10.msh")
+qmfile = os.path.join(meshdir, "circle25_32x32.qm")
+muafile = os.path.join(meshdir, "tgt_mua_ellips_tri10.nim")
+musfile = os.path.join(meshdir, "tgt_mus_ellips_tri10.nim")
 
 # Load the mesh and source/detector specs
 mesh = toast.Mesh(meshfile)

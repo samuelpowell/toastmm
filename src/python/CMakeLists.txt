@@ -64,7 +64,7 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.py DESTINATION ${CMAKE_INSTALL_P
 # Install python source, associated driver scripts, documentation, etc.
 #
 install(DIRECTORY toast DESTINATION ${CMAKE_INSTALL_PREFIX}/python/src)
-install(DIRECTORY ${CMAKE_SOURCE_DIR}/script/python DESTINATION ${CMAKE_INSTALL_PREFIX})       
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/script/python DESTINATION ${CMAKE_INSTALL_PREFIX}) 
 
 # Copy files required for build
 #
