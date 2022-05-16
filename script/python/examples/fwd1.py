@@ -14,9 +14,9 @@ import matplotlib.pyplot as plt
 import toast
 
 # Set the file paths
-meshdir = os.path.expandvars("$TOASTDIR/test/2D/meshes/")
-meshfile = meshdir + "circle25_32.msh"
-qmfile = meshdir + "circle25_32x32.qm"
+meshdir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "meshes")
+meshfile = os.path.join(meshdir, "circle25_32.msh")
+qmfile = os.path.join(meshdir, "circle25_32x32.qm")
 
 # Load the mesh and source/detector specs
 mesh = toast.Mesh(meshfile)

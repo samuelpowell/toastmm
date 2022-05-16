@@ -29,7 +29,7 @@ MATHLIB void Task_Init (int nth)
 {
     if (!nth) nth = Task::nProcessor();
     Task::SetThreadCount (nth);
-    cout << "Toast using " << nth << "threads" << std::endl;
+    cout << "Toast using " << nth << " threads" << std::endl;
     // int ompnth = omp_get_max_threads();
     // cout << "Toast thread count: " << nth << " OMP thread max: " << ompnth << std::endl;
 }

@@ -75,12 +75,12 @@ def imerr(im1, im2):
 import toast
 
 # Set the file paths
-meshdir = os.path.expandvars("$TOASTDIR/test/2D/meshes/")
-meshfile1 = meshdir + "ellips_tri10.msh"  # mesh for target data generation
-meshfile2 = meshdir + "circle25_32.msh"   # mesh for reconstruction
-qmfile = meshdir + "circle25_32x32.qm"    # source-detector file
-muafile = meshdir + "tgt_mua_ellips_tri10.nim" # nodal target absorption
-musfile = meshdir + "tgt_mus_ellips_tri10.nim" # nodal target scattering
+meshdir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "meshes")
+meshfile1 = os.path.join(meshdir, "ellips_tri10.msh")       # mesh for target data generation
+meshfile2 =os.path.join(meshdir, "circle25_32.msh")         # mesh for reconstruction
+qmfile = os.path.join(meshdir, "circle25_32x32.qm")         # source-detector file
+muafile = os.path.join(meshdir, "tgt_mua_ellips_tri10.nim") # nodal target absorption
+musfile = os.path.join(meshdir, "tgt_mus_ellips_tri10.nim") # nodal target scattering
 
 # A few general parameters
 c0 = 0.3        # speed of light in vacuum [mm/ps]
