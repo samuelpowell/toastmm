@@ -15,24 +15,16 @@ jobs:
 
       # Used to host cibuildwheel
       - uses: actions/setup-python@v2
-
-      # Build the library
-      #- name: Configure library
-      #  run: |
-      #    mkdir build
-      #    cd build
-      #    cmake ../
-      #    cmake --build . --target install --config Release
           
       - name: Install cibuildwheel
         run: python -m pip install cibuildwheel==2.5.0
 
       - name: Build wheels
-        run: python -m cibuildwheel --output-dir ./dist/python/wheelhouse
+        run: python -m cibuildwheel --output-dir ./dist/python
 
       - uses: actions/upload-artifact@v3
         with:
-          name: pytoast-${{ matrix.os }}
+          name: pytoast-${{ env.RUNNER_OS }}
           path: |
-            dist/python/wheelhouse/*.whl
-            dist/python/examples/
+            dist/python/*.whl
+            dist/python/examples

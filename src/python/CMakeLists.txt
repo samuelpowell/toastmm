@@ -1,6 +1,17 @@
 cmake_minimum_required(VERSION 3.9.0)
 project(pytoast VERSION 0.1.0)
 
+# Install python source, associated driver scripts, documentation, etc.
+#
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/script/python DESTINATION ${CMAKE_INSTALL_PREFIX}) 
+
+set(CPACK_PROJECT_NAME ${PROJECT_NAME})
+set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
+include(CPack)
+
+
+# The following is the old style auto configured python build script. Too painful, so moved
+# to static configuration.
 
 # # Configure setup.py
 # #
@@ -71,12 +82,3 @@ project(pytoast VERSION 0.1.0)
 # # install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.py DESTINATION ${CMAKE_INSTALL_PREFIX}/python/src)
 # install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.py DESTINATION ${CMAKE_SOURCE_DIR})
 # install( FILES pyproject.toml DESTINATION ${CMAKE_SOURCE_DIR})
-
-# Install python source, associated driver scripts, documentation, etc.
-#
-install(DIRECTORY ${CMAKE_SOURCE_DIR}/script/python DESTINATION ${CMAKE_INSTALL_PREFIX}) 
-
-set(CPACK_PROJECT_NAME ${PROJECT_NAME})
-set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
-include(CPack)
-

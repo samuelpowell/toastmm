@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta:__legacy__"
 [tool.cibuildwheel]
 
 # Disable 32-bit builds, PyPy builds
-skip = ["*-win32", "*-manylinux_i686", "pp*"]
+skip = ["*-win32", "*_i686", "pp*"]
 
 # Build the library in the docker container for good core deps
 before-all = [

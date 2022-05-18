@@ -94,6 +94,4 @@ setup(
     packages=['toast'],
     package_dir = {'toast': 'src/python/toast'},
     cmdclass={"bdist_wheel": bdist_wheel_abi3}
-    #package_data = pkg_files,
-    #include_package_data=True
 )
