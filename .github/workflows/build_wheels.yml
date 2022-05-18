@@ -17,11 +17,11 @@ jobs:
       - uses: actions/setup-python@v2
 
       # Build the library
-      - name: Configure library
-        run: |
-          mkdir build
-          cd build
-          cmake ../
+      #- name: Configure library
+      #  run: |
+      #    mkdir build
+      #    cd build
+      #    cmake ../
       #    cmake --build . --target install --config Release
           
       - name: Install cibuildwheel

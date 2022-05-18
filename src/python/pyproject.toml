@@ -11,6 +11,7 @@ skip = ["*-win32", "*-manylinux_i686", "pp*"]
 # already be set up because CMake configuration step is run in the host to generate the 
 # appropriate files before build.
 before-all = [
+     "mkdir build",
      "cd build",
      "cmake ../",
      "cmake --build . --target INSTALL --config Release",
