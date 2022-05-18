@@ -14,8 +14,8 @@ get_target_property(LIBFE_INCLUDES      libfe       INTERFACE_INCLUDE_DIRECTORIE
 get_target_property(LIBRASTER_INCLUDES  libraster   INTERFACE_INCLUDE_DIRECTORIES)
 get_target_property(LIBSTOAST_INCLUDES  libstoast   INTERFACE_INCLUDE_DIRECTORIES)
 
-foreach(dir "${CMAKE_SOURCE_DIR}/include/."
-            "${CMAKE_SOURCE_DIR}/src/common/."
+foreach(dir "$include/."
+            "$src/common/."
             ${LIBMATH_INCLUDES} 
             ${LIBFE_INCLUDES} ${LIBRASTER_INCLUDES}
             ${LIBSTOAST_INCLUDES})
