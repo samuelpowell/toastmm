@@ -12,7 +12,7 @@ before-all = [
      "mkdir build", 
      "cd build",
      "cmake ../",
-     "cmake --build . --target INSTALL --config Release",
+     "cmake --build . --target install --config Release",
      "cd .."
      ]
 
