@@ -14,13 +14,15 @@ get_target_property(LIBFE_INCLUDES      libfe       INTERFACE_INCLUDE_DIRECTORIE
 get_target_property(LIBRASTER_INCLUDES  libraster   INTERFACE_INCLUDE_DIRECTORIES)
 get_target_property(LIBSTOAST_INCLUDES  libstoast   INTERFACE_INCLUDE_DIRECTORIES)
 
-foreach(dir "include/."
-            "src/common/."
+foreach(dir "${CMAKE_SOURCE_DIR}/include/."
+            "${CMAKE_SOURCE_DIR}/src/common/."
             ${LIBMATH_INCLUDES} 
-            ${LIBFE_INCLUDES} ${LIBRASTER_INCLUDES}
+            ${LIBFE_INCLUDES} 
+            ${LIBRASTER_INCLUDES}
             ${LIBSTOAST_INCLUDES})
 
-    string(APPEND PYTOAST_INCLUDE_STRING "'${dir}',")
+    file(RELATIVE_PATH reldir ${CMAKE_SOURCE_DIR} ${dir})
+    string(APPEND PYTOAST_INCLUDE_STRING "'${reldir}',")
 endforeach()
 
 # Library link directories
@@ -34,11 +36,12 @@ foreach(dir ${LIBMATH_DIR}
             ${LIBFE_DIR} 
             ${LIBRASTER_DIR}
             ${LIBSTOAST_DIR})
+    file(RELATIVE_PATH reldir ${CMAKE_SOURCE_DIR} ${dir})
     if(WIN32)
         # Very ugly hack because I can't access ARCHIVE_CUI
-        string(APPEND PYTOAST_LIBRARY_STRING "'${dir}/Release',")
+        string(APPEND PYTOAST_LIBRARY_STRING "'${reldir}/Release',")
     else()
-        string(APPEND PYTOAST_LIBRARY_STRING "'${dir}',")
+        string(APPEND PYTOAST_LIBRARY_STRING "'${reldir}',")
     endif()
 endforeach()
 
