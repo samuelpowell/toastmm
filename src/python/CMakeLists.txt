@@ -71,20 +71,7 @@ install( FILES pyproject.toml DESTINATION ${CMAKE_SOURCE_DIR})
 
 # Install python source, associated driver scripts, documentation, etc.
 #
-install(DIRECTORY toast DESTINATION ${CMAKE_INSTALL_PREFIX}/python/src)
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/script/python DESTINATION ${CMAKE_INSTALL_PREFIX}) 
-
-# Copy files required for build
-#
-list(APPEND PYTOAST_BUILD_FILES ../../include/arch.h
-                                pyproject.toml
-                                toastmodule.cc)
-
-# Install python build system files
-foreach ( file ${PYTOAST_BUILD_FILES} )
-    get_filename_component( dir ${file} DIRECTORY )
-    install( FILES ${file} DESTINATION ${CMAKE_INSTALL_PREFIX}/python/src )
-endforeach()
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
