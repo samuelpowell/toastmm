@@ -1,4 +1,4 @@
-name: PyToast Wheels
+name: Toast Python Wheel
 
 on: [pull_request]
 
