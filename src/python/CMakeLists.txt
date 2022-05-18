@@ -60,6 +60,9 @@ endif()
 
 configure_file(setup.py.in setup.py @ONLY)
 
+configure_file(setup.py.in ${CMAKE_SOURCE_DIR}/setup.py @ONLY COPYONLY)
+configure_file(pyproject.toml ${CMAKE_SOURCE_DIR}/pyproject.toml COPYONLY)
+
 # Note that we have to place the resultant file in the root, because the CI wheel builder
 # requires this to be the case in order to import the entire project. Evidently this is
 # sub-optimal since it polutes the source tree. The python project TOML configuration is 
