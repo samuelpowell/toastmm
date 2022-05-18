@@ -24,7 +24,7 @@ jobs:
 
       - uses: actions/upload-artifact@v3
         with:
-          name: pytoast-${{ env.RUNNER_OS }}
+          name: pytoast-${{ runner.os }}
           path: |
             dist/python/*.whl
             dist/python/examples
