@@ -3,6 +3,7 @@ import sys
 import numpy as np
 from setuptools import setup, Extension
 from sysconfig import get_paths
+from wheel.bdist_wheel import bdist_wheel
 import platform
 
 pyinc = get_paths()['include'] 
