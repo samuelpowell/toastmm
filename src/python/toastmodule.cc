@@ -7,7 +7,7 @@
 #include <fstream>
 #include <iostream>
 
-#include "../common/objmgr.h"
+#include "objmgr.h"
 #include "toastdef.h"
 #include "mathlib.h"
 #include "felib.h"
