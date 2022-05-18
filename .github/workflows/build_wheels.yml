@@ -1,0 +1,38 @@
+name: PyToast Wheels
+
+on: [push, pull_request]
+
+jobs:
+  build_wheels:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-20.04, windows-2019, macos-10.15]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      # Used to host cibuildwheel
+      - uses: actions/setup-python@v2
+
+      # Build the library
+      - name: Build library
+        run: |
+          mkdir build
+          cd build
+          cmake ../
+          cmake --build . --target INSTALL --config Release
+          
+      - name: Install cibuildwheel
+        run: python -m pip install cibuildwheel==2.5.0
+
+      - name: Build wheels
+        run: python -m cibuildwheel dist/python/src --output-dir ./dist/python/wheelhouse
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: pytoast-${{ matrix.os }}
+          path: |
+            /dist/python/wheelhouse/*.whl
+            /dist/python/examples/
