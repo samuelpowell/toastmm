@@ -9,15 +9,13 @@ project(pytoast VERSION 0.1.0)
 
 # Library headers
 #
-# Note that we include the libmath includes in addition to the interface includes
-# in order to pull in the full root path (required for toastdef.h arch.h)
-get_target_property(ROOT_INCLUDES       libmath     INCLUDE_DIRECTORIES)
 get_target_property(LIBMATH_INCLUDES    libmath     INTERFACE_INCLUDE_DIRECTORIES)
 get_target_property(LIBFE_INCLUDES      libfe       INTERFACE_INCLUDE_DIRECTORIES)
 get_target_property(LIBRASTER_INCLUDES  libraster   INTERFACE_INCLUDE_DIRECTORIES)
 get_target_property(LIBSTOAST_INCLUDES  libstoast   INTERFACE_INCLUDE_DIRECTORIES)
 
-foreach(dir ${ROOT_INCLUDES} 
+foreach(dir "${CMAKE_SOURCE_DIR}/include"
+            "${CMAKE_SOURCE_DIR}/src/common"
             ${LIBMATH_INCLUDES} 
             ${LIBFE_INCLUDES} ${LIBRASTER_INCLUDES}
             ${LIBSTOAST_INCLUDES})
