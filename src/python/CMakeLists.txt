@@ -59,7 +59,14 @@ endif()
 
 configure_file(setup.py.in setup.py @ONLY)
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.py DESTINATION ${CMAKE_INSTALL_PREFIX}/python/src)
+# Note that we have to place the resultant file in the root, because the CI wheel builder
+# requires this to be the case in order to import the entire project. Evidently this is
+# sub-optimal since it polutes the source tree. The python project TOML configuration is 
+# also required.
+#
+# install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.py DESTINATION ${CMAKE_INSTALL_PREFIX}/python/src)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.py DESTINATION ${CMAKE_SOURCE_DIR})
+install( FILES pyproject.toml DESTINATION ${CMAKE_SOURCE_DIR})
 
 # Install python source, associated driver scripts, documentation, etc.
 #

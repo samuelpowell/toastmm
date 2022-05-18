@@ -55,7 +55,7 @@ module1 = Extension('toast.toastmod',
                     extra_compile_args = compile_args,
                     define_macros = [('NPY_NO_DEPRECATED_API', 'NPY_1_7_API_VERSION')],
                     py_limited_api=True,
-                    sources = ['toastmodule.cc'])
+                    sources = ['dist/python/src/toastmodule.cc'])
 
                          
 # Define installation
@@ -73,6 +73,7 @@ setup(
     },
     ext_modules = [module1],
     packages=['toast'],
+    package_dir = {'toast': 'dist/python/src/toast'}
     #package_data = pkg_files,
     #include_package_data=True
 )
