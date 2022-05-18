@@ -8,11 +8,11 @@ build-backend = "setuptools.build_meta:__legacy__"
 skip = ["*-win32", "*-manylinux_i686", "pp*"]
 
 # Build the library
-[tool.cibuildwheel]
-before-all = [
-    "mkdir build", 
-    "cd build",
-    "cmake ../"
-    "cmake --build . --target INSTALL --config Release"
-    ]
+# [tool.cibuildwheel]
+# before-all = [
+#     "mkdir build", 
+#     "cd build",
+#     "cmake ../"
+#     "cmake --build . --target INSTALL --config Release"
+#     ]
 
