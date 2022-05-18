@@ -60,7 +60,7 @@ endif()
 
 configure_file(setup.py.in setup.py @ONLY)
 
-configure_file(setup.py.in ${CMAKE_SOURCE_DIR}/setup.py @ONLY COPYONLY)
+configure_file(setup.py.in ${CMAKE_SOURCE_DIR}/setup.py @ONLY)
 configure_file(pyproject.toml ${CMAKE_SOURCE_DIR}/pyproject.toml COPYONLY)
 
 # Note that we have to place the resultant file in the root, because the CI wheel builder
