@@ -1,13 +1,11 @@
 // -*- C++ -*-
-#define Py_LIMITED_API 0x030500F0
-
 #include <Python.h>
 #include <numpy/arrayobject.h>
 
 #include <fstream>
 #include <iostream>
 
-#include "../common/objmgr.h"
+#include "objmgr.h"
 #include "toastdef.h"
 #include "mathlib.h"
 #include "felib.h"

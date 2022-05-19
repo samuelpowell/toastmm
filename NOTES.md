@@ -83,6 +83,8 @@ Aim: simplify codebase, ensuring that all code is builds and is used
     - Remove `THREAD_LEVEL_1` (which uses the thread pool, not ported), and make `THREAD_LEVEL_2 == TOAST_THREAD`, remove vector_MT.
     - Enable multi-threading in Python interface
     - Thread pool based parallelism removed as used in limited places. Will consider reimplementation with OpenMP or standard library implementation: `TOAST_PARALLEL` define, parallel CG implementation, thread pool implementation.
+  - Refactor Python build configuration to be standalone, and run from the source root, in order to use cibuildwheel in CI
+  - Enale CI for Python wheels and MATLAB mex builds
 
 # TODO
 
