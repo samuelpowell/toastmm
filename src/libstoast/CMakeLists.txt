@@ -20,7 +20,7 @@ target_include_directories(libstoast INTERFACE .)                      # Provide
 target_sources(libstoast PRIVATE    source.cc fwdsolver.cc 
                                     fwdsolver_mw.cc jacobian.cc of.cc regul.cc
                                     pscaler.cc pparse.cc lsearch.cc
-                                    projector.cc camera.cc GLProjector.cc)
+                                    projector.cc camera.cc)
 
 
 target_link_libraries(libstoast libfe libmath libraster)

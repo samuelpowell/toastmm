@@ -13,13 +13,8 @@
 #include "mexutil.h"
 #include "fdotlib.h"
 #include "matlabfdot.h"
-//#include "felib.h"
-//#include "stoastlib.h"
-//#include "camera.h"
 #include "projector.h"
-#ifdef MESA_SUPPORT
-#include "GLProjector.h"
-#endif
+
 
 using namespace std;
 
@@ -183,14 +178,7 @@ void MatlabFDOT::MakeProjectorList (int nlhs, mxArray *plhs[],
 	    }
 	}
 	if (projtp == PROJTYPE_MESAGL) {
-#if defined(MESA_SUPPORT)
-#if defined(__APPLE__)
-        mexErrMsgTxt("Matab toast interface on OS X does not support OpenGL based cameras.");
-#endif
-        projPList[m] = new GLProjector(camPList[m], mesh, nBndElems, bndellist, bndsdlist);
-#else
-        mexErrMsgTxt("This function requires Mesa-3D, but Toast has been compiled without Mesa support.");
-#endif
+        mexErrMsgTxt("OpenGL based projection not supported");
 	} else {
 	    projPList[m] = new RayProjector (camPList[m], mesh);
 	}
