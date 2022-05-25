@@ -85,6 +85,7 @@ Aim: simplify codebase, ensuring that all code is builds and is used
     - Thread pool based parallelism removed as used in limited places. Will consider reimplementation with OpenMP or standard library implementation: `TOAST_PARALLEL` define, parallel CG implementation, thread pool implementation.
   - Refactor Python build configuration to be standalone, and run from the source root, in order to use cibuildwheel in CI
   - Enale CI for Python wheels and MATLAB mex builds
+  - Remove remaining MESA based functionality
 
 # TODO
 
@@ -92,7 +93,6 @@ Aim: simplify codebase, ensuring that all code is builds and is used
  - Look at building static libraries for intermediary components
  - Investigate `warning C4910` on MSVC - some declspec conflict
  - Look at MEX config as per first item
- - Check `MESA_SUPPORT`
  - Make individual libraries properly CMake with interface exports, etc. to avoid replicating includes in e.g. matlab2
  - Look at fwdsolver_mw.h instantiation requirements, determine appropriate preprocessor gaurd (e.g. Clang?)
  - Remove MESA based projection

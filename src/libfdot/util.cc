@@ -11,9 +11,7 @@ from file or console input
 #include <iomanip>
 #include "camera.h"
 #include "projector.h"
-#ifdef MESA_SUPPORT
-#include "GLProjector.h"
-#endif
+
 
 using namespace std;
 
@@ -223,14 +221,7 @@ void SelectProjectors (ParamParser &pp, QMMesh & mesh, Projector ** projPtrs, Ca
 	    }
 	}
 	if (projtp==PROJTYPE_MESAGL) {
-#ifdef MESA_SUPPORT
-	    // note: currently only GLProjector is implemented, so MESA_SUPPORT
-	    // is required
-	    projPtrs[m] = new GLProjector(camPtrs[m], &mesh, nBndElems,
-					  bndellist, bndsdlist);
-#else
-	    xERROR("Mesa-3D support required but not provided.");
-#endif
+	    xERROR("OpenGL projection not supported.");
 	} else {
 	    xERROR("Unsupported projector type requested.");
 	}
