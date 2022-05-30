@@ -17,7 +17,7 @@ plt.ion()
 import toast
 
 # Set the file paths
-meshdir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "meshes")
+meshdir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "meshes", "2D")
 meshfile = os.path.join(meshdir, "circle25_32.msh")
 qmfile = os.path.join(meshdir, "circle25_32x32.qm")
 

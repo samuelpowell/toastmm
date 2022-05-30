@@ -75,7 +75,7 @@ def imerr(im1, im2):
 import toast
 
 # Set the file paths
-meshdir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "meshes")
+meshdir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "meshes", "2D")
 meshfile1 = os.path.join(meshdir, "ellips_tri10.msh")       # mesh for target data generation
 meshfile2 =os.path.join(meshdir, "circle25_32.msh")         # mesh for reconstruction
 qmfile = os.path.join(meshdir, "circle25_32x32.qm")         # source-detector file
