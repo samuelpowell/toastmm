@@ -41,6 +41,10 @@ if(Matlab_FOUND)
   # Install associated driver scripts, documentation, etc.
   install(DIRECTORY ${CMAKE_SOURCE_DIR}/script/matlab DESTINATION ${CMAKE_INSTALL_PREFIX})                
 
+  # Install test meshes used by examples
+  install(DIRECTORY ${CMAKE_SOURCE_DIR}/test/2D/meshes/ DESTINATION ${CMAKE_INSTALL_PREFIX}/matlab/meshes/2D)     
+  install(DIRECTORY ${CMAKE_SOURCE_DIR}/test/3D/meshes/ DESTINATION ${CMAKE_INSTALL_PREFIX}/matlab/meshes/3D)     
+
   set(CPACK_PROJECT_NAME ${PROJECT_NAME})
   set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
   include(CPack)

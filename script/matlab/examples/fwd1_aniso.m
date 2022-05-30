@@ -3,7 +3,7 @@
 function fwd1_aniso
 close all
 
-meshdir = '../../test/2D/meshes/';
+meshdir = '../meshes/2D/';
 hmesh = toastMesh([meshdir 'circle25_32.msh']);
 hmesh.ReadQM([meshdir 'circle25_32x32.qm']);
 
