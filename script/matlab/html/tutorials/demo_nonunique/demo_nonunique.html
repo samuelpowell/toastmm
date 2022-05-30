@@ -36,7 +36,6 @@
 <p>In this example, this is demonstrated by generating data from a model with homogeneous absorption, while scattering consists of a homogeneous background with a circular inclusion of increased scattering.</p>
 <p>Using these data, an absorption-only reconstruction is performed under the assumption that scattering is constant.</p>
 <p>The reconstruction succeeds in finding an absorption distribution that generates data matching the scatter-perturbed target data.</p>
-<p>The Matlab script for this example can be downloaded <a href="nonuniqueness.m">here</a>.</p>
 
 <h2>Step 1: Create the target mesh</h2>
 <p>For this example, we create a 2D circular mesh with a circular inclusion. You can create this mesh yourself with gmsh (see <a href="../demo_meshgen1/demo_meshgen1.html">Meshing tutorial 1</a> and <a href="../demo_meshgen2/demo_meshgen2.html">Meshing tutorial 2</a> for details). The mesh should be circular with radius 25 and centre in the origin. It should contain a small off-centre inclusion, and separate surface definitions for the background and inclusion. Call the mesh <i>circle_blob.msh</i> so that the script will recognise it.</p>
