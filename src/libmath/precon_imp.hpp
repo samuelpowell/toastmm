@@ -10,11 +10,6 @@
 #define MATHLIB_IMPLEMENTATION
 #include "mathlib.h"
 
-#ifdef HAVE_ILU
-#include "ilutoast.h"
-#include <ilupack.h>
-#endif // HAVE_ILU
-
 using namespace std;
 
 // ==========================================================================
@@ -36,11 +31,6 @@ TPreconditioner<MT> *TPreconditioner<MT>::Create (PreconType type)
     case PRECON_DILU:         // diagonal incomplete LU decomposition
         return new TPrecon_DILU<MT>;
 	break;
-#ifdef HAVE_ILU
-     case PRECON_ILU:         // diagonal incomplete LU decomposition
-        return new TPrecon_ILU<MT>;
-	break;
-#endif // HAVE_ILU
     //case PRECON_CG_MULTIGRID: // CG multigrid
         //return new TPrecon_CG_Multigrid<MT>;
 	//break;
@@ -330,36 +320,6 @@ inline void SCPreconMixed_DILU::Apply (const CVector &r, CVector &s)
 }
 
 // ==========================================================================
-// class TPrecon_ILU
-
-#ifdef HAVE_ILU
-
-template<class MT>
-void TPrecon_ILU<MT>::Reset (TCompRowMatrix<MT> &, int matching, char *ordering, double droptol, int condest, int elbow)
-{
-    ERROR_UNDEF;
-}
-
-template<class MT>
-TPrecon_ILU<MT>::~TPrecon_ILU ()
-{
-	ZGNLAMGdelete(&A,&PRE,&param);
-	delete []rhs;
-	delete []sol;
-	delete []A.ia;
-	delete []A.ja;
-	delete []A.a;
-}
-
-template<class MT>
-void TPrecon_ILU<MT>::Apply (const TVector<MT> &rh, TVector<MT> &s)
-{
-    ERROR_UNDEF;
-}
-
-#endif // HAVE_ILU
-
-// ==========================================================================
 // class and friend instantiations
 
 #ifdef UNDEF // NEED_EXPLICIT_INSTANTIATION
@@ -391,12 +351,5 @@ template class MATHLIB TPrecon_Diag<scomplex>;
 template class MATHLIB TPrecon_IC<scomplex>;
 template class MATHLIB TPrecon_DILU<scomplex>;
 template class MATHLIB TPrecon_CG_Multigrid<scomplex>;
-
-#ifdef HAVE_ILU
-template class MATHLIB TPrecon_ILU<float>;
-template class MATHLIB TPrecon_ILU<double>;
-template class MATHLIB TPrecon_ILU<toast::complex>;
-template class MATHLIB TPrecon_ILU<scomplex>;
-#endif // HAVE_ILU
 
 #endif // NEED_EXPLICIT_INSTANTIATION

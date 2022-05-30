@@ -97,16 +97,6 @@ void LUSolve (const TCompRowMatrix<MT> &LU, const TVector<MT> &b,
 // template<class MT>
 // void LU (TCompRowMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x);
 
-template<class MT>
-int ILUSolve (TCompRowMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
-    double tol = 1e-10, double droptol = 1e-3, int maxit = 500);
-// solve general system Ax=b with ILU solver
-
-template<class MT>
-int ILUSymSolve (TCompRowMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
-    double tol = 1e-10, double droptol = 1e-3, int maxit = 500);
-// solve symmetric system Ax=b with ILU solver
-
 #ifdef ML_INTERFACE
 
 template<class MT>
@@ -469,14 +459,6 @@ public:
     friend void LUSolve<> (const TCompRowMatrix<MT> &LU, const TVector<MT> &b,
         TVector<MT> &x);
     // Returns solution of LU x = b
-
-    friend int ILUSolve<> (TCompRowMatrix<MT> &A, const TVector<MT> &b,
-        TVector<MT> &x, double tol, double droptol, int maxit);
-    // solve general system Ax=b with ILU solver
-
-    friend int ILUSymSolve<> (TCompRowMatrix<MT> &A, const TVector<MT> &b,
-        TVector<MT> &x, double tol, double droptol, int maxit);
-    // solve symmetric system Ax=b with ILU solver
 
     void ExportHB (std::ostream &os);
     // output matrix in Harwell-Boeing format

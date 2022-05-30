@@ -27,7 +27,7 @@ Aim: simplify codebase, ensuring that all code is builds and is used
 
  - CUDA, MPI
 
-# Changelog (build system)
+# Changelog
 
  - Bump liblbfgs to master for CMake support
  - Add Eigen
@@ -86,6 +86,8 @@ Aim: simplify codebase, ensuring that all code is builds and is used
   - Refactor Python build configuration to be standalone, and run from the source root, in order to use cibuildwheel in CI
   - Enale CI for Python wheels and MATLAB mex builds
   - Remove remaining MESA based functionality
+  - Remove mesh reordering functionality due to LGPL license
+  - Remove ILUPACK bindings
 
 # TODO
 
