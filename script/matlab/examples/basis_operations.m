@@ -8,7 +8,7 @@ toastSetVerbosity(1);
 
 %% Constructing the basis mapper object
 
-hmesh = toastMesh('../../test/2D/meshes/ellips_tri10.msh');
+hmesh = toastMesh('../meshes/2D/ellips_tri10.msh');
 % the unstructured mesh
 
 grd = [128,128];
