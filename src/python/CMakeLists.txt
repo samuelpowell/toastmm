@@ -5,6 +5,12 @@ project(pytoast VERSION 0.1.0)
 #
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/script/python DESTINATION ${CMAKE_INSTALL_PREFIX}) 
 
+
+# Install test meshes used by examples
+#
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/test/2D/meshes/ DESTINATION ${CMAKE_INSTALL_PREFIX}/python/meshes/2D)     
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/test/3D/meshes/ DESTINATION ${CMAKE_INSTALL_PREFIX}/python/meshes/3D)     
+
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 include(CPack)
