@@ -4,7 +4,7 @@
 
 
 %% Load a mesh consisting of linear triangles
-mesh = toastMesh('../../test/2D/meshes/circle25_32.msh');
+mesh = toastMesh('../meshes/2D/circle25_32.msh');
 
 % Pick an element to work on and extract its geometry
 el = mesh.Element(10);

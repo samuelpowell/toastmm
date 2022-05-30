@@ -1,7 +1,7 @@
 % Using the high-level convenience method dotFwd to compute a forward
 % solution for the DOT problem.
 
-meshpath = '../../test/2D/meshes/';
+meshpath = '../meshes/2D/';
 meshfile = [meshpath 'ellips_tri10.msh'];
 qmfile   = [meshpath 'circle25_32x32.qm'];
 

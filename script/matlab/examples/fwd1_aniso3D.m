@@ -1,7 +1,7 @@
 function tmp
 close all
 
-meshdir = '../../test/3D/meshes/';
+meshdir = '.../meshes/3D/';
 hmesh = toastMesh([meshdir 'cyl3.msh']);
 hmesh.ReadQM([meshdir 'cyl_3ring.qm']);
 
