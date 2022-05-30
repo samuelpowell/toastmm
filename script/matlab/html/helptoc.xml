@@ -9,28 +9,19 @@
       <tocitem target="background/about_toast.html">About Toast++</tocitem>
       <tocitem target="background/about_toolbox.html">About the Toast++ toolbox</tocitem>
     </tocitem>
-    <tocitem target="examples.html" image="$toolbox/matlab/icons/demoicon.gif">Examples
-      <tocitem target="quickstart.html">A 2D reconstruction</tocitem>
-      <tocitem target="../demos.xml">Toast++ demos</tocitem>
-	<tocitem target="tutorials/demos_matlab.html">Toast++ tutorials
-	<tocitem target="tutorials/demo_meshgen1/demo_meshgen1.html">Mesh generation: spherical mesh</tocitem>
-	<tocitem target="tutorials/demo_meshgen2/demo_meshgen2.html">Internal boundaries</tocitem>
-	<tocitem target="tutorials/demo_meshgen3/demo_meshgen3.html">Adaptive meshing</tocitem>
-	<tocitem target="tutorials/demo_fwd1/demo_matlab_fwd1.html">Building a DOT forward solver</tocitem>
-	<tocitem target="tutorials/demo_fwd2/demo_matlab_fwd2.html">Inhomogeneous parameters</tocitem>
-	<tocitem target="tutorials/demo_fwd3/demo_matlab_fwd3.html">Frequency domain data</tocitem>
-	<tocitem target="tutorials/demo_fwd4/demo_matlab_fwd4.html">Time domain data</tocitem>
-	<tocitem target="tutorials/demo_pmdf1/demo_matlab_pmdf1.html">Jacobian generation</tocitem>
-	<tocitem target="tutorials/demo_rec1/demo_matlab_rec1.html">Simple inverse solver</tocitem>
-	<tocitem target="tutorials/demo_nonunique/demo_nonunique.html">Non-uniqueness example</tocitem>
-      </tocitem>
+    <tocitem target="tutorials/demos_matlab.html">Tutorials
+      <tocitem target="tutorials/demo_meshgen1/demo_meshgen1.html">Mesh generation: spherical mesh</tocitem>
+      <tocitem target="tutorials/demo_meshgen2/demo_meshgen2.html">Internal boundaries</tocitem>
+      <tocitem target="tutorials/demo_meshgen3/demo_meshgen3.html">Adaptive meshing</tocitem>
+      <tocitem target="tutorials/demo_fwd1/demo_matlab_fwd1.html">Building a DOT forward solver</tocitem>
+      <tocitem target="tutorials/demo_fwd2/demo_matlab_fwd2.html">Inhomogeneous parameters</tocitem>
+      <tocitem target="tutorials/demo_fwd3/demo_matlab_fwd3.html">Frequency domain data</tocitem>
+      <tocitem target="tutorials/demo_fwd4/demo_matlab_fwd4.html">Time domain data</tocitem>
+      <tocitem target="tutorials/demo_pmdf1/demo_matlab_pmdf1.html">Jacobian generation</tocitem>
+      <tocitem target="tutorials/demo_rec1/demo_matlab_rec1.html">Simple inverse solver</tocitem>
+      <tocitem target="tutorials/demo_nonunique/demo_nonunique.html">Non-uniqueness example</tocitem>
     </tocitem>
-    <tocitem>Reference
-      <tocitem target="matlab: doc toast2">Class and function list</tocitem>
-    </tocitem>
-    <tocitem>Toast++ on the web
-      <tocitem target="http://web4.cs.ucl.ac.uk/research/vis/toast/index.html" image="$toolbox/matlab/icons/webicon.gif">Toast++ Web Site</tocitem>
-    </tocitem>
+    <tocitem target="matlab: doc toast2">Reference</tocitem>
   </tocitem>
 
 </toc>
