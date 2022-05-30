@@ -99,5 +99,7 @@ Aim: simplify codebase, ensuring that all code is builds and is used
  - Look at fwdsolver_mw.h instantiation requirements, determine appropriate preprocessor gaurd (e.g. Clang?)
  - Remove MESA based projection
  - MEX 64-bit update (https://uk.mathworks.com/help/matlab/matlab_external/upgrading-mex-files-to-use-64-bit-api.html)
-
+ - MATLAB basis operations example is extremely slow in hmesh.Diaply function with two arguments
+ - MATLAB gmsh reader out of date
+ - Check MATLAB interface complex outputs on QM
 
