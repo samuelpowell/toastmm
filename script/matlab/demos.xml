@@ -62,22 +62,6 @@ functional.
       <file>html/toast_demo6.html</file>
       <type>M-GUI</type>
    </demoitem>
-   <demoitem>
-      <label>Multi-spectral reconstruction</label>
-      <callback>rundemo('toast_demo7')</callback>
-      <file>html/toast_demo7.html</file>
-      <type>M-GUI</type>
-   </demoitem>
-</demosection>
-
-<demosection>
-    <label>Tutorials</label>
-    <demoitem>
-        <label>Simple absorption reconstruction</label>
-        <callback>rundemo('reconCW1')</callback>
-        <file>html/toast_tut1.html</file>
-        <type>M-file</type>
-    </demoitem>
 </demosection>
 
 </demos>
