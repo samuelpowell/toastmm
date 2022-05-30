@@ -14,9 +14,6 @@
 #include "dgmatrix.h"
 #include "crmatrix.h"
 #include "crmatrix_cm.h"
-#ifdef HAVE_ILU
-#include "ilupack.h"
-#endif // HAVE_ILU
 
 /// \defgroup iterative linear solver preconditioner types
 //@{
@@ -123,29 +120,6 @@ private:
     const TMatrix<MT> *A;  // pointer to matrix
 };
 
-// ==========================================================================
-// class TPrecon_ILU 
-// ILU: incomplete LU preconditioner using ILUPACK
-
-#ifdef HAVE_ILU
-
-template<class MT> class TPrecon_ILU: public TPreconditioner<MT> {
-public:
-    TPrecon_ILU() {}
-    PreconType Type() { return PRECON_ILU; }
-    void Reset (const TMatrix<MT> *){ ERROR_UNDEF; }
-    void Reset (TCompRowMatrix<MT> &, int matching, char *ordering, double droptol, int condest, int elbow);
-    void Apply (const TVector<MT> &r, TVector<MT> &s);
-    void Apply (const TDenseMatrix<MT> &r, TDenseMatrix<MT> &s)const;
-    ~TPrecon_ILU();
-private:
-    ilu_doublecomplex *rhs, *sol;
-    Zmat A;
-    ZAMGlevelmat  PRE;
-    ZILUPACKparam param;
-};
-
-#endif // HAVE_ILU
 
 // ==========================================================================
 // class TPrecon_CG_Multigrid
@@ -214,12 +188,6 @@ typedef TPrecon_DILU<float>             FPrecon_DILU;
 typedef TPrecon_DILU<std::complex<double> >    CPrecon_DILU;
 typedef TPrecon_DILU<std::complex<float> >          SCPrecon_DILU;
 typedef TPrecon_DILU<int>               IPrecon_DILU;
-
-#ifdef HAVE_ILU
-typedef TPrecon_ILU<double>            RPrecon_ILU;
-typedef TPrecon_ILU<std::complex<double> >    CPrecon_ILU;
-typedef TPrecon_ILU<std::complex<float> >          SCPrecon_ILU;
-#endif // HAVE_ILU
 
 typedef TPrecon_CG_Multigrid<double>    RPrecon_CG_Multigrid;
 typedef TPrecon_CG_Multigrid<float>     FPrecon_CG_Multigrid;

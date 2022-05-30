@@ -9,10 +9,6 @@ add_executable(quad2linmesh quad2linmesh.cc)
 target_link_libraries(quad2linmesh PRIVATE libmath libfe)
 target_include_directories(quad2linmesh PRIVATE ../../include) 
 
-add_executable(opt2 opt2.cc)
-target_link_libraries(opt2 PRIVATE libmath libfe)
-target_include_directories(opt2 PRIVATE ../../include) 
-
 add_executable(mkmesh_sphere mkmesh_sphere.cc)
 target_link_libraries(mkmesh_sphere PRIVATE libmath libfe)
 target_include_directories(mkmesh_sphere PRIVATE ../../include) 
@@ -49,7 +45,7 @@ add_executable(getnim getnim.cc)
 target_link_libraries(getnim PRIVATE libmath)
 target_include_directories(getnim PRIVATE ../../include) 
 
-install(TARGETS cmpvec quad2linmesh opt2 mkmesh_sphere mkmesh_cyl mkmesh_brick meshinfo makeqm3d makeqm lin2quadmesh lin2cubicmesh getnim
+install(TARGETS cmpvec quad2linmesh mkmesh_sphere mkmesh_cyl mkmesh_brick meshinfo makeqm3d makeqm lin2quadmesh lin2cubicmesh getnim
         LIBRARY DESTINATION lib
         RUNTIME DESTINATION bin)
         

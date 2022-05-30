@@ -200,36 +200,8 @@ void MatlabToast::WriteMeshVtk (int nlhs, mxArray *plhs[], int nrhs,
 
 void MatlabToast::MeshOpt (int nlhs, mxArray *plhs[], int nrhs,
     const mxArray *prhs[])
-{
-    int i, res, len, *perm;
-    char optmode[256] = "\0";
-
-    Mesh *mesh = GETMESH_SAFE(0);
-    ASSERTARG_CHAR(1);
-    mxGetString (prhs[1], optmode, 256);
-
-    len = mesh->nlen();
-    perm = new int[len];
-    for (i = 0; i < len; i++) perm[i] = i;
-
-    if (!strcasecmp(optmode, "mmd")) {
-	res = Optimise_MMD (*mesh, perm, 0, len);
-    } else if (!strcasecmp(optmode, "bandw")) {
-	res = Optimise_MinBandwidth (*mesh, perm, 0, len);
-    } else if (!strcasecmp (optmode, "tinney2")) {
-	res = Optimise_Tinney2 (*mesh, perm, 0, len);
-    } else {
-	res = 1;
-    }
-
-    ASSERTARG(res == 0, 2, "optimisation reports failure");
-
-    plhs[0] = mxCreateDoubleMatrix (len,1,mxREAL);
-    double *pr = mxGetPr(plhs[0]);
-    for (i = 0; i < len; i++)
-	*pr++ = perm[i]+1; // switch to 1-based
-
-    delete []perm;
+{    
+    mexErrMsgTxt("Mesh optimisation/reordering not supported");
 }
 
 // =========================================================================

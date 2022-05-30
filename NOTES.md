@@ -27,7 +27,7 @@ Aim: simplify codebase, ensuring that all code is builds and is used
 
  - CUDA, MPI
 
-# Changelog (build system)
+# Changelog
 
  - Bump liblbfgs to master for CMake support
  - Add Eigen
@@ -86,6 +86,8 @@ Aim: simplify codebase, ensuring that all code is builds and is used
   - Refactor Python build configuration to be standalone, and run from the source root, in order to use cibuildwheel in CI
   - Enale CI for Python wheels and MATLAB mex builds
   - Remove remaining MESA based functionality
+  - Remove mesh reordering functionality due to LGPL license
+  - Remove ILUPACK bindings
 
 # TODO
 
@@ -97,5 +99,7 @@ Aim: simplify codebase, ensuring that all code is builds and is used
  - Look at fwdsolver_mw.h instantiation requirements, determine appropriate preprocessor gaurd (e.g. Clang?)
  - Remove MESA based projection
  - MEX 64-bit update (https://uk.mathworks.com/help/matlab/matlab_external/upgrading-mex-files-to-use-64-bit-api.html)
-
+ - MATLAB basis operations example is extremely slow in hmesh.Diaply function with two arguments
+ - MATLAB gmsh reader out of date
+ - Check MATLAB interface complex outputs on QM
 
