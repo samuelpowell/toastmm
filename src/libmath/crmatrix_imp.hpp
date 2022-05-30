@@ -15,7 +15,6 @@
 #include <string.h>
 
 #include "mathlib.h"
-#include "ilutoast.h"
 
 #ifdef ML_INTERFACE
 #include "ml_defs.h"
@@ -2126,53 +2125,6 @@ void LUSolve (const TCompRowMatrix<MT> &LU, const TVector<MT> &b,
     }
 }
 
-// ==========================================================================
-
-template<class MT>
-int ILUSolve (TCompRowMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
-    double tol, double droptol, int maxit)
-{
-    xERROR ("ILUSolve: called for unsupported data type");
-    // only implemented in data specialisations
-    return 0;
-}
-
-template<>
-inline int ILUSolve (TCompRowMatrix<std::complex<double> > &A,
-    const TVector<std::complex<double> > &b,
-    TVector<std::complex<double> > &x, double tol, double droptol, int maxit)
-{
-#ifdef HAVE_ILU
-    return ILUSolveZGNL (A, b, x, tol, droptol, maxit);
-#else
-    xERROR("ILUPACK support not configured");
-	return 0;
-#endif
-}
-
-// ==========================================================================
-
-template<class MT>
-int ILUSymSolve (TCompRowMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
-    double tol, double droptol, int maxit)
-{
-    xERROR ("ILUSymSolve: called for unsupported data type");
-    // only implemented in data specialisations
-    return 0;
-}
-
-template<>
-inline int ILUSymSolve (TCompRowMatrix<std::complex<double> > &A,
-    const TVector<std::complex<double> > &b,
-    TVector<std::complex<double> > &x, double tol, double droptol, int maxit)
-{
-#ifdef HAVE_ILU
-    return ILUSolveZSYM (A, b, x, tol, droptol, maxit);
-#else
-    xERROR("ILUPACK support not configured");
-	return 0;
-#endif
-}
 
 // ==========================================================================
 
