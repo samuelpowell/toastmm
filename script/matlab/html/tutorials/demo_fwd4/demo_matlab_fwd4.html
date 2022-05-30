@@ -38,14 +38,14 @@ To run this tutorial yourself, you need Matlab, and you have to install the Toas
 <h2>Step 1: Setting up the time domain system matrix</h2>
 <p>The time-domain version of the diffusion equation is given by</p>
 <img src="demo_matlab_fwd4_eq1.png" />
-<p>where <i>&phiv;</i> is the real-valued photon density depending on position and time. In contrast to the steady-state problem of <a href="demo_matlab_fwd1.html">Tutorial 1</a>, this PDE contains a time derivative of the photon density. We will approximate this by a finite difference scheme in time.</p>
+<p>where <i>&phiv;</i> is the real-valued photon density depending on position and time. In contrast to the steady-state problem of <a href="../demo_fwd1/demo_matlab_fwd1.html">Tutorial 1</a>, this PDE contains a time derivative of the photon density. We will approximate this by a finite difference scheme in time.</p>
 <p>The discretised version of the PDE is given by</p>
 <img src="demo_matlab_fwd4_eq2.png" />
 <p>where K is the same stiffness matrix as for the steady-state problem, and M is the mass matrix.
 By approximating the derivative with a forward difference at time <i>n</i> and a backward difference at time <i>n</i>+1 and employing a trapezoid integration rule, we get</p>
 <img src="demo_matlab_fwd4_eq3.png" />
 <p>where parameter <i>&theta;</i> controls the coupling of adjacent time steps. Typical values are 0 (explicit scheme), 1 (implicit scheme), and 1/2 (Crank-Nicholson).</p>
-<p>After setting up the Toast code identically to <a href="demo_matlab_fwd1.html">Tutorial 1</a> (or <a href="demo_matlab_fwd2.html">Tutorial 2</a> for the inhomogeneous problem), up to computation of the stiffness matrix using the dotSysmat call, we now need to compute the mass matrix:</p>
+<p>After setting up the Toast code identically to <a href="../demo_fwd1/demo_matlab_fwd1.html">Tutorial 1</a> (or <a href="../demo_fwd2/demo_matlab_fwd2.html">Tutorial 2</a> for the inhomogeneous problem), up to computation of the stiffness matrix using the dotSysmat call, we now need to compute the mass matrix:</p>
 <div class="example">
 M = mesh.Massmat;
 </div>
