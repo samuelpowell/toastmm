@@ -8,7 +8,7 @@ disp('-------------------------------------------------------')
 % User-defined parameters
 % ======================================================================
 verbosity = 1;
-meshdir = '../../test/2D/meshes/';       % example mesh repository
+meshdir = '../meshes/2D/';       % example mesh repository
 qmname  = [meshdir 'circle25_32x32.qm']; % source-detector definitions
 fwdmesh = [meshdir 'ellips_tri10.msh'];  % mesh for data generation
 invmesh = [meshdir 'circle25_32.msh'];   % mesh for inverse solver forward model

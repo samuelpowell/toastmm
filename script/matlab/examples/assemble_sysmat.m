@@ -2,7 +2,7 @@
 % for the DOT problem
 
 % Load a mesh
-hmesh = toastMesh('../../test/2D/meshes/circle25_32.msh');
+hmesh = toastMesh('../meshes/2D/circle25_32.msh');
 
 % Construct the nodal coefficient vectors (homogeneous for simplicity)
 nnd = hmesh.NodeCount();

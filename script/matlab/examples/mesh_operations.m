@@ -5,7 +5,7 @@
 hmesh1 = toastMesh;
 % create a mesh object without an associated mesh
 
-hmesh2 = toastMesh('../../test/2D/meshes/circle25_32.msh');
+hmesh2 = toastMesh('../meshes/2D/circle25_32.msh');
 % create a mesh object from a mesh file
 
 [vtx idx eltp] = mkslab([-10, -10, -10; 10, 10, 10],[10 10 10]);
@@ -15,7 +15,7 @@ hmesh3 = toastMesh(vtx,idx,eltp);
 
 %% Replacing an existing mesh
 
-hmesh2.Read('../../test/2D/meshes/circle25_64.msh');
+hmesh2.Read('../meshes/2D/circle25_64.msh');
 % replace mesh with data read from file
 
 [vtx idx eltp] = mkcircle(25,6,32,2);
