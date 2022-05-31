@@ -1,8 +1,8 @@
 function J = toastJacobianCW(mesh,basis,varargin)
 % Jacobian for DOT continuous wave problem for mua parameter
 %
-% Syntax: J = toastJacobianCW (mesh, basis, qvec, mvec, mua, mus, ref,
-%                              solver, tol)
+% Syntax: [J, proj] = toastJacobianCW (mesh, basis, qvec, mvec, mua, mus, ref,
+%                                      solver, tol, impl)
 %
 % Parameters:
 %         mesh [toastMesh object]:
@@ -20,13 +20,18 @@ function J = toastJacobianCW(mesh,basis,varargin)
 %         ref [nlen vector]:
 %             nodal refractive index coefficients
 %         solver [string]:
-%             linear solver (DIRECT|CG|BICG|BICGSTAB|GMRES|GAUSSSEIDEL)
+%             linear solver (DIRECT|CG|BICG|BICGSTAB|GMRES)
 %         tol [scalar]:
 %             linear solver tolerance (optional, iterative solvers only)
+%         impl (string):
+%             solver provider (AUTO|TOAST|MATLAB)
 %
 % Return values:
 %         J: [nqm x slen dense real matrix]:
 %             Jacobian matrix
+%
+%         proj: [nqm dense real matrix]:
+%             vector of logarithm of boundary measuremnts
 %
 % Notes:  Calculates the derivative of the logarithm of the CW amplitude
 %         data with respect to the absorption coefficients of the forward
@@ -42,14 +47,15 @@ else
     hb = 0;
 end
 
+
 if nargin==5
-    % This format isn't supported yet
-    error('Incorrect argument syntax');
+    % Compute from fields
     dphi = varargin{1};
     aphi = varargin{2};
     proj = varargin{3};
     J = toastmex(uint32(54),mesh.handle,hb,dphi,aphi,proj);
 else
+    % Compute fields
     qvec = varargin{1};
     mvec = varargin{2};
     mua = varargin{3};
@@ -57,13 +63,30 @@ else
     ref = varargin{5};
     solver = 'direct';
     tol = 1e-8;
+    impl = 'auto';
     if nargin >= 8
         solver = varargin{6};
         if nargin >= 9
             tol = varargin{7};
+            if nargin >= 10
+                impl = varargin{8};
+            end
         end
     end
-    J = toastmex(uint32(54),mesh.handle,hb,qvec,mvec,mua,mus,ref,solver,tol);
+
+    % Compute fields in mesh basis
+    phi = toastFields(mesh,0,[qvec mvec],mua,mus,ref,0,solver,tol,impl);
+    dphi = phi(:, 1:size(qvec,2));
+    aphi = phi(:, (size(qvec,2)+1) : end);
+        
+    % Build projection data, reduce by linklist
+    proj = reshape (mvec.' * dphi, [], 1);
+    proj = proj(mesh.DataLinkList());
+
+    % Compute Jacobian
+    J = toastmex(uint32(54),mesh.handle,hb,dphi,aphi,proj);
+
+
 end
 
 end

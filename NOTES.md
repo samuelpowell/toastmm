@@ -95,6 +95,8 @@ Aim: ensure multithreading where possible, but avoid contention
   - Fix swap bug with internal Cholesky implementation, use Eigen Cholesky for forward solvers
   - Split factorise/analyse steps in forward solver
   - toastFields reimplemented with both MATLAB and TOAST solvers, the former used by default for direct solves
+  - toastJacobianCW reimplemented to use toastFields
+  - toastJacobianCW mesh integrals multithreaded, 6x speedup on 8x threads
 
 # TODO
 

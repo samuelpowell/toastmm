@@ -25,7 +25,7 @@
 %             solver provider (AUTO|TOAST|MATLAB)
 %
 % Return values:
-%         phi (complex matrix slen x nq or n x nq):
+%         phi (real or complex matrix slen x nq or n x nq):
 %             photon density fields for all nq sources
 %
 % Notes:  If the basis parameter is set to 0, the fields are returned in
@@ -36,7 +36,7 @@
 %         To compute adjoint fields, pass the matrix of measurement
 %         vectors (mvec) instead of qvec.
 
-function [phi,aphi] = toastFields(mesh,basis,qvec,mua,mus,ref,freq,method,tol,impl)
+function [phi] = toastFields(mesh,basis,qvec,mua,mus,ref,freq,method,tol,impl)
 
     if nargin < 10
         impl = auto;
