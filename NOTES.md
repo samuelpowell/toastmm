@@ -2,30 +2,33 @@
 
 Capture intent and changes applied from the initial import of the toast++.
 
-## Build system, dependencies, and you
+## Build system
 
-Aim: working one-liner build, without external dependencies, on all platforms
+Aim: working one-liner builds for interfaces on all platforms
 
- - Create CMake build system for all modules required for Matlab/Python interfaces
- - Replace any numerics which don't easily conform with Eigen
- - Disable components which cannot be build (e.g. requiring mesa), note build flags
+ - CMake buld system implemented with support for MATLAB MEX build
+ - Python wheel build script with support for isolated builds and `cibuildwheel` 
+ - Static compilation to minimise complexity of library dependencies
 
-## Optional numerics / support libraries
+## Dependencies
 
- - reintroduce external solvers and BLAS as options
- - use system provided builds where possible, else e.g., `vcpkg` to avoid maintenance
+Aim: minimise build and maintenance complexity
 
-## Threading
+ - removed all external libraries other than liblbfgs, only a recent C++ compiler required
+ - custom solvers replaced with Eigen equivalents
+ - (WIP) script interfaces updated with external direct solvers
+ - Removed CUDA, MPI, MesaGL support
+
+## Multithreading & Performance
 
 Aim: ensure multithreading where possible, but avoid contention
 
- - manage threading within toast, and optional BLAS
-
-## Remove features and unused code
-
-Aim: simplify codebase, ensuring that all code is builds and is used
-
- - CUDA, MPI
+ - coarse multithreading enabled on all platforms
+   - assembly procedures run in parallel
+   - iterative solvers apply RHS in parallel
+ - fine multithreading removed
+   - lower level numerical operations single-threaded, avoiding contention across coarse multithreading
+ - (WIP) script interfaces updated with external direct solvers to exploit threading
 
 # Changelog
 
@@ -88,6 +91,10 @@ Aim: simplify codebase, ensuring that all code is builds and is used
   - Remove remaining MESA based functionality
   - Remove mesh reordering functionality due to LGPL license
   - Remove ILUPACK bindings
+  - Remove unused solver implementations
+  - Fix swap bug with internal Cholesky implementation, use Eigen Cholesky for forward solvers
+  - Split factorise/analyse steps in forward solver
+  - toastFields reimplemented with both MATLAB and TOAST solvers, the former used by default for direct solves
 
 # TODO
 
@@ -97,7 +104,6 @@ Aim: simplify codebase, ensuring that all code is builds and is used
  - Look at MEX config as per first item
  - Make individual libraries properly CMake with interface exports, etc. to avoid replicating includes in e.g. matlab2
  - Look at fwdsolver_mw.h instantiation requirements, determine appropriate preprocessor gaurd (e.g. Clang?)
- - Remove MESA based projection
  - MEX 64-bit update (https://uk.mathworks.com/help/matlab/matlab_external/upgrading-mex-files-to-use-64-bit-api.html)
  - MATLAB basis operations example is extremely slow in hmesh.Diaply function with two arguments
  - MATLAB gmsh reader out of date

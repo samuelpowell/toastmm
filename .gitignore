@@ -17,6 +17,9 @@ test/**/*.fem
 script/matlab/demos/*.dat
 script/matlab/demos/*.mat
 
+# Matlab autosaves
+*.asv
+
 # Notebooks
 .ipynb_checkpoints
 *.ipynb
