@@ -77,7 +77,7 @@ MATHLIB int symbolic_cholesky_factor (int dim, idxtype *rowptr, idxtype *colidx,
     int nval = rowptr[dim];
     int i, c, r, ci, ri, n, parent, newlen;
 
-    const char *swapname = "/tmp/chswap.tmp";
+    const char *swapname = "chswap.tmp";
     FILE *swap = 0; // column swap file
     int *colbuf, swap_next = 0;
 

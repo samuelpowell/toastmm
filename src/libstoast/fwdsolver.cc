@@ -44,8 +44,6 @@ template<class T>
 TFwdSolver<T>::~TFwdSolver ()
 {
     if (F)      delete F;
-    if (FL)     delete FL;
-    if (Fd)     delete Fd;
     if (B)      delete B;
     if (precon) delete precon;
     if (pphi)   delete []pphi;
@@ -66,8 +64,6 @@ void TFwdSolver<T>::Setup (int nth)
     iterative_maxit = 0;
     unwrap_phase = false;
     F  = 0;
-    FL = 0;
-    Fd = 0;
     B  = 0;
     precon = 0;
     meshptr = 0;
@@ -79,42 +75,12 @@ void TFwdSolver<T>::Setup (int nth)
 
 // =========================================================================
 
-template<>
-void TFwdSolver<std::complex<float> >::SetupType (int nth)
-{
-    //using namespace Eigen;
-    //ES = new SparseLU<SparseMatrix<std::complex<float> >, COLAMDOrdering<int> >;
-}
-
-template<>
-void TFwdSolver<std::complex<double> >::SetupType (int nth)
-{
-    //using namespace Eigen;
-    //ES = new SparseLU<SparseMatrix<std::complex<double> >, COLAMDOrdering<int> >;
-}
-
 template<class T>
 void TFwdSolver<T>::SetupType (int nth)
 {
 }
 
 // =========================================================================
-
-template<>
-void TFwdSolver<std::complex<float> >::DeleteType ()
-{
-    // if(ES) {
-    //     delete ES;
-    // }
-}
-
-template<>
-void TFwdSolver<std::complex<double> >::DeleteType ()
-{
-    // if(ES) {
-    //     delete ES;
-    // }
-}
 
 template<class T>
 void TFwdSolver<T>::DeleteType ()
@@ -167,13 +133,9 @@ void TFwdSolver<float>::Allocate ()
 
     // allocate factorisations and preconditioners
     if (solvertp == LSOLVER_DIRECT) {
-	F->SymbolicCholeskyFactorize (rowptr, colidx);
-	if (FL) delete FL;
-	FL = new FCompRowMatrix (n, n, rowptr, colidx);
-	if (Fd) delete Fd;
-	Fd = new FVector (n);
-	delete []rowptr;
-	delete []colidx;
+        using namespace Eigen;
+        Map<const SparseMatrix<float, RowMajor> > RF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr());      
+        rsolver.analyzePattern(RF); 
     } else {
 	if (precon) delete precon;
 	switch (precontp) {
@@ -200,13 +162,9 @@ void TFwdSolver<double>::Allocate ()
 
     // allocate factorisations and preconditioners
     if (solvertp == LSOLVER_DIRECT) {
-	F->SymbolicCholeskyFactorize (rowptr, colidx);
-	if (FL) delete FL;
-	FL = new RCompRowMatrix (n, n, rowptr, colidx);
-	if (Fd) delete Fd;
-	Fd = new RVector (n);
-	delete []rowptr;
-	delete []colidx;
+        using namespace Eigen;
+        Map<const SparseMatrix<double, RowMajor> > RF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr());      
+        rsolver.analyzePattern(RF); 
     } else {
 	if (precon) delete precon;
 	switch (precontp) {
@@ -233,8 +191,9 @@ void TFwdSolver<std::complex<double> >::Allocate ()
 
     // allocate factorisations and preconditioners
     if (solvertp == LSOLVER_DIRECT) {
-	//lu_data.Setup(F);
-	//((ZSuperLU*)SuperLU)->Reset (F);
+        using namespace Eigen;
+        Map<const SparseMatrix<std::complex<double>, RowMajor> > RF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr());      
+        csolver.analyzePattern(RF);         
     } else {
 	if (precon) delete precon;
 	switch (precontp) {
@@ -262,8 +221,9 @@ void TFwdSolver<std::complex<float> >::Allocate ()
 
     // allocate factorisations and preconditioners
     if (solvertp == LSOLVER_DIRECT) {
-    //    ((CSuperLU*)SuperLU)->Reset (F);
-	// lu_data.Setup(meshptr->nlen(), F);
+        using namespace Eigen;
+        Map<const SparseMatrix<std::complex<float>, RowMajor> > RF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr());      
+        csolver.analyzePattern(RF); 
     } else {
 	if (precon) delete precon;
 	switch (precontp) {
@@ -303,18 +263,6 @@ void TFwdSolver<float>::AssembleSystemMatrix (const Solution &sol,
     double *dval = FF.ValPtr();
     for (i = 0; i < nz; i++) *fval++ = (float)*dval++;
  
-#ifdef UNDEF
-    F->Zero();
-    prm = sol.GetParam (OT_CMUA);
-    AddToSysMatrix (*meshptr, *F, &prm,
-		    elbasis ? ASSEMBLE_PFF_EL:ASSEMBLE_PFF);
-    prm = sol.GetParam (OT_CKAPPA);
-    AddToSysMatrix (*meshptr, *F, &prm,
-		    elbasis ? ASSEMBLE_PDD_EL:ASSEMBLE_PDD);
-    prm = sol.GetParam (OT_C2A);
-    AddToSysMatrix (*meshptr, *F, &prm,
-		    elbasis ? ASSEMBLE_BNDPFF_EL:ASSEMBLE_BNDPFF);
-#endif
 }
 
 template<>
@@ -369,19 +317,6 @@ void TFwdSolver<std::complex<float> >::AssembleSystemMatrix (
     for (i = 0; i < nz; i++)
         sval[i] = (std::complex<float>)cval[i];
 
-#ifdef UNDEF
-    F->Zero();
-    prm = sol.GetParam (OT_CMUA);
-    AddToSysMatrix (*meshptr, *F, &prm,
-		    elbasis ? ASSEMBLE_PFF_EL:ASSEMBLE_PFF);
-    prm = sol.GetParam (OT_CKAPPA);
-    AddToSysMatrix (*meshptr, *F, &prm,
-		    elbasis ? ASSEMBLE_PDD_EL:ASSEMBLE_PDD);
-    prm = sol.GetParam (OT_C2A);
-    AddToSysMatrix (*meshptr, *F, &prm,
-    		    elbasis ? ASSEMBLE_BNDPFF_EL:ASSEMBLE_BNDPFF);
-    AddToSysMatrix (*meshptr, *F, omega, ASSEMBLE_iCFF);
-#endif
 }
 
 template<>
@@ -440,8 +375,12 @@ void TFwdSolver<float>::Reset (const Solution &sol, double omega, bool elbasis)
 {
     // real version
     AssembleSystemMatrix (sol, omega, elbasis);
-    if (solvertp == LSOLVER_DIRECT)
-	CholeskyFactorize (*F, *FL, *Fd, true);
+    if (solvertp == LSOLVER_DIRECT) {
+      using namespace Eigen;
+      Map<const SparseMatrix<float, RowMajor> > RF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr());      
+      rsolver.factorize(RF);
+      xASSERT(rsolver.info() == 0, "System matrix factorisation failed");
+    }
     else
 	precon->Reset (F);
     if (B) AssembleMassMatrix();
@@ -452,8 +391,12 @@ void TFwdSolver<double>::Reset (const Solution &sol, double omega, bool elbasis)
 {
     // real version
     AssembleSystemMatrix (sol, omega, elbasis);
-    if (solvertp == LSOLVER_DIRECT)
-	CholeskyFactorize (*F, *FL, *Fd, true);
+    if (solvertp == LSOLVER_DIRECT) {
+      using namespace Eigen;
+      Map<const SparseMatrix<double, RowMajor> > RF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr());      
+      rsolver.factorize(RF);
+      xASSERT(rsolver.info() == 0, "System matrix factorisation failed");
+    }
     else
 	precon->Reset (F);
     if (B) AssembleMassMatrix();
@@ -467,8 +410,7 @@ void TFwdSolver<std::complex<float> >::Reset (const Solution &sol,
     AssembleSystemMatrix (sol, omega, elbasis);
     if (solvertp == LSOLVER_DIRECT) {
       using namespace Eigen;
-      Map<const SparseMatrix<std::complex<float>, RowMajor> > RF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr());      
-      csolver.analyzePattern(RF);  
+      Map<const SparseMatrix<std::complex<float>, RowMajor> > RF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr());       
       csolver.factorize(RF);
       xASSERT(csolver.info() == 0, "System matrix factorisation failed");
     } else
@@ -484,8 +426,7 @@ void TFwdSolver<std::complex<double> >::Reset (const Solution &sol,
     AssembleSystemMatrix (sol, omega, elbasis);
     if (solvertp == LSOLVER_DIRECT) {
       using namespace Eigen;
-      Map<const SparseMatrix<std::complex<double>, RowMajor> > RF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr());      
-      csolver.analyzePattern(RF);  
+      Map<const SparseMatrix<std::complex<double>, RowMajor> > RF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr()); 
       csolver.factorize(RF);      
       xASSERT(csolver.info() == 0, "System matrix factorisation failed"); 
     }
@@ -501,8 +442,11 @@ void TFwdSolver<float>::CalcField (const TVector<float> &qvec,
     // calculate the (real) photon density field for a given (real)
     // source distribution. Use only if data type is INTENSITY
 
-    if (solvertp == LSOLVER_DIRECT) {
-	CholeskySolve (*FL, *Fd, qvec, phi);
+    if (solvertp == LSOLVER_DIRECT)  {
+        using namespace Eigen;
+        Map<const VectorXf> eqvec(qvec.data_buffer(), qvec.Dim());
+        Map<VectorXf> ecphi(phi.data_buffer(), phi.Dim());
+        ecphi = rsolver.solve(eqvec); 
     } else {
 	double tol = iterative_tol;
 	int it = IterativeSolve (*F, qvec, phi, tol, precon, iterative_maxit);
@@ -520,8 +464,11 @@ void TFwdSolver<double>::CalcField (const TVector<double> &qvec,
     // calculate the (real) photon density field for a given (real)
     // source distribution. Use only if data type is INTENSITY
 
-    if (solvertp == LSOLVER_DIRECT) {
-	CholeskySolve (*FL, *Fd, qvec, phi);
+    if (solvertp == LSOLVER_DIRECT)  {
+        using namespace Eigen;
+        Map<const VectorXd> eqvec(qvec.data_buffer(), qvec.Dim());
+        Map<VectorXd> ecphi(phi.data_buffer(), phi.Dim());
+        ecphi = rsolver.solve(eqvec); 
     } else {
 	double tol = iterative_tol;
 	int it = IterativeSolve (*F, qvec, phi, tol, precon, iterative_maxit);
