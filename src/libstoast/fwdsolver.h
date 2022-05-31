@@ -11,6 +11,7 @@
 #include "mathlib.h"
 
 #include "Eigen/SparseLU"
+#include "Eigen/SparseCholesky"
 
 class Solution;
 class MWsolution;
@@ -396,8 +397,6 @@ public:
     LSOLVER solvertp;       ///< linear solver type
     IterativeMethod method; ///< iterative solver method, if applicable
     TCompRowMatrix<T> *F;   ///< FEM system matrix
-    TCompRowMatrix<T> *FL;  ///< lower triangle of system matrix decomposition
-    TVector<T> *Fd;         ///< diagonal of Cholesky factorisation
     TPreconditioner<T> *precon; ///< preconditioner instance
     TCompRowMatrix<T> *B;   ///< mass matrix; only used for time-domain problems
     double iterative_tol;   ///< iterative solver tolerance
@@ -405,8 +404,9 @@ public:
     PreconType precontp;    ///< preconditioner
 
     // Eigen replacement for SuperLU
-    Eigen::SparseLU<Eigen::SparseMatrix<T>, Eigen::COLAMDOrdering<int> > csolver;
-
+    Eigen::SparseLU<Eigen::SparseMatrix<T> > csolver;
+    Eigen::SimplicialCholesky<Eigen::SparseMatrix<T> > rsolver;
+    
 protected:
     void Setup (int nth=1);
     void SetupType (int nth=1);
