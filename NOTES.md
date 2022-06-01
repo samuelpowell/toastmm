@@ -29,6 +29,7 @@ Aim: ensure multithreading where possible, but avoid contention
  - fine multithreading removed
    - lower level numerical operations single-threaded, avoiding contention across coarse multithreading
  - (WIP) script interfaces updated with external direct solvers to exploit threading
+ - CW Jacobian computation multithreaded
 
 # Changelog
 
@@ -95,6 +96,8 @@ Aim: ensure multithreading where possible, but avoid contention
   - Fix swap bug with internal Cholesky implementation, use Eigen Cholesky for forward solvers
   - Split factorise/analyse steps in forward solver
   - toastFields reimplemented with both MATLAB and TOAST solvers, the former used by default for direct solves
+  - toastJacobianCW reimplemented to use toastFields
+  - toastJacobianCW mesh integrals multithreaded, 6x speedup on 8x threads
 
 # TODO
 

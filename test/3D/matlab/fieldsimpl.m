@@ -46,4 +46,7 @@ assert(norm(x7 - x11) < 1e-8);
 assert(norm(x7 - x12) < 1e-8);
 
 
-
+[t_ml_cw_direct   t_st_cw_direct  t_au_cw_direct;
+ t_ml_cw_cg       t_st_cw_cg      t_au_cw_cg;
+ t_ml_fd_direct   t_st_fd_direct  t_au_fd_direct;
+ t_ml_fd_cg       t_st_fd_cg      t_au_fd_cg]

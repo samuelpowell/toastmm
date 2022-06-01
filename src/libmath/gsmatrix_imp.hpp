@@ -115,6 +115,8 @@ int CG (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
     dASSERT(b.Dim() == A.nRows(), "Dimension mismatch");
     dASSERT(x.Dim() == A.nRows(), "Dimension mismatch");
 
+    
+
     double dnew, dold, alpha, beta;
     double err, bnorm;
     int niter, dim = x.Dim();

@@ -134,7 +134,8 @@ void TFwdSolver<float>::Allocate ()
     // allocate factorisations and preconditioners
     if (solvertp == LSOLVER_DIRECT) {
         using namespace Eigen;
-        Map<const SparseMatrix<float, RowMajor> > RF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr());      
+        Map<const SparseMatrix<float, RowMajor> > 
+            RF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr());      
         rsolver.analyzePattern(RF); 
     } else {
 	if (precon) delete precon;
@@ -163,7 +164,8 @@ void TFwdSolver<double>::Allocate ()
     // allocate factorisations and preconditioners
     if (solvertp == LSOLVER_DIRECT) {
         using namespace Eigen;
-        Map<const SparseMatrix<double, RowMajor> > RF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr());      
+        Map<const SparseMatrix<double, RowMajor> > 
+            RF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr());      
         rsolver.analyzePattern(RF); 
     } else {
 	if (precon) delete precon;
@@ -192,7 +194,8 @@ void TFwdSolver<std::complex<double> >::Allocate ()
     // allocate factorisations and preconditioners
     if (solvertp == LSOLVER_DIRECT) {
         using namespace Eigen;
-        Map<const SparseMatrix<std::complex<double>, RowMajor> > RF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr());      
+        Map<const SparseMatrix<std::complex<double>, RowMajor> > 
+            RF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr());      
         csolver.analyzePattern(RF);         
     } else {
 	if (precon) delete precon;
@@ -222,7 +225,8 @@ void TFwdSolver<std::complex<float> >::Allocate ()
     // allocate factorisations and preconditioners
     if (solvertp == LSOLVER_DIRECT) {
         using namespace Eigen;
-        Map<const SparseMatrix<std::complex<float>, RowMajor> > RF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr());      
+        Map<const SparseMatrix<std::complex<float>, RowMajor> > 
+            RF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr());      
         csolver.analyzePattern(RF); 
     } else {
 	if (precon) delete precon;
@@ -377,7 +381,8 @@ void TFwdSolver<float>::Reset (const Solution &sol, double omega, bool elbasis)
     AssembleSystemMatrix (sol, omega, elbasis);
     if (solvertp == LSOLVER_DIRECT) {
       using namespace Eigen;
-      Map<const SparseMatrix<float, RowMajor> > RF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr());      
+      Map<const SparseMatrix<float, RowMajor> > 
+        RF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr());      
       rsolver.factorize(RF);
       xASSERT(rsolver.info() == 0, "System matrix factorisation failed");
     }
@@ -393,7 +398,8 @@ void TFwdSolver<double>::Reset (const Solution &sol, double omega, bool elbasis)
     AssembleSystemMatrix (sol, omega, elbasis);
     if (solvertp == LSOLVER_DIRECT) {
       using namespace Eigen;
-      Map<const SparseMatrix<double, RowMajor> > RF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr());      
+      Map<const SparseMatrix<double, RowMajor> > 
+        RF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr());      
       rsolver.factorize(RF);
       xASSERT(rsolver.info() == 0, "System matrix factorisation failed");
     }
@@ -410,7 +416,8 @@ void TFwdSolver<std::complex<float> >::Reset (const Solution &sol,
     AssembleSystemMatrix (sol, omega, elbasis);
     if (solvertp == LSOLVER_DIRECT) {
       using namespace Eigen;
-      Map<const SparseMatrix<std::complex<float>, RowMajor> > RF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr());       
+      Map<const SparseMatrix<std::complex<float>, RowMajor> > 
+        RF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr());       
       csolver.factorize(RF);
       xASSERT(csolver.info() == 0, "System matrix factorisation failed");
     } else
@@ -426,7 +433,8 @@ void TFwdSolver<std::complex<double> >::Reset (const Solution &sol,
     AssembleSystemMatrix (sol, omega, elbasis);
     if (solvertp == LSOLVER_DIRECT) {
       using namespace Eigen;
-      Map<const SparseMatrix<std::complex<double>, RowMajor> > RF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr()); 
+      Map<const SparseMatrix<std::complex<double>, RowMajor> > 
+        RF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr()); 
       csolver.factorize(RF);      
       xASSERT(csolver.info() == 0, "System matrix factorisation failed"); 
     }
