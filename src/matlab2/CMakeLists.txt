@@ -16,6 +16,8 @@ if(Matlab_FOUND)
                                   mtJacobian.cc mtRegul.cc toastlbfgs.cc mtSysmat_basis.cc
                                   matlabfdot.cc mtProjector.cc )
 
+  target_compile_options(toastmex PRIVATE largeArrayDims)                                    
+  
   target_include_directories(toastmex PRIVATE Matlab_INCLUDE_DIRS)                                        
   target_include_directories(toastmex PRIVATE ../../include)    # For blasnames, toastdef, arch
 
