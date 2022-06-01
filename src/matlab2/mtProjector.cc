@@ -87,7 +87,7 @@ void MatlabFDOT::MakeProjectorList (int nlhs, mxArray *plhs[],
 
     // additional parameters from key/value list
     if (nrhs > 4 && mxIsCell (prhs[4])) {
-	int prm, nprm = mxGetM(prhs[4])*mxGetN(prhs[4]);
+	int prm, nprm = (int) (mxGetM(prhs[4])*mxGetN(prhs[4]));
 	char cbuf[256];
 	for (prm = 0; prm < nprm; prm += 2) {
 	    mxArray *field = mxGetCell (prhs[4], prm);

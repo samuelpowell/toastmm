@@ -260,7 +260,7 @@ void MatlabToast::ElMat (int nlhs, mxArray *plhs[], int nrhs,
 	    for (k = 0; k < nnd; k++)
 		for (j = 0; j < dim; j++)
 		    for (i = 0; i < nnd; i++)
-			*pr++ = intdd(i*dim+j,k*dim+l);
+			*pr++ = intdd(i*((int)dim)+j, k*((int)dim)+l);
 
     } else if (!strcmp(cbuf, "Fdd")) {
 	mwSize dims[5] = {nnd, nnd, dim, nnd, dim};
@@ -281,7 +281,7 @@ void MatlabToast::ElMat (int nlhs, mxArray *plhs[], int nrhs,
 	pr = mxGetPr(elmat);
 	for (j = 0; j < dim; j++)
 	    for (i = 0; i < nnd; i++)
-		*pr++ = pel->IntPd(prm, i, k);
+		*pr++ = pel->IntPd(prm, i, j);
 	
     } else if (!strcmp(cbuf, "Pdd")) {
 	RVector prm;
@@ -395,7 +395,7 @@ void MatlabToast::ShapeFunc (int nlhs, mxArray *plhs[], int nrhs,
 
     // evaluation points
     const mwSize *gdim = mxGetDimensions (prhs[2]);
-    int npoint = gdim[1];
+    int npoint = (int) gdim[1];
     ASSERTARG(gdim[0] == dim, 1, "Invalid point dimensions");
 
     mxArray *sf = mxCreateDoubleMatrix (nn, npoint, mxREAL);
@@ -455,7 +455,7 @@ void MatlabToast::ShapeGrad (int nlhs, mxArray *plhs[], int nrhs,
         mxDOUBLE_CLASS, mxREAL);
     double *pgrad = mxGetPr (sg);
 
-    Point pt(dim);
+    Point pt((int) dim);
     for (k = 0; k < npoint; k++) {
         for (j = 0; j < dim; j++)
 	    pt[j] = ppt[k + j*npoint];

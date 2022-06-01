@@ -361,7 +361,7 @@ void MatlabToast::WriteNIM (int nlhs, mxArray *plhs[], int nrhs,
 
     ofs << "SolutionType = N/A" << endl;
     
-    int n = mxGetN(prhs[2]) * mxGetM(prhs[2]);
+    int n = (int) (mxGetN(prhs[2]) * mxGetM(prhs[2]));
     ofs << "ImageSize = " << n << endl;
 
     ofs << "EndHeader" << endl;
@@ -810,12 +810,21 @@ void MatlabToast::ReadVector (int nlhs, mxArray *plhs[], int nrhs,
 
     if (cok) {
 	plhs[0] = mxCreateDoubleMatrix (cdata.Dim(), 1, mxCOMPLEX);
+    #if MX_HAS_INTERLEAVED_COMPLEX
+    mxComplexDouble *pc = mxGetComplexDoubles(plhs[0]);
+    #else
 	double *pr = mxGetPr (plhs[0]);
 	double *pi = mxGetPi (plhs[0]);
+    #endif
 	std::complex<double> *buf = cdata.data_buffer();
 	for (int i = 0; i < cdata.Dim(); i++) {
-	    pr[i] = buf[i].real();
+        #if MX_HAS_INTERLEAVED_COMPLEX
+	    pc[i].real = buf[i].real();
+        pc[i].imag = buf[i].imag();
+        #else
+        pr[i] = buf[i].real();
 	    pi[i] = buf[i].imag();
+        #endif
 	}
 	    
     } else if (rok) {
@@ -932,8 +941,8 @@ RCompRowMatrix BuildRHessian (Regularisation *reg, const RVector &x,
 void MatlabToast::Krylov (int nlhs, mxArray *plhs[], int nrhs,
     const mxArray *prhs[])
 {
-    mwSize m = mxGetM (prhs[1]);
-    mwSize n = mxGetN (prhs[1]);
+    int m = (int) mxGetM (prhs[1]);
+    int n = (int) mxGetN (prhs[1]);
 
     // copy current solution
     RVector x(n);

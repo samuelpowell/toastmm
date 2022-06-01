@@ -212,7 +212,7 @@ RCompRowMatrix *Raster_Pixel2::CreateBuv_tet4 () const
 			pel->GContains(Point3D(xmax,ymin,zmax),false) &&
 			pel->GContains(Point3D(xmin,ymax,zmax),false) &&
 			pel->GContains(Point3D(xmax,ymax,zmax),false)) {
-			int reg = (i-imin) + (j-jmin) << 10 + (k-kmin) << 20;
+			int reg = (i-imin) + ((j-jmin) << 10) + ((k-kmin) << 20);
 			for (m = 0; m < submesh.elen_used; m++)
 			    if (submesh.elist[m]->Region() == reg)
 				submesh.elist[m]->SetRegion(-1); // mark disabled

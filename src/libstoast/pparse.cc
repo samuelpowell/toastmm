@@ -59,7 +59,7 @@ void ParamParser::Lineout (const char *str)
 bool ParamParser::GetString (const char *cat, char *str)
 {
     char cbuf[256];
-    int i, ok, lcat = strlen(cat);
+    int i, ok, lcat = (int) strlen(cat);
     
     if (!bfile) return false;
     prmf.clear();

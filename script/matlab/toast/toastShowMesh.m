@@ -44,6 +44,9 @@ showcolorbar = false;
 if nargin > 1
     showcolorbar = true;
     vtxdata = double(vtxdata);
+    if size(vtx,1) ~= length(vtxdata)
+      error('Vertex data does not match number of vertices in mesh');
+    end
     showsurfdata = true;
     showgrid = false;
     if dim == 3
