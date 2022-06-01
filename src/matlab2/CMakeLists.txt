@@ -35,8 +35,8 @@ if(Matlab_FOUND)
 
   # Install the output dynamic library
   install(TARGETS toastmex
-          LIBRARY DESTINATION matlab/toast2
-          RUNTIME DESTINATION matlab/toast2)
+          LIBRARY DESTINATION matlab/toast
+          RUNTIME DESTINATION matlab/toast)
 
   # Install associated driver scripts, documentation, etc.
   install(DIRECTORY ${CMAKE_SOURCE_DIR}/script/matlab DESTINATION ${CMAKE_INSTALL_PREFIX})                
