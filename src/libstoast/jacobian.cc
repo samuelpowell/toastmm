@@ -735,6 +735,82 @@ void GenerateJacobian_cw_grid (const Raster *raster, const QMMesh *mesh,
 // This computes a 'raw' Jacobian dy/dx without any data or parameter scaling
 // (y: cw intensity, x: mua and/or kappa)
 
+#if TOAST_THREAD
+
+struct GENJAC_CW_MESH_THREADDATA {
+    const QMMesh *mesh;
+    const RVector *dphi;
+    const RVector *aphi;
+    RDenseMatrix *Jmua;
+    RDenseMatrix *Jkap;
+	int nsol;
+	bool elbasis;
+};
+
+void GenerateJacobian_cw_mesh_engine (task_data *td)
+{
+    int itask = td->proc;
+    int ntask = td->np;
+    GENJAC_CW_MESH_THREADDATA *thdata = (GENJAC_CW_MESH_THREADDATA*)td->data;
+    int nq  = thdata->mesh->nQ;
+    int nm  = thdata->mesh->nM;
+    int q0  = (itask*nq)/ntask;
+    int q1  = ((itask+1)*nq)/ntask;    
+	int nsol = thdata->nsol;
+	bool elbasis = thdata->elbasis;
+	const QMMesh *mesh = thdata->mesh;
+    int nM = mesh->nM;
+
+	double *Jmua_ptr = 0;
+    double *Jkap_ptr = 0;
+
+	if (thdata->Jmua) {
+		Jmua_ptr = thdata->Jmua->ValPtr()+thdata->mesh->Qofs[q0]*nsol;
+    }
+
+    if (thdata->Jkap) {
+		Jkap_ptr = thdata->Jkap->ValPtr()+thdata->mesh->Qofs[q0]*nsol;
+    }
+
+    RVector pmdf (nsol);
+
+    for (int i = q0; i < q1; i++) {
+
+		// loop over detectors
+		for (int j = 0; j < nM; j++) {
+
+			if (!mesh->Connected (i,j)) continue;
+
+			// absorption component
+			if (thdata->Jmua) {
+			if (elbasis)
+				pmdf = -IntFG_el (*mesh, thdata->dphi[i], thdata->aphi[j]);
+			else
+				pmdf = -IntFG (*mesh, thdata->dphi[i], thdata->aphi[j]);
+			
+			// copy into Jacobian
+			memcpy (Jmua_ptr, pmdf.data_buffer(), nsol*sizeof(double));
+			Jmua_ptr += nsol;
+			}
+
+			// diffusion component
+			if (thdata->Jkap) {
+			if (elbasis)
+				pmdf = -IntGradFGradG_el (*mesh, thdata->dphi[i], thdata->aphi[j]);
+			else
+				pmdf = -IntGradFGradG (*mesh, thdata->dphi[i], thdata->aphi[j]);
+
+			// copy into Jacobian
+			memcpy (Jkap_ptr, pmdf.data_buffer(), nsol*sizeof(double));
+			Jkap_ptr += nsol;
+			}
+		}
+    }
+}
+
+#endif // TOAST_THREAD
+
+
 void GenerateJacobian_cw_mesh (const QMMesh *mesh,
     const RVector *dphi, const RVector *aphi,
     RDenseMatrix *Jmua, RDenseMatrix *Jkap, bool elbasis)
@@ -743,12 +819,11 @@ void GenerateJacobian_cw_mesh (const QMMesh *mesh,
 	std::cout << "--> Basis...........Mesh ("
 		  << (elbasis ? "elements":"nodal") << ')' << std::endl;
 
-    int i, j, n, nsol, nQ, nM, nQM;
-    n    = mesh->nlen();
-    nQ   = mesh->nQ;
-    nM   = mesh->nM;
-    nQM  = mesh->nQM;
-    nsol = (elbasis ? mesh->elen() : n);
+    int n    = mesh->nlen();
+    int nQ   = mesh->nQ;
+    int nM   = mesh->nM;
+    int nQM  = mesh->nQM;
+    int nsol = (elbasis ? mesh->elen() : n);
 
     RVector pmdf (nsol);
 
@@ -767,10 +842,24 @@ void GenerateJacobian_cw_mesh (const QMMesh *mesh,
 	if (elbasis && !mesh->nbhrs)
 		mesh->SetupNeighbourList();
 
-    for (i = 0; i < nQ; i++) {
+
+#if TOAST_THREAD
+    int nqm  = mesh->nQM;
+    static GENJAC_CW_MESH_THREADDATA thdata;
+    thdata.mesh   = mesh;
+    thdata.dphi   = dphi;
+    thdata.aphi   = aphi;
+    thdata.Jmua   = Jmua;
+    thdata.Jkap   = Jkap;
+	thdata.nsol   = nsol;
+	thdata.elbasis = elbasis;
+    Task::Multiprocess (GenerateJacobian_cw_mesh_engine, &thdata);
+#else		
+
+    for (int i = 0; i < nQ; i++) {
 
 	// loop over detectors
-	for (j = 0; j < nM; j++) {
+	for (int j = 0; j < nM; j++) {
 
 	    if (!mesh->Connected (i,j)) continue;
 
@@ -799,6 +888,8 @@ void GenerateJacobian_cw_mesh (const QMMesh *mesh,
 	    }
 	}
     }
+
+#endif // TOAST_THREAD
 }
 
 // ============================================================================

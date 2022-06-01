@@ -25,9 +25,13 @@ void CalcJacobian (QMMesh *mesh, Raster *raster,
     double freq, char *solver, double tol, mxArray **res);
 
 void CalcJacobianCW (QMMesh *mesh, Raster *raster,
+    const RVector *dphi, const RVector *aphi,
+    const RVector *proj, DataScale dscale, mxArray **res);
+
+void CalcJacobianCW (QMMesh *mesh, Raster *raster,
     const RCompRowMatrix &qvec, const RCompRowMatrix &mvec,
     const RVector &mua, const RVector &mus, const RVector &ref,
-    char *solver, double tol, mxArray **res);
+    char *solver, double tol, mxArray **res);     
 
 // =========================================================================
 // Matlab interface
@@ -148,38 +152,87 @@ void MatlabToast::JacobianCW (int nlhs, mxArray *plhs[], int nrhs,
     // mesh
     QMMesh *mesh = (QMMesh*)GetMesh(prhs[0]);
     ASSERTARG(mesh, 1, "Mesh not found");
-    int n = mesh->nlen();
+
+    int n   = mesh->nlen();
+    int nq  = mesh->nQ;
+    int nm  = mesh->nM;
+    int nqm = mesh->nQM;
 
     // raster
     Raster *raster = GetBasis(prhs[1], 0, true);
 
-    // source vectors
-    RCompRowMatrix qvec;
-    CopyTMatrix (qvec, prhs[2]);
+    if (nrhs == 5) {
 
-    // measurement vectors
-    RCompRowMatrix mvec;
-    CopyTMatrix (mvec, prhs[3]);
-    
-    // bounds check on optical parameters
-    ASSERTARG(mxGetM(prhs[4]) == n, 5, "Unexpected size");
-    ASSERTARG(mxGetM(prhs[5]) == n, 6, "Unexpected size");
-    ASSERTARG(mxGetM(prhs[6]) == n, 7, "Unexpected size");
-
-    // nodal optical parameters
-    RVector mua (n, mxGetPr (prhs[4]));
-    RVector mus (n, mxGetPr (prhs[5]));
-    RVector ref (n, mxGetPr (prhs[6]));
-    
-    
-    // linear solver parameters
-    char solver[128];
-    double tol = 1e-10;
-    mxGetString (prhs[7], solver, 128);
-    if (nrhs >= 9) tol = mxGetScalar (prhs[8]);
+    // compute jacobian from fields and projection data       
+	int i, j;
+	double *pr;
 	
-    CalcJacobianCW (mesh, raster, qvec, mvec, mua, mus, ref,
-		  solver, tol, &plhs[0]);
+	// copy fields
+	const mxArray *mx_dphi = prhs[2];
+	ASSERTARG(mxGetM(mx_dphi) == n, 3, "Unexpected number of rows");
+	ASSERTARG(mxGetN(mx_dphi) == nq, 3, "Unexpected number of columns");
+	pr  = mxGetPr (mx_dphi);
+	RVector *dphi = new RVector[nq];
+	for (i = 0; i < nq; i++) {
+	    dphi[i].New (n);
+	    double *v = dphi[i].data_buffer();
+	    for (j = 0; j < n; j++) {
+	        *v++ = *pr++;
+        }
+	}
+	// copy adjoint fields
+	const mxArray *mx_aphi = prhs[3];
+	ASSERTARG(mxGetM(mx_aphi) == n, 4, "Unexpected number of rows");
+	ASSERTARG(mxGetN(mx_aphi) == nm, 4, "Unexpected number of columns");
+	pr = mxGetPr (mx_aphi);
+	RVector *aphi = new RVector[nm];
+	for (i = 0; i < nm; i++) {
+	    aphi[i].New (n);
+	    double *v = aphi[i].data_buffer();
+	    for (j = 0; j < n; j++) {
+	        *v++ = *pr++;
+        }
+	}
+	// copy projections
+	const mxArray *mx_proj = prhs[4];
+	ASSERTARG(mxGetM(mx_proj)*mxGetN(mx_proj) == nqm, 5,"Unexpected size");
+	RVector proj(nqm);
+	pr = mxGetPr (mx_proj);
+	double *v = proj.data_buffer();
+	for (i = 0; i < nqm; i++)
+	    *v++ = *pr++;
+
+    CalcJacobianCW (mesh, raster, dphi, aphi, &proj, DATA_LOG, &plhs[0]);
+    
+    } else {
+
+        // source vectors
+        RCompRowMatrix qvec;
+        CopyTMatrix (qvec, prhs[2]);
+
+        // measurement vectors
+        RCompRowMatrix mvec;
+        CopyTMatrix (mvec, prhs[3]);
+        
+        // bounds check on optical parameters
+        ASSERTARG(mxGetM(prhs[4]) == n, 5, "Unexpected size");
+        ASSERTARG(mxGetM(prhs[5]) == n, 6, "Unexpected size");
+        ASSERTARG(mxGetM(prhs[6]) == n, 7, "Unexpected size");
+
+        // nodal optical parameters
+        RVector mua (n, mxGetPr (prhs[4]));
+        RVector mus (n, mxGetPr (prhs[5]));
+        RVector ref (n, mxGetPr (prhs[6]));
+        
+        
+        // linear solver parameters
+        char solver[128];
+        double tol = 1e-10;
+        mxGetString (prhs[7], solver, 128);
+        if (nrhs >= 9) tol = mxGetScalar (prhs[8]);
+        
+        CalcJacobianCW (mesh, raster, qvec, mvec, mua, mus, ref, solver, tol, &plhs[0]);
+    }
 }
 
 
@@ -202,13 +255,7 @@ void CalcJacobian (QMMesh *mesh, Raster *raster,
     nprm = slen * 2;
 
     RDenseMatrix J(ndat,nprm);
-
-    ofstream ofs("dbg_m.dat");
-    ofs << dphi[0] << endl;
-    ofs.close();
-
     GenerateJacobian (raster, mesh, dphi, aphi, proj, dscale, J);
-
     CopyMatrix (res, J);
 }
 
@@ -343,3 +390,22 @@ void CalcJacobianCW (QMMesh *mesh, Raster *raster,
 
     CopyMatrix (res, J);
 }                                                                              
+
+// ==========================================================================
+// Calculate CW Jacobian from given direct and adjoint fields and boundary
+// projection data
+
+
+void CalcJacobianCW (QMMesh *mesh, Raster *raster,
+    const RVector *dphi, const RVector *aphi,
+    const RVector *proj, DataScale dscale, mxArray **res)
+{
+    int nQM  = mesh->nQM;
+    int slen = (raster ? raster->SLen() : mesh->nlen());
+    int ndat = nQM;
+    int nprm = slen;
+
+    RDenseMatrix J(ndat,nprm);
+    GenerateJacobian_cw (raster, mesh, dphi, aphi, proj, DATA_LOG, &J);
+    CopyMatrix (res, J);
+}

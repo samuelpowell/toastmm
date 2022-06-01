@@ -410,6 +410,8 @@ void MatlabToast::Regul (int nlhs, mxArray *plhs[], int nrhs,
 	return;
 	
     }
+
+	mexLock();
     
     plhs[0] = mxCreateNumericMatrix (1,1, mxUINT64_CLASS, mxREAL);
     uint64_T *ptr = (uint64_T*)mxGetData (plhs[0]);
@@ -427,6 +429,8 @@ void MatlabToast::ClearRegul (int nlhs, mxArray *plhs[], int nrhs,
     delete reg;
     if (verbosity >= 1)
         mexPrintf ("<Regularisation object deleted>\n");
+
+	mexUnlock();
 }
 
 // =========================================================================
