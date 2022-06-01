@@ -197,10 +197,9 @@ void CreateBuv_tri_pass2_engine (task_data *td)
 
 RCompRowMatrix *Raster_Pixel2::CreateBuv_tri () const
 {
-    int i, j, k, r, m, el, nel = meshptr->elen(), n = meshptr->nlen();
-    int ii, jj, idx_i, idx_j;
+    int i, j, k, r, el, nel = meshptr->elen(), n = meshptr->nlen();
     int imin, imax, jmin, jmax;
-    double b, djac;
+
 
     double xrange = bbmax[0]-bbmin[0];
     double yrange = bbmax[1]-bbmin[1];
