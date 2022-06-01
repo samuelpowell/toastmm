@@ -260,7 +260,7 @@ void MatlabToast::ElMat (int nlhs, mxArray *plhs[], int nrhs,
 	    for (k = 0; k < nnd; k++)
 		for (j = 0; j < dim; j++)
 		    for (i = 0; i < nnd; i++)
-			*pr++ = intdd(i*dim+j,k*dim+l);
+			*pr++ = intdd(i*((int)dim)+j, k*((int)dim)+l);
 
     } else if (!strcmp(cbuf, "Fdd")) {
 	mwSize dims[5] = {nnd, nnd, dim, nnd, dim};
@@ -281,7 +281,7 @@ void MatlabToast::ElMat (int nlhs, mxArray *plhs[], int nrhs,
 	pr = mxGetPr(elmat);
 	for (j = 0; j < dim; j++)
 	    for (i = 0; i < nnd; i++)
-		*pr++ = pel->IntPd(prm, i, k);
+		*pr++ = pel->IntPd(prm, i, j);
 	
     } else if (!strcmp(cbuf, "Pdd")) {
 	RVector prm;
