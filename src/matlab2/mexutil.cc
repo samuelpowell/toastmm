@@ -42,13 +42,22 @@ void CopyVector (mxArray **array, const CVector &vec, VectorOrientation vo)
     // note: these seem transposed, but produce correct result
     if (vo==ROWVEC) tmp = mxCreateDoubleMatrix (1, m, mxCOMPLEX);
     else            tmp = mxCreateDoubleMatrix (m, 1, mxCOMPLEX);
-    double *pr = mxGetPr (tmp);
-    double *pi = mxGetPi (tmp);
 
-    for (i = 0; i < m; i++) {
-        pr[i] = vec[i].real();
-	pi[i] = vec[i].imag();
-    }
+     #if MX_HAS_INTERLEAVED_COMPLEX
+        mxComplexDouble *pc = mxGetComplexDoubles(tmp);
+        for(i = 0; i < m; i++) {
+           pc[i].real = vec[i].real();
+           pc[i].imag = vec[i].imag();
+        }
+    #else
+        double *pr = mxGetPr (tmp);
+        double *pi = mxGetPi (tmp);
+
+        for (i = 0; i < m; i++) {
+            pr[i] = vec[i].real();
+            pi[i] = vec[i].imag();
+        }
+    #endif
 
     *array = tmp;
 }
@@ -102,15 +111,30 @@ void CopyMatrix (mxArray **array, const CDenseMatrix &mat)
     int i, j, idx;
 
     mxArray *tmp = mxCreateDoubleMatrix (m, n, mxCOMPLEX);
+
+    #if MX_HAS_INTERLEAVED_COMPLEX
+
+        mxComplexDouble *pc = mxGetComplexDoubles(tmp);
+        for (j = idx = 0; j < n; j++) {
+            for (i = 0; i < m; i++) { 
+                pc[idx].real = mat(i,j).real();
+                pc[idx].imag = mat(i,j).imag();
+            }
+        }
+
+    #else
+
     double *pr = mxGetPr (tmp);
     double *pi = mxGetPi (tmp);
-
-    for (j = idx = 0; j < n; j++)
+    for (j = idx = 0; j < n; j++) {
       for (i = 0; i < m; i++) {
-	pr[idx] = mat(i,j).real();
-	pi[idx] = mat(i,j).imag();
-	idx++;
+	    pr[idx] = mat(i,j).real();
+	    pi[idx] = mat(i,j).imag();
+	    idx++;
       }
+    }
+
+    #endif
 
     *array = tmp;
 }
@@ -174,8 +198,13 @@ void CopyMatrix (mxArray **array, const CCompRowMatrix &mat)
     for (i = 0; i < n; i++) rcount[i] = 0;
     for (i = 0; i < nz; i++) rcount[colidx[i]]++;
 
+    #if MX_HAS_INTERLEAVED_COMPLEX
+    mxComplexDouble *pc = mxGetComplexDoubles(tmp);
+    #else
     double  *pr = mxGetPr(tmp);
     double  *pi = mxGetPi(tmp);
+    #endif
+
     mwIndex *ir = mxGetIr(tmp);
     mwIndex *jc = mxGetJc(tmp);
 
@@ -188,8 +217,14 @@ void CopyMatrix (mxArray **array, const CCompRowMatrix &mat)
 	    j = colidx[k];
 	    idx = jc[j]+rcount[j];
 	    ir[idx] = i;
-	    pr[idx] = pval[k].real();
+        #if MX_HAS_INTERLEAVED_COMPLEX
+        pc[idx].real = pval[k].real();
+        pc[idx].imag = pval[k].imag();
+        #else
+        pr[idx] = pval[k].real();
 	    pi[idx] = pval[k].imag();
+        #endif
+        
 	    rcount[j]++;	
 	}
     delete []rcount;
@@ -229,8 +264,12 @@ void CopyMatrix (mxArray **array, const CSymCompRowMatrix &mat)
 
     mxArray *tmp = mxCreateSparse (m, n, nz, mxCOMPLEX);
 
+    #if MX_HAS_INTERLEAVED_COMPLEX
+    mxComplexDouble *pc = mxGetComplexDoubles(tmp);
+    #else
     double  *pr = mxGetPr(tmp);
     double  *pi = mxGetPi(tmp);
+    #endif
     mwIndex *ir = mxGetIr(tmp);
     mwIndex *jc = mxGetJc(tmp);
 
@@ -243,15 +282,27 @@ void CopyMatrix (mxArray **array, const CSymCompRowMatrix &mat)
 	    j = colidx[k];
 	    idx = jc[j]+rcount[j];
 	    ir[idx] = i;
-	    pr[idx] = pval[k].real();
+
+        #if MX_HAS_INTERLEAVED_COMPLEX
+        pc[idx].real = pval[k].real();
+        pc[idx].imag = pval[k].imag();
+        #else
+        pr[idx] = pval[k].real();
 	    pi[idx] = pval[k].imag();
+        #endif
+
 	    rcount[j]++;
 
 	    if (j < i) { // off-diagonal element: transpose
 		idx = jc[i]+rcount[i];
 		ir[idx] = j;
-		pr[idx] = pval[k].real();
-		pi[idx] = pval[k].imag();
+        #if MX_HAS_INTERLEAVED_COMPLEX
+        pc[idx].real = pval[k].real();
+        pc[idx].imag = pval[k].imag();
+        #else
+        pr[idx] = pval[k].real();
+	    pi[idx] = pval[k].imag();
+        #endif
 		rcount[i]++;
 	    }
 	}
@@ -294,15 +345,24 @@ void CopyTMatrix (mxArray **array, const CCompRowMatrix &mat)
     int nz = rowptr[n];
 
     mxArray *tmp = mxCreateSparse (m, n, nz, mxCOMPLEX);
+    #if MX_HAS_INTERLEAVED_COMPLEX
+    mxComplexDouble *pc = mxGetComplexDoubles(tmp);
+    #else
     double  *pr = mxGetPr (tmp);
     double  *pi = mxGetPi (tmp);
+    #endif
     mwIndex *ir = mxGetIr (tmp);
     mwIndex *jc = mxGetJc (tmp);
 
     for (i = 0; i < nz; i++) {
+        #if MX_HAS_INTERLEAVED_COMPLEX
+        pc[i].real = pval[i].real();
+        pc[i].imag = pval[i].imag();
+        #else
         pr[i] = pval[i].real();
-	pi[i] = pval[i].imag();
-	ir[i] = colidx[i];
+	    pi[i] = pval[i].imag();
+        #endif
+	    ir[i] = colidx[i];
     }
     for (i = 0; i <= n; i++)
 	jc[i] = rowptr[i];
@@ -360,14 +420,22 @@ void CopyVector (CVector &vec, const mxArray *array)
     mwIndex m = mxGetM(array);
     mwIndex n = mxGetN(array);
     mwIndex d = m*n;
+    #if MX_HAS_INTERLEAVED_COMPLEX
+    mxComplexDouble *pc = mxGetComplexDoubles(array);
+    #else
     double *pr = mxGetPr (array);
     double *pi = mxGetPi (array);
- 
+    #endif
+
     vec.New((int)d);
     std::complex<double> *val = vec.data_buffer();
    
     for (mwIndex i = 0; i < d; i++)
+        #if MX_HAS_INTERLEAVED_COMPLEX
+        val[i] = std::complex<double> (pc[i].real, pc[i].imag);
+        #else
         val[i] = std::complex<double> (pr[i], pi[i]);
+        #endif
 }
 
 
@@ -436,11 +504,14 @@ void CopyTMatrix (CCompRowMatrix &mat, const mxArray *array)
     mwIndex m   = mxGetDimensions (array)[0];
     mwIndex n   = mxGetDimensions (array)[1];
     mwIndex nz  = mxGetNzmax (array);
+    #if MX_HAS_INTERLEAVED_COMPLEX
+    mxComplexDouble *pc = mxGetComplexDoubles(array);
+    #else
     double *pr  = mxGetPr (array);
     double *pi  = mxGetPi (array);
+    #endif
     int *rowptr, *colidx;
 
-#ifdef INDEX64
     mwIndex i;
     mwIndex *ir = mxGetIr (array);
     mwIndex *jc = mxGetJc (array);
@@ -448,23 +519,21 @@ void CopyTMatrix (CCompRowMatrix &mat, const mxArray *array)
     colidx = new int[nz];
     for (i = 0; i <= n; i++) rowptr[i] = (int)jc[i];
     for (i = 0; i < nz; i++) colidx[i] = (int)ir[i];
-#else
-    rowptr = mxGetJc (array);
-    colidx = mxGetIr (array);
-#endif
 
     std::complex<double> *val = new std::complex<double>[nz];
-    for (mwIndex i = 0; i < nz; i++)
+    for (mwIndex i = 0; i < nz; i++) {
+        #if MX_HAS_INTERLEAVED_COMPLEX
+        val[i] = std::complex<double> (pc[i].real, pc[i].imag);
+        #else
         val[i] = std::complex<double> (pr[i], pi[i]);
+        #endif
+    }
 
     mat.New ((int)n, (int)m);
     mat.Initialise (rowptr, colidx, val);
 
     delete []val;
-#ifdef INDEX64
-    delete []rowptr;
-    delete []colidx;
-#endif
+
 }
 
 // ============================================================================
@@ -481,7 +550,6 @@ void CopyTMatrix (RCompRowMatrix &mat, const mxArray *array)
     double *pr  = mxGetPr (array);
     int *rowptr, *colidx;
 
-#ifdef INDEX64
     mwIndex i;
     mwIndex *ir = mxGetIr (array);
     mwIndex *jc = mxGetJc (array);
@@ -489,10 +557,6 @@ void CopyTMatrix (RCompRowMatrix &mat, const mxArray *array)
     colidx = new int[nz];
     for (i = 0; i <= n; i++) rowptr[i] = (int)jc[i];
     for (i = 0; i < nz; i++) colidx[i] = (int)ir[i];
-#else
-    rowptr = mxGetJc (array);
-    colidx = mxGetIr (array);
-#endif
 
     double *val = new double[nz];
     for (mwIndex i = 0; i < nz; i++) {
@@ -521,60 +585,3 @@ void xAssert (bool cond, char *msg) {
     if (!cond) mexErrMsgTxt (msg);
 }
 
-
-// ============================================================================
-// ============================================================================
-// Misc. mex utility functions
-
-// ============================================================================
-// waitbar functions
-
-static struct {
-    mwSize ndim, dims[2];
-    int flag;
-    int range, d;
-    mxArray *pmx1[1];
-    mxArray *pmx2[2];
-    mxArray *pmx3[1];
-    mxArray *pmx4[1];
-    double *pmx2_0;
-    double *pmx3_0;
-} waitbar = {0, {0,0}, 0, 0, 0};
-
-void mxOpenWaitbar (char *s, int range)
-{
-    if (waitbar.flag < 1) {
-	waitbar.flag++;
-	waitbar.range = range;
-	waitbar.d = std::max(1,waitbar.range/50); // granularity
-	waitbar.ndim = 2; waitbar.dims[0] = 1; waitbar.dims[1] = 1;
-	waitbar.pmx2[0] = mxCreateNumericArray(waitbar.ndim,waitbar.dims,mxUINT16_CLASS,mxREAL);
-	waitbar.pmx2_0 = mxGetPr(waitbar.pmx2[0]);
-	*waitbar.pmx2_0 = 0;
-	waitbar.ndim = 2; waitbar.dims[0] = 1; waitbar.dims[1] = 1;
-	waitbar.pmx3[0] = mxCreateNumericArray(waitbar.ndim,waitbar.dims,mxDOUBLE_CLASS,mxREAL);
-	waitbar.pmx3_0 = mxGetPr(waitbar.pmx3[0]);
-	waitbar.pmx2[1] = mxCreateString(s);
-	mexCallMATLAB(1,waitbar.pmx1,2,waitbar.pmx2,"waitbar");
-    }
-}
-
-void mxUpdateWaitbar (int i)
-{
-    double x;
-    if (waitbar.flag > 0) {
-	if ((i%waitbar.d) == 0) {
-	    x = (double)(i+1)/waitbar.range;
-	    *waitbar.pmx3_0 = x;
-	    mexCallMATLAB(0,waitbar.pmx4,1,waitbar.pmx3,"waitbar");
-	}
-    }
-}
-
-void mxCloseWaitbar ()
-{
-    if (waitbar.flag > 0) {
-	mexCallMATLAB (0, waitbar.pmx4, 1, waitbar.pmx1, "close");
-	waitbar.flag = 0;
-    }
-}

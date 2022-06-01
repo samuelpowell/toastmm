@@ -98,13 +98,13 @@ Aim: ensure multithreading where possible, but avoid contention
   - toastFields reimplemented with both MATLAB and TOAST solvers, the former used by default for direct solves
   - toastJacobianCW reimplemented to use toastFields
   - toastJacobianCW mesh integrals multithreaded, 6x speedup on 8x threads
+  - Update MEX interface to interleaved complex (>R2018a) format with runtime improvements
 
 # TODO
 
  - Check Makefile / Xcode projects configuration for shared library flags, e.g. -fPIC required on Linux. Consider `FLAGS`, `SHLIB_CFLAGS`
  - Look at building static libraries for intermediary components
  - Investigate `warning C4910` on MSVC - some declspec conflict
- - Look at MEX config as per first item
  - Make individual libraries properly CMake with interface exports, etc. to avoid replicating includes in e.g. matlab2
  - Look at fwdsolver_mw.h instantiation requirements, determine appropriate preprocessor gaurd (e.g. Clang?)
  - MEX 64-bit update (https://uk.mathworks.com/help/matlab/matlab_external/upgrading-mex-files-to-use-64-bit-api.html)

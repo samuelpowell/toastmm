@@ -9,15 +9,13 @@ if(Matlab_FOUND)
 
   message(STATUS "MATLAB located, toast MATLAB interface will be built")
 
-  matlab_add_mex(NAME toastmex    SHARED R2017b
+  matlab_add_mex(NAME toastmex    SHARED R2018a 
                                   SRC toastmex.cc 
                                   matlabtoast.cc mexutil.cc util.cc 
                                   mtMesh.cc mtElement.cc mtQMvec.cc mtBasis.cc mtField.cc mtGradient.cc
                                   mtJacobian.cc mtRegul.cc toastlbfgs.cc mtSysmat_basis.cc
-                                  matlabfdot.cc mtProjector.cc )
+                                  matlabfdot.cc mtProjector.cc )                               
 
-  target_compile_options(toastmex PRIVATE largeArrayDims)                                    
-  
   target_include_directories(toastmex PRIVATE Matlab_INCLUDE_DIRS)                                        
   target_include_directories(toastmex PRIVATE ../../include)    # For blasnames, toastdef, arch
 
