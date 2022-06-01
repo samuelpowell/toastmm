@@ -812,6 +812,15 @@ STOASTLIB FVector TFwdSolver<std::complex<float> >::UnfoldSComplex (
     return rvec;
 }
 
+template<class T>
+FVector TFwdSolver<T>::UnfoldSComplex (const TVector<T> &vec)
+   const
+{
+	xERROR("Not implemented");
+	return FVector();
+}
+
+
 // =========================================================================
 
 template<>

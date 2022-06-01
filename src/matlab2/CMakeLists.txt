@@ -3,18 +3,16 @@ project(toastmex VERSION 0.1.0)
 
 find_package(Matlab 7.16)
 
-
-
 if(Matlab_FOUND)
 
   message(STATUS "MATLAB located, toast MATLAB interface will be built")
 
-  matlab_add_mex(NAME toastmex    SHARED R2017b
+  matlab_add_mex(NAME toastmex    SHARED R2018a 
                                   SRC toastmex.cc 
                                   matlabtoast.cc mexutil.cc util.cc 
                                   mtMesh.cc mtElement.cc mtQMvec.cc mtBasis.cc mtField.cc mtGradient.cc
                                   mtJacobian.cc mtRegul.cc toastlbfgs.cc mtSysmat_basis.cc
-                                  matlabfdot.cc mtProjector.cc )
+                                  matlabfdot.cc mtProjector.cc )                               
 
   target_include_directories(toastmex PRIVATE Matlab_INCLUDE_DIRS)                                        
   target_include_directories(toastmex PRIVATE ../../include)    # For blasnames, toastdef, arch
@@ -28,15 +26,10 @@ if(Matlab_FOUND)
   target_link_libraries(toastmex libfdot)
   target_link_libraries(toastmex ${Matlab_MEX_LIBRARY} ${Matlab_MX_LIBRARY})
 
-  if(TOAST_THREAD)
-        # Enable threading in eigen
-        # target_link_libraries(toastmex OpenMP::OpenMP_CXX)
-  endif()
-
   # Install the output dynamic library
   install(TARGETS toastmex
-          LIBRARY DESTINATION matlab/toast2
-          RUNTIME DESTINATION matlab/toast2)
+          LIBRARY DESTINATION matlab/toast
+          RUNTIME DESTINATION matlab/toast)
 
   # Install associated driver scripts, documentation, etc.
   install(DIRECTORY ${CMAKE_SOURCE_DIR}/script/matlab DESTINATION ${CMAKE_INSTALL_PREFIX})                

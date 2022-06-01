@@ -30,7 +30,7 @@ fprintf('Grid dimensions: %d %d\n', hbasis.Dims);
 %% Mapping functions between basis representations
 
 mua = toastNim('../meshes/2D/tgt_mua_ellips_tri10.nim');
-subplot(1,3,1); hmesh.Display(mua,[0 0.05]);
+subplot(1,3,1); hmesh.Display(mua,'range',[0 0.05]);
 % load a nodal image
 
 bmua = hbasis.Map('M->B', mua);
@@ -42,4 +42,4 @@ axis equal tight; colorbar
 hmesh2 = toastMesh('../meshes/2D/circle25_32.msh');
 hbasis2 = toastBasis(hmesh2,grd);
 mua2 = hbasis2.Map('B->M', bmua);
-subplot(1,3,3); hmesh2.Display(mua2,[0 0.05]);
+subplot(1,3,3); hmesh2.Display(mua2,'range',[0 0.05]);

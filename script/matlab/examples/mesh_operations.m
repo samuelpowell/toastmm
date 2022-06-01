@@ -52,7 +52,8 @@ fprintf ('Sum of element sizes is %f\n', sum(elsize));
 [svtx sidx perm] = hmesh3.SurfData;
 % retrieve surface mesh geometry
 
-[evtx eidx etp] = hmesh3.ElementData(50);
+el = hmesh3.Element(50);
+[evtx eidx etp] = el.Data();
 % retrieve geometry for an individual element
 
 elid = hmesh3.FindElement([5,5;10,-3]);
