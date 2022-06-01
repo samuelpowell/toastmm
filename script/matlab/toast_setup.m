@@ -49,8 +49,8 @@ function toast_setup()
     toastdir_core = fullfile(toastdir, 'toast');
     toastdir_util = fullfile(toastdir, 'utilities');
     toastdir_demo = fullfile(toastdir, 'demos');
-    toast_paths = {toastdir_core, toastdir_util, toastdir_demo};
-    
+    toast_paths = {toastdir_demo, toastdir_util, toastdir_core};
+
     for i = 1:length(toast_paths)   
         disp(['Adding search path ' toast_paths{i}]);
         addpath(toast_paths{i});
