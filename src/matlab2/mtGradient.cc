@@ -192,14 +192,26 @@ void MatlabToast::GradientCplx (int nlhs, mxArray *plhs[], int nrhs,
 	    int q, nq = mesh->nQ, nlen = mesh->nlen();
 	    mwSize m = mxGetM(prhs[i]);
 	    mwSize n = mxGetN(prhs[i]);
+
+        #if MX_HAS_INTERLEAVED_COMPLEX
+	    mxComplexDouble *pc = mxGetComplexDoubles(prhs[1]);
+	    #else
 	    double *pr = mxGetPr(prhs[i]);
 	    double *pi = mxGetPi(prhs[i]);
+        #endif
+
 	    xASSERT(m == nlen && n == nq, "Parameter phi wrong dimension");
 	    phi = new CVector[nq];
 	    for (q = 0; q < nq; q++) {
 	        phi[q].New (nlen);
-		for (j = 0; j < nlen; j++)
+		for (j = 0; j < nlen; j++)  {
+            #if MX_HAS_INTERLEAVED_COMPLEX
+            phi[q][j] = std::complex<double> ((*pc).real, (*pc).imag);
+            pc++;
+            #else
 		    phi[q][j] = std::complex<double> (*pr++, *pi++);
+            #endif
+        }
 	    }
 	} else if (!strcasecmp(label,"Projections")) {
 	    proj = new RVector(mesh->nQM*2, mxGetPr (prhs[++i]));

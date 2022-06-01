@@ -395,7 +395,7 @@ void MatlabToast::ShapeFunc (int nlhs, mxArray *plhs[], int nrhs,
 
     // evaluation points
     const mwSize *gdim = mxGetDimensions (prhs[2]);
-    int npoint = gdim[1];
+    int npoint = (int) gdim[1];
     ASSERTARG(gdim[0] == dim, 1, "Invalid point dimensions");
 
     mxArray *sf = mxCreateDoubleMatrix (nn, npoint, mxREAL);
@@ -455,7 +455,7 @@ void MatlabToast::ShapeGrad (int nlhs, mxArray *plhs[], int nrhs,
         mxDOUBLE_CLASS, mxREAL);
     double *pgrad = mxGetPr (sg);
 
-    Point pt(dim);
+    Point pt((int) dim);
     for (k = 0; k < npoint; k++) {
         for (j = 0; j < dim; j++)
 	    pt[j] = ppt[k + j*npoint];

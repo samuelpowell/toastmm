@@ -109,16 +109,27 @@ void CalcFields (QMMesh *mesh, Raster *raster,
     for (i = 0; i < nQ; i++) dphi[i].New (n);
     FWS.CalcFields (qvec, dphi);
     mxArray *dmx = mxCreateDoubleMatrix (slen, nQ, mxCOMPLEX);
+
+    #if MX_HAS_INTERLEAVED_COMPLEX
+	mxComplexDouble *pc = mxGetComplexDoubles(dmx);
+	#else
     double *pr = mxGetPr (dmx);
     double *pi = mxGetPi (dmx);
+    #endif
 
     for (i = idx = 0; i < nQ; i++) {
 	if (raster) raster->Map_MeshToSol (dphi[i], sphi);
 	else        sphi = dphi[i];
 	for (j = 0; j < slen; j++) {
+        #if MX_HAS_INTERLEAVED_COMPLEX
+	    pc[idx].real = sphi[j].real();
+	    pc[idx].imag = sphi[j].imag();
+	    idx++;
+	    #else
 	    pr[idx] = sphi[j].real();
 	    pi[idx] = sphi[j].imag();
 	    idx++;
+        #endif
 	}
     }
     delete []dphi;

@@ -92,7 +92,7 @@ void MatlabToast::Regul (int nlhs, mxArray *plhs[], int nrhs,
 
 	// generic parameters from key/value list
 	if (nrhs > 3 && mxIsCell(prhs[4])) {
-		int nprm = mxGetM(prhs[4])*mxGetN(prhs[4]);
+		int nprm = (int) (mxGetM(prhs[4])*mxGetN(prhs[4]));
 
 	    for (prm = 0; prm < nprm; prm+=2) {
 			field = mxGetCell (prhs[4], prm);

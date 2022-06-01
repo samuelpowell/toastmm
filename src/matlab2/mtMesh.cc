@@ -772,15 +772,16 @@ void MatlabToast::FindElement (int nlhs, mxArray *plhs[], int nrhs,
 void MatlabToast::SetQM (int nlhs, mxArray *plhs[], int nrhs,
     const mxArray *prhs[])
 {
-    size_t i, j, d;
+    int i, j, d;
 
     QMMesh *mesh = (QMMesh*)GETMESH_SAFE(0);
 
-    size_t dim = (size_t)mesh->Dimension();
+    int dim = mesh->Dimension();
 
     // Copy source positions
-    mwSize nq = mxGetM(prhs[1]);
-    mwSize dimq = mxGetN(prhs[1]);
+    int nq = (int) mxGetM(prhs[1]);
+    int dimq = (int) mxGetN(prhs[1]);
+
     d = std::min(dim, dimq);
     if (dim != dimq) {
 	cerr << "Warning: toastSetQM: param 2:" << endl;
@@ -797,8 +798,8 @@ void MatlabToast::SetQM (int nlhs, mxArray *plhs[], int nrhs,
     }
 
     // Copy detector positions
-    size_t nm = mxGetM(prhs[2]);
-    size_t dimm = mxGetN(prhs[2]);
+    int  nm = (int) mxGetM(prhs[2]);
+    int dimm = (int) mxGetN(prhs[2]);
     d = std::min(dim,dimm);
     if (dim != dimm) {
 	cerr << "Warning: toastSetQM: param 3:" << endl;

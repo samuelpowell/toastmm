@@ -288,7 +288,7 @@ void MatlabToast::Mvec (int nlhs, mxArray *plhs[], int nrhs,
     bool apply_c2a = true;
 
     if (nrhs >= 4) {
-	int len = mxGetM(prhs[3])*mxGetN(prhs[3]);
+	int len = (int) (mxGetM(prhs[3])*mxGetN(prhs[3]));
 	if ((len != 1 && len != n) || !mxIsDouble(prhs[3])) {
 	    char cbuf[256];
 	    sprintf (cbuf, "Mvec: parameter 3: expected double scalar or double vector of length %d", n);
