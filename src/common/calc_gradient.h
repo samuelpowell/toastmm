@@ -3,6 +3,10 @@
 // Prototypes of gradient functions
 // =========================================================================
 
+#ifndef __CALC_GRADIENT_H
+#define __CALC_GRADIENT_H
+
+#include "toastdef.h"
 #include "stoastlib.h"
 
 void AddDataGradientReal (QMMesh *mesh, Raster *raster, const RFwdSolver &FWS,
@@ -24,3 +28,5 @@ void GetGradientCplx (QMMesh *mesh, Raster *raster, CFwdSolver &FWS,
     const RVector &data, const RVector &sd,
     const CCompRowMatrix &qvec, const CCompRowMatrix &mvec,
     RVector &grad, CVector *phi=0, RVector *proj=0);
+
+#endif

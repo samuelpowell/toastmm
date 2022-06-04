@@ -2,6 +2,10 @@
 // Prototypes of Jacobian methods for script interfaces
 // ========================================================================
 
+#ifndef __CALC_JACOBIAN_H
+#define __CALC_JACOBIAN_H
+
+#include "toastdef.h"
 #include "stoastlib.h"
 
 void CalcJacobian (QMMesh *mesh, Raster *raster,
@@ -21,3 +25,5 @@ void CalcJacobianCW (QMMesh *mesh, Raster *raster,
     const RCompRowMatrix &qvec, const RCompRowMatrix &mvec,
     const RVector &mua, const RVector &mus, const RVector &ref,
     char *solver, double tol, RDenseMatrix &J);
+
+#endif

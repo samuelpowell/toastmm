@@ -2,6 +2,7 @@
 // Implementation of Jacobian methods for script interfaces
 // ========================================================================
 
+#include "toastdef.h"
 #include "calc_jacobian.h"
 
 // ==========================================================================

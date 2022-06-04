@@ -2,6 +2,10 @@
 // Prototypes of Mesh methods for script interfaces
 // ========================================================================
 
+#ifndef __CALC_MESH_H
+#define __CALC_MESH_H
+
+#include "toastdef.h"
 #include "stoastlib.h"
 
 // =========================================================================
@@ -26,3 +30,5 @@ void CalcFields (QMMesh *mesh, Raster *raster,
     const RCompRowMatrix &qvec, const RVector &mua, const RVector &mus,
     const RVector &ref, double freq, char *solver, double tol,
     RVector **dphi);    
+
+#endif

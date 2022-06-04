@@ -15,6 +15,7 @@
 #include "calc_gradient.h"
 #include "calc_jacobian.h"
 #include "calc_mesh.h"
+#include "calc_qmvec.h"
 
 #define TOAST_NPY_INT NPY_INT   // The numpy type for integer output to Python
 typedef int nint;               // The C type for integer input from Python
@@ -1210,36 +1211,6 @@ static PyObject *toast_sysmat(PyObject *self, PyObject *args) {
 
 // ===========================================================================
 
-void CalcQvec(const QMMesh *mesh, SourceMode qtype,
-              SRC_PROFILE qprof, double qwidth, CCompRowMatrix *qvec) {
-  int i, n, nQ;
-
-  n = mesh->nlen();
-  nQ = mesh->nQ;
-
-  // build the source vectors
-  qvec->New(nQ, n);
-
-  for (i = 0; i < nQ; i++) {
-    CVector q(n);
-    switch (qprof) {
-      case PROF_POINT:
-        SetReal(q, QVec_Point(*mesh, mesh->Q[i], qtype));
-        break;
-      case PROF_GAUSSIAN:
-        SetReal(q, QVec_Gaussian(*mesh, mesh->Q[i], qwidth, qtype));
-        break;
-      case PROF_COSINE:
-        SetReal(q, QVec_Cosine(*mesh, mesh->Q[i], qwidth, qtype));
-        break;
-      case PROF_COMPLETETRIG:
-        std::cerr << "Not implemented" << std::endl;
-        // q = CompleteTrigSourceVector (*mesh, i);
-        break;
-    }
-    qvec->SetRow(i, q);
-  }
-}
 
 static PyObject *toast_qvec(PyObject *self, PyObject *args, PyObject *keywds) {
   int i, hmesh;
@@ -1316,40 +1287,6 @@ static PyObject *toast_qvec(PyObject *self, PyObject *args, PyObject *keywds) {
 
 // ===========================================================================
 
-void CalcMvec(const QMMesh *mesh, SRC_PROFILE mprof, double mwidth,
-              RVector *ref, CCompRowMatrix *mvec) {
-  int n, nM;
-  int i, j;
-
-  n = mesh->nlen();
-  nM = mesh->nM;
-
-  // build the measurement vectors
-  mvec->New(nM, n);
-  for (i = 0; i < nM; i++) {
-    CVector m(n);
-    switch (mprof) {
-      case PROF_GAUSSIAN:
-        SetReal(m, QVec_Gaussian(*mesh, mesh->M[i], mwidth, SRCMODE_NEUMANN));
-        break;
-      case PROF_COSINE:
-        SetReal(m, QVec_Cosine(*mesh, mesh->M[i], mwidth, SRCMODE_NEUMANN));
-        break;
-      case PROF_COMPLETETRIG:
-        std::cerr << "Not implemented" << std::endl;
-        // m = CompleteTrigSourceVector (*mesh, i);
-        break;
-      default:
-        std::cerr << "Not implemented" << std::endl;
-        break;
-    }
-    for (j = 0; j < n; j++) {
-      m[j] *= c0 / (2.0 * (*ref)[j] * A_Keijzer((*ref)[j]));
-    }
-    mvec->SetRow(i, m);
-  }
-}
-
 static PyObject *toast_mvec(PyObject *self, PyObject *args, PyObject *keywds) {
   int i, hmesh;
   const char *profstr = "Gaussian";
@@ -1378,18 +1315,6 @@ static PyObject *toast_mvec(PyObject *self, PyObject *args, PyObject *keywds) {
     std::cerr << "toast.Qvec: Invalid source profile" << std::endl;
   }
 
-#ifdef UNDEF
-  npy_intp *ref_dims = PyArray_DIMS((PyArrayObject *)py_ref);
-  int reflen = ref_dims[0] * ref_dims[1];
-  RVector ref(mesh->nlen());
-  if (reflen == 1) {
-    ref = *(double *)PyArray_DATA((PyArrayObject *)py_ref);
-  } else {
-    if (reflen != mesh->nlen())
-      return NULL;
-    memcpy(ref.data_buffer(), PyArray_DATA((PyArrayObject *)py_ref), reflen * sizeof(double));
-  }
-#endif
   RVector ref(mesh->nlen());
   ref = refind;
 
@@ -1400,7 +1325,7 @@ static PyObject *toast_mvec(PyObject *self, PyObject *args, PyObject *keywds) {
   }
 
   CCompRowMatrix mvec;
-  CalcMvec(mesh, mprof, mwidth, &ref, &mvec);
+  CalcMvec(mesh, mprof, mwidth, &ref, true, &mvec);
 
   const idxtype *rowptr, *colidx;
   npy_intp nnz = mvec.GetSparseStructure(&rowptr, &colidx);

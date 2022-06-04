@@ -77,7 +77,8 @@ module1 = Extension('toast.toastmod',
                     sources = ['src/python/toastmodule.cc',
                                'src/common/calc_jacobian.cc',
                                'src/common/calc_gradient.cc',
-                               'src/common/calc_mesh.cc'])
+                               'src/common/calc_mesh.cc',
+                               'src/common/calc_qmvec.cc'])
 
                          
 # Define installation

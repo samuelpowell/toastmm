@@ -2,6 +2,7 @@
 // Implementation
 // ==========================================================================
 
+#include "toastdef.h"
 #include "calc_gradient.h"
 
 #ifdef TOAST_THREAD

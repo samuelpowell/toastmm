@@ -15,7 +15,8 @@ if(Matlab_FOUND)
                                   matlabfdot.cc mtProjector.cc
                                   ../common/calc_jacobian.cc
                                   ../common/calc_gradient.cc
-                                  ../common/calc_mesh.cc )                               
+                                  ../common/calc_mesh.cc 
+                                  ../common/calc_qmvec.cc)                               
 
   target_include_directories(toastmex PRIVATE Matlab_INCLUDE_DIRS)                                        
   target_include_directories(toastmex PRIVATE ../../include)    # For blasnames, toastdef, arch
