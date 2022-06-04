@@ -34,8 +34,6 @@
 // Threading
 //
 #ifdef TOAST_THREAD
-#define TOAST_THREAD_MATLAB_GRADIENT  	// parallelise Matlab toastGradient
-#define TOAST_THREAD_MATLAB_QMVEC     	// parallelise Matlab Mvec
 #define TOAST_THREAD_ASSEMBLE         	// parallelise system matrix assembly
 #else
 #define THREAD_LEVEL 0
