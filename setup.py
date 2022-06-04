@@ -74,7 +74,10 @@ module1 = Extension('toast.toastmod',
                     define_macros = [('NPY_NO_DEPRECATED_API', 'NPY_1_7_API_VERSION'),
                                      ("Py_LIMITED_API", "0x03060000")],
                     py_limited_api=True,
-                    sources = ['src/python/toastmodule.cc'])
+                    sources = ['src/python/toastmodule.cc',
+                               'src/common/calc_jacobian.cc',
+                               'src/common/calc_gradient.cc',
+                               'src/common/calc_mesh.cc'])
 
                          
 # Define installation
