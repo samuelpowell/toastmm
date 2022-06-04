@@ -95,30 +95,6 @@ public:
     void BasisRefine (int nlhs, mxArray *plhs[], int nrhs,
 	const mxArray *prhs[]);
     void MapBasis (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
-    void MapMeshToBasis (int nlhs, mxArray *plhs[], int nrhs,
-        const mxArray *prhs[]);
-    void MapMeshToGrid (int nlhs, mxArray *plhs[], int nrhs,
-        const mxArray *prhs[]);
-    void MapMeshToSol (int nlhs, mxArray *plhs[], int nrhs,
-        const mxArray *prhs[]);
-    void MapBasisToMesh (int nlhs, mxArray *plhs[], int nrhs,
-        const mxArray *prhs[]);
-    void MapSolToMesh (int nlhs, mxArray *plhs[], int nrhs,
-        const mxArray *prhs[]);
-    void MapSolToBasis (int nlhs, mxArray *plhs[], int nrhs,
-        const mxArray *prhs[]);
-    void MapSolToGrid (int nlhs, mxArray *plhs[], int nrhs,
-        const mxArray *prhs[]);
-    void MapGridToMesh (int nlhs, mxArray *plhs[], int nrhs,
-        const mxArray *prhs[]);
-    void MapGridToBasis (int nlhs, mxArray *plhs[], int nrhs,
-        const mxArray *prhs[]);
-    void MapGridToSol (int nlhs, mxArray *plhs[], int nrhs,
-        const mxArray *prhs[]);
-    void BasisToMeshMatrix (int nlhs, mxArray *plhs[], int nrhs,
-        const mxArray *prhs[]);
-    void MeshToBasisMatrix (int nlhs, mxArray *plhs[], int nrhs,
-        const mxArray *prhs[]);
     void SampleBasis (int nlhs, mxArray *plhs[], int nrhs,
 	const mxArray *prhs[]);
     void GridElref (int nlhs, mxArray *plhs[], int nrhs,

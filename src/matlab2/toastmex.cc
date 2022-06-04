@@ -113,13 +113,13 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	mtoast->GetBasisSize (nlhs, plhs, nrhs, prhs);
 	break;
     case TOAST_BASIS_NLEN:
-        mtoast->GetBasisNLen (nlhs, plhs, nrhs, prhs);
+	mtoast->GetBasisNLen (nlhs, plhs, nrhs, prhs);
 	break;
     case TOAST_BASIS_BLEN:
-        mtoast->GetBasisBLen (nlhs, plhs, nrhs, prhs);
+	mtoast->GetBasisBLen (nlhs, plhs, nrhs, prhs);
 	break;
     case TOAST_BASIS_SLEN:
-        mtoast->GetBasisSLen (nlhs, plhs, nrhs, prhs);
+	mtoast->GetBasisSLen (nlhs, plhs, nrhs, prhs);
 	break;
     case TOAST_BASIS_VALUE:
 	mtoast->BasisValue (nlhs, plhs, nrhs, prhs);
@@ -134,7 +134,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	mtoast->GetBasisBuv (nlhs, plhs, nrhs, prhs);
 	break;
     case TOAST_BASIS_BVW:
-        mtoast->GetBasisBvw (nlhs, plhs, nrhs, prhs);
+	mtoast->GetBasisBvw (nlhs, plhs, nrhs, prhs);
 	break;
     case TOAST_BASIS_DUU:
 	mtoast->GetBasisDuu (nlhs, plhs, nrhs, prhs);
@@ -153,39 +153,6 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	break;
     case TOAST_MAPBASIS:
 	mtoast->MapBasis (nlhs, plhs, nrhs, prhs);
-	break;
-    case TOAST_MAPMESHTOBASIS:
-	mtoast->MapMeshToBasis (nlhs, plhs, nrhs, prhs);
-	break;
-    case TOAST_MAPMESHTOGRID:
-	mtoast->MapMeshToGrid (nlhs, plhs, nrhs, prhs);
-	break;
-    case TOAST_MAPMESHTOSOL:
-	mtoast->MapMeshToSol (nlhs, plhs, nrhs, prhs);
-	break;
-    case TOAST_MAPBASISTOMESH:
-	mtoast->MapBasisToMesh (nlhs, plhs, nrhs, prhs);
-	break;
-    case TOAST_MAPSOLTOMESH:
-	mtoast->MapSolToMesh (nlhs, plhs, nrhs, prhs);
-	break;
-    case TOAST_MAPSOLTOBASIS:
-	mtoast->MapSolToBasis (nlhs, plhs, nrhs, prhs);
-	break;
-    case TOAST_MAPSOLTOGRID:
-	mtoast->MapSolToGrid (nlhs, plhs, nrhs, prhs);
-	break;
-    case TOAST_MAPGRIDTOMESH:
-	mtoast->MapGridToMesh (nlhs, plhs, nrhs, prhs);
-	break;
-    case TOAST_MAPGRIDTOBASIS:
-	mtoast->MapGridToBasis (nlhs, plhs, nrhs, prhs);
-	break;
-    case TOAST_MAPGRIDTOSOL:
-	mtoast->MapGridToSol (nlhs, plhs, nrhs, prhs);
-	break;
-    case TOAST_BASISTOMESHMATRIX:
-	mtoast->BasisToMeshMatrix (nlhs, plhs, nrhs, prhs);
 	break;
     case TOAST_BASISSAMPLE:
 	mtoast->SampleBasis (nlhs, plhs, nrhs, prhs);
@@ -239,7 +206,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	mtoast->RegulKappa (nlhs, plhs, nrhs, prhs);
 	break;
     case TOAST_REGULSETLOCALSCALING:
-        mtoast->RegulSetLocalScaling (nlhs, plhs, nrhs, prhs);
+	mtoast->RegulSetLocalScaling (nlhs, plhs, nrhs, prhs);
 	break;
     case TOAST_FIELDS:
 	mtoast->Fields (nlhs, plhs, nrhs, prhs);
@@ -339,7 +306,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
     // methods defined in mtElement.cc
     case TOAST_ELDOF:
-        mtoast->ElDof (nlhs, plhs, nrhs, prhs);
+	mtoast->ElDof (nlhs, plhs, nrhs, prhs);
 	break;
     case TOAST_ELEMENTSIZE:
 	mtoast->ElSize (nlhs, plhs, nrhs, prhs);

@@ -11,6 +11,11 @@
 #include "felib.h"
 #include "stoastlib.h"
 
+// Computation routines
+#include "calc_gradient.h"
+#include "calc_jacobian.h"
+#include "calc_mesh.h"
+#include "calc_qmvec.h"
 
 #define TOAST_NPY_INT NPY_INT   // The numpy type for integer output to Python
 typedef int nint;               // The C type for integer input from Python
@@ -649,8 +654,6 @@ static PyObject *toast_make_mesh(PyObject *self, PyObject *args) {
     return NULL;
   }
 
-  int i, j, k;
-
   if (!AssertArray(py_ndlist, 2, NPY_DOUBLE)) {
     PyErr_SetString(PyExc_ValueError, "vertices must be a two-dimensional array of doubles");
     return NULL;
@@ -675,96 +678,11 @@ static PyObject *toast_make_mesh(PyObject *self, PyObject *args) {
   }
   nint *etp = (nint *)PyArray_DATA(py_eltp);
 
-  Mesh *mesh = new QMMesh;
 
-  // create node list
-  mesh->nlist.New(nvtx);
-  for (i = 0; i < nvtx; i++) {
-    mesh->nlist[i].New(dim);
-    mesh->nlist[i].SetBndTp(BND_NONE);
-  }
-  for (i = k = 0; i < nvtx; i++) {
-    for (j = 0; j < dim; j++) {
-      mesh->nlist[i][j] = vtx[k++];
-    }
-  }
+  QMMesh *mesh;
+  BuildMesh(&mesh, nvtx, nel, dim, nnd0, vtx, idx, etp);
 
-  // create element list
-  Element *el, **list = new Element *[nel];
-  for (i = 0; i < nel; i++) {
-    switch (etp[i]) {
-      case ELID_TRI3OLD:
-        list[i] = new Triangle3old;
-        break;
-      case ELID_TET4:
-        list[i] = new Tetrahedron4;
-        break;
-      case ELID_WDG6:
-        list[i] = new Wedge6;
-        break;
-      case ELID_VOX8:
-        list[i] = new Voxel8;
-        break;
-      case ELID_TRI6:
-        list[i] = new Triangle6;
-        break;
-      case ELID_TET10:
-        list[i] = new Tetrahedron10;
-        break;
-      case ELID_TRI6_IP:
-        list[i] = new Triangle6_ip;
-        break;
-      case ELID_TRI10:
-        list[i] = new Triangle10;
-        break;
-      case ELID_TRI10_IP:
-        list[i] = new Triangle10_ip;
-        break;
-      case ELID_TET10_IP:
-        list[i] = new Tetrahedron10_ip;
-        break;
-      case ELID_PIX4:
-        list[i] = new Pixel4;
-        break;
-      case ELID_TRI3:
-        list[i] = new Triangle3;
-        break;
-      case ELID_TRI3D3:
-        list[i] = new Triangle3D3;
-        break;
-      case ELID_TRI3D6:
-        list[i] = new Triangle3D6;
-        break;
-      default:
-        std::cerr << "Element type not supported!" << std::endl;
-        list[i] = 0;
-        break;
-    }
-  }
-  mesh->elist.SetList(nel, list);
-  delete[] list;
-
-  for (i = k = 0; i < nel; i++) {
-    for (j = 0; j < nnd0; j++) {
-      if ((el = mesh->elist[i])) {
-        if (j < el->nNode())
-          el->Node[j] = idx[k];
-        // Matlab mtMesh.cc subtracts 0.5 from idx[k] and truncates to int
-        // to change the indexing from 1-based to 0-based and cast double to int.
-        // Not needed here because input py_ellist assumed to be int and 0-based.
-      }
-      k++;
-    }
-  }
-
-  // check mesh consistency
-  if (mesh->Shrink()) {
-    nvtx = mesh->nlen();
-  }
-  // set up mesh
-  mesh->Setup();
   int hmesh = g_meshmgr.Add(mesh);
-
   return Py_BuildValue("i", hmesh);
 }
 
@@ -1293,36 +1211,6 @@ static PyObject *toast_sysmat(PyObject *self, PyObject *args) {
 
 // ===========================================================================
 
-void CalcQvec(const QMMesh *mesh, SourceMode qtype,
-              SRC_PROFILE qprof, double qwidth, CCompRowMatrix *qvec) {
-  int i, n, nQ;
-
-  n = mesh->nlen();
-  nQ = mesh->nQ;
-
-  // build the source vectors
-  qvec->New(nQ, n);
-
-  for (i = 0; i < nQ; i++) {
-    CVector q(n);
-    switch (qprof) {
-      case PROF_POINT:
-        SetReal(q, QVec_Point(*mesh, mesh->Q[i], qtype));
-        break;
-      case PROF_GAUSSIAN:
-        SetReal(q, QVec_Gaussian(*mesh, mesh->Q[i], qwidth, qtype));
-        break;
-      case PROF_COSINE:
-        SetReal(q, QVec_Cosine(*mesh, mesh->Q[i], qwidth, qtype));
-        break;
-      case PROF_COMPLETETRIG:
-        std::cerr << "Not implemented" << std::endl;
-        // q = CompleteTrigSourceVector (*mesh, i);
-        break;
-    }
-    qvec->SetRow(i, q);
-  }
-}
 
 static PyObject *toast_qvec(PyObject *self, PyObject *args, PyObject *keywds) {
   int i, hmesh;
@@ -1399,40 +1287,6 @@ static PyObject *toast_qvec(PyObject *self, PyObject *args, PyObject *keywds) {
 
 // ===========================================================================
 
-void CalcMvec(const QMMesh *mesh, SRC_PROFILE mprof, double mwidth,
-              RVector *ref, CCompRowMatrix *mvec) {
-  int n, nM;
-  int i, j;
-
-  n = mesh->nlen();
-  nM = mesh->nM;
-
-  // build the measurement vectors
-  mvec->New(nM, n);
-  for (i = 0; i < nM; i++) {
-    CVector m(n);
-    switch (mprof) {
-      case PROF_GAUSSIAN:
-        SetReal(m, QVec_Gaussian(*mesh, mesh->M[i], mwidth, SRCMODE_NEUMANN));
-        break;
-      case PROF_COSINE:
-        SetReal(m, QVec_Cosine(*mesh, mesh->M[i], mwidth, SRCMODE_NEUMANN));
-        break;
-      case PROF_COMPLETETRIG:
-        std::cerr << "Not implemented" << std::endl;
-        // m = CompleteTrigSourceVector (*mesh, i);
-        break;
-      default:
-        std::cerr << "Not implemented" << std::endl;
-        break;
-    }
-    for (j = 0; j < n; j++) {
-      m[j] *= c0 / (2.0 * (*ref)[j] * A_Keijzer((*ref)[j]));
-    }
-    mvec->SetRow(i, m);
-  }
-}
-
 static PyObject *toast_mvec(PyObject *self, PyObject *args, PyObject *keywds) {
   int i, hmesh;
   const char *profstr = "Gaussian";
@@ -1461,18 +1315,6 @@ static PyObject *toast_mvec(PyObject *self, PyObject *args, PyObject *keywds) {
     std::cerr << "toast.Qvec: Invalid source profile" << std::endl;
   }
 
-#ifdef UNDEF
-  npy_intp *ref_dims = PyArray_DIMS((PyArrayObject *)py_ref);
-  int reflen = ref_dims[0] * ref_dims[1];
-  RVector ref(mesh->nlen());
-  if (reflen == 1) {
-    ref = *(double *)PyArray_DATA((PyArrayObject *)py_ref);
-  } else {
-    if (reflen != mesh->nlen())
-      return NULL;
-    memcpy(ref.data_buffer(), PyArray_DATA((PyArrayObject *)py_ref), reflen * sizeof(double));
-  }
-#endif
   RVector ref(mesh->nlen());
   ref = refind;
 
@@ -1483,7 +1325,7 @@ static PyObject *toast_mvec(PyObject *self, PyObject *args, PyObject *keywds) {
   }
 
   CCompRowMatrix mvec;
-  CalcMvec(mesh, mprof, mwidth, &ref, &mvec);
+  CalcMvec(mesh, mprof, mwidth, &ref, true, &mvec);
 
   const idxtype *rowptr, *colidx;
   npy_intp nnz = mvec.GetSparseStructure(&rowptr, &colidx);
@@ -1513,70 +1355,6 @@ static PyObject *toast_mvec(PyObject *self, PyObject *args, PyObject *keywds) {
 }
 
 // ===========================================================================
-
-void CalcFields(QMMesh *mesh, Raster *raster,
-                const CCompRowMatrix &qvec, const RVector &mua, const RVector &mus,
-                const RVector &ref, double freq, const char *solver, double tol,
-                PyObject **dfield) {
-  const double c0 = 0.3;
-  int i, j, n, nQ, slen;
-
-  n = mesh->nlen();
-  nQ = qvec.nRows();
-  slen = (raster ? raster->SLen() : n);
-
-  CVector *dphi;
-  CFwdSolver FWS(mesh, solver, tol);
-
-  // Solution in mesh basis
-  Solution msol(OT_NPARAM, n);
-  msol.SetActive(OT_CMUA, true);
-  msol.SetActive(OT_CKAPPA, true);
-
-  // Set optical coefficients
-  msol.SetParam(OT_CMUA, mua * c0 / ref);
-  msol.SetParam(OT_CKAPPA, c0 / (3.0 * ref * (mua + mus)));
-  RVector c2a(n);
-  for (i = 0; i < n; i++) {
-    c2a[i] = c0 / (2.0 * ref[i] * A_Keijzer(ref[i]));
-  }
-  msol.SetParam(OT_C2A, c2a);
-
-  FWS.SetDataScaling(DATA_LOG);
-
-  double omega = freq * 2.0 * Pi * 1e-6;  // convert from MHz to rad
-
-  // Calculate fields
-  FWS.Allocate();
-  FWS.Reset(msol, omega);
-  CVector sphi(slen);
-
-  // build the field vectors
-  dphi = new CVector[nQ];
-  for (i = 0; i < nQ; i++) {
-    dphi[i].New(n);
-  }
-
-  FWS.CalcFields(qvec, dphi);
-
-  npy_intp dmx_dims[2] = {slen, nQ};
-  PyObject *dmx = PyArray_SimpleNew(2, dmx_dims, NPY_CDOUBLE);
-  std::complex<double> *dmx_ptr = (std::complex<double> *)PyArray_DATA((PyArrayObject *)dmx);
-  for (i = 0; i < nQ; i++) {
-    std::complex<double> *dp = dmx_ptr + i;
-    if (raster) {
-      raster->Map_MeshToSol(dphi[i], sphi);
-    } else {
-      sphi = dphi[i];
-    }
-    for (j = 0; j < slen; j++) {
-      *dp = sphi[j];
-      dp += nQ;
-    }
-  }
-  delete[] dphi;
-  *dfield = dmx;
-}
 
 static PyObject *toast_fields(PyObject *self, PyObject *args) {
   int hmesh, hraster, nQ;
@@ -1638,22 +1416,41 @@ static PyObject *toast_fields(PyObject *self, PyObject *args) {
     return NULL;
   }
   double *mua_ptr = (double *)PyArray_DATA(py_mua);
-  RVector mua(n, mua_ptr);
+  RVector mua(n, mua_ptr, SHALLOW_COPY);
 
   double *mus_ptr = (double *)PyArray_DATA(py_mus);
-  RVector mus(n, mus_ptr);
+  RVector mus(n, mus_ptr, SHALLOW_COPY);
 
   double *ref_ptr = (double *)PyArray_DATA(py_ref);
-  RVector ref(n, ref_ptr);
+  RVector ref(n, ref_ptr, SHALLOW_COPY);
 
-  PyObject *dfield;
+  int slen = (raster ? raster->SLen() : n);
 
-  CalcFields(mesh, raster, qvec, mua, mus, ref, freq, "DIRECT", 1e-12, &dfield);
+  CVector *dphi;
+  CVector sphi(slen);
+ 
+  CalcFields(mesh, raster, qvec, mua, mus, ref, freq, "DIRECT", 1e-12, &dphi);
 
-  PyObject *ret;
+  // Map or copy to output
+  npy_intp dmx_dims[2] = {slen, nQ};
+  PyObject *dmx = PyArray_SimpleNew(2, dmx_dims, NPY_CDOUBLE);
+  std::complex<double> *dmx_ptr = (std::complex<double> *)PyArray_DATA((PyArrayObject *)dmx);
+  for (int i = 0; i < nQ; i++) {
+    std::complex<double> *dp = dmx_ptr + i;
+    if (raster) {
+      raster->Map_MeshToSol(dphi[i], sphi);
+    } else {
+      sphi = dphi[i];
+    }
+    for (int j = 0; j < slen; j++) {
+      *dp = sphi[j];
+      dp += nQ;
+    }
+  }
+  delete[] dphi;
 
-  ret = Py_BuildValue("O", dfield);
-  Py_DECREF(dfield);
+  PyObject *ret = Py_BuildValue("O", dmx);
+  Py_DECREF(dmx);
 
   if (ret) {
     return ret;
@@ -1666,27 +1463,6 @@ static PyObject *toast_fields(PyObject *self, PyObject *args) {
 
 // Calculate Jacobian from given direct and adjoint fields and boundary
 // projection data
-
-void CalcJacobian(QMMesh *mesh, Raster *raster,
-                  const CVector *dphi, const CVector *aphi,
-                  const CVector *proj, DataScale dscale, PyObject **res) {
-  int nQM, slen, ndat, nprm;
-  nQM = mesh->nQM;
-  slen = (raster ? raster->SLen() : mesh->nlen());
-  ndat = nQM * 2;
-  nprm = slen * 2;
-
-  RDenseMatrix J(ndat, nprm);
-
-  GenerateJacobian(raster, mesh, dphi, aphi, proj, dscale, J);
-
-  npy_intp J_dims[2] = {ndat, nprm};
-  PyObject *pyJ = PyArray_SimpleNew(2, J_dims, NPY_DOUBLE);
-  double *pyJ_data = (double *)PyArray_DATA((PyArrayObject *)pyJ);
-  const double *J_data = J.ValPtr();
-  memcpy(pyJ_data, J_data, ndat * nprm * sizeof(double));
-  *res = pyJ;
-}
 
 static PyObject *toast_jacobian(PyObject *self, PyObject *args) {
   int hmesh, hraster, i, j;
@@ -1748,94 +1524,30 @@ static PyObject *toast_jacobian(PyObject *self, PyObject *args) {
   std::complex<double> *proj_ptr = (std::complex<double> *)PyArray_DATA(py_proj);
   CVector proj(nqm, proj_ptr, SHALLOW_COPY);
 
-  PyObject *J;
-  CalcJacobian(mesh, raster, dphi, aphi, &proj, DATA_LOG, &J);
+  RDenseMatrix J;
+  CalcJacobian(mesh, raster, dphi, aphi, &proj, DATA_LOG, J);
+
+  npy_intp J_dims[2] = {J.nRows(), J.nCols()};
+  PyObject *pyJ = PyArray_SimpleNew(2, J_dims, NPY_DOUBLE);
+  double *pyJ_data = (double *)PyArray_DATA((PyArrayObject *)pyJ);
+  const double *J_data = J.ValPtr();
+  memcpy(pyJ_data, J_data, J.nRows() * J.nCols() * sizeof(double));
 
   // cleanup
   delete[] dphi;
   delete[] aphi;
 
-  PyObject *res = Py_BuildValue("O", J);
-  Py_DECREF(J);
+  PyObject *res = Py_BuildValue("O", pyJ);
+  Py_DECREF(pyJ);
   return res;
 }
 
-// Calculate Jacobian from given optical parameters.
-// This version calculates the direct and adjoint fields, and boundary
-// projection data on the fly from the provided optical parameters
-void CalcJacobian(QMMesh *mesh, Raster *raster,
-                  const CCompRowMatrix &qvec, const CCompRowMatrix &mvec,
-                  const RVector &mua, const RVector &mus, const RVector &ref,
-                  double freq, const char *solver, double tol, PyObject **res) {
-  const double c0 = 0.3;
-  int i, n, nQ, nM, nQM;
-
-  n = mesh->nlen();
-  nQ = mesh->nQ;
-  nM = mesh->nM;
-  nQM = mesh->nQM;
-
-  CVector *dphi, *aphi;
-  CFwdSolver FWS(mesh, solver, tol);
-
-  // Solution in mesh basis
-  Solution msol(OT_NPARAM, n);
-  msol.SetActive(OT_CMUA, true);
-  msol.SetActive(OT_CKAPPA, true);
-
-  // Set optical coefficients
-  msol.SetParam(OT_CMUA, mua * c0 / ref);
-  msol.SetParam(OT_CKAPPA, c0 / (3.0 * ref * (mua + mus)));
-  RVector c2a(n);
-  for (i = 0; i < n; i++) {
-    c2a[i] = c0 / (2.0 * ref[i] * A_Keijzer(ref[i]));
-  }
-  msol.SetParam(OT_C2A, c2a);
-
-  FWS.SetDataScaling(DATA_LOG);
-
-  double omega = freq * 2.0 * Pi * 1e-6;  // convert from MHz to rad
-
-  // build the field vectors
-  dphi = new CVector[nQ];
-  for (i = 0; i < nQ; i++) {
-    dphi[i].New(n);
-  }
-  aphi = new CVector[nM];
-  for (i = 0; i < nM; i++) {
-    aphi[i].New(n);
-  }
-
-  // Calculate direct and adjoint fields
-  FWS.Allocate();
-  FWS.Reset(msol, omega);
-  FWS.CalcFields(qvec, dphi);
-  FWS.CalcFields(mvec, aphi);
-
-  // Calculate projections if required
-  CVector *proj = 0;
-  DataScale dscale = FWS.GetDataScaling();
-  if (dscale == DATA_LOG) {
-    proj = new CVector(nQM);
-    *proj = FWS.ProjectAll(mvec, dphi, DATA_LIN);
-    // ProjectAll (*mesh, FWS, mvec, dphi, *proj);
-  }
-
-  // Calculate Jacobian
-  CalcJacobian(mesh, raster, dphi, aphi, proj, dscale, res);
-
-  delete[] dphi;
-  delete[] aphi;
-  if (proj) {
-    delete proj;
-  }
-}
 
 static PyObject *toast_jacobian_optical(PyObject *self, PyObject *args) {
   int hmesh, hraster;
   QMMesh *mesh;
   Raster *raster;
-  const char *solver;
+  char *solver;
   double freq, tol;
   PyArrayObject *py_qvec_vl, *py_qvec_rp, *py_qvec_ci;
   PyArrayObject *py_mvec_vl, *py_mvec_rp, *py_mvec_ci;
@@ -1876,7 +1588,7 @@ static PyObject *toast_jacobian_optical(PyObject *self, PyObject *args) {
   nint *qrowptr = (nint *)PyArray_DATA(py_qvec_rp);
   nint *qcolidx = (nint *)PyArray_DATA(py_qvec_ci);
   std::complex<double> *qval = (std::complex<double> *)PyArray_DATA(py_qvec_vl);
-  CCompRowMatrix qvec(nQ, n, qrowptr, qcolidx, qval /*, SHALLOW_COPY*/);
+  const CCompRowMatrix qvec(nQ, n, qrowptr, qcolidx, qval /*, SHALLOW_COPY*/);
 
   if (!AssertArray(py_mvec_rp, 1, TOAST_NPY_INT)) {
     PyErr_SetString(PyExc_ValueError, "mvec row pointer must be a one-dimensional vector of integers");
@@ -1893,7 +1605,7 @@ static PyObject *toast_jacobian_optical(PyObject *self, PyObject *args) {
   nint *mrowptr = (nint *)PyArray_DATA(py_mvec_rp);
   nint *mcolidx = (nint *)PyArray_DATA(py_mvec_ci);
   std::complex<double> *mval = (std::complex<double> *)PyArray_DATA(py_mvec_vl);
-  CCompRowMatrix mvec(nM, n, mrowptr, mcolidx, mval /*, SHALLOW_COPY*/);
+  const CCompRowMatrix mvec(nM, n, mrowptr, mcolidx, mval /*, SHALLOW_COPY*/);
 
   if (!AssertArrayDims(py_mua, NPY_DOUBLE, n)) {
     PyErr_SetString(PyExc_ValueError, "mua must be a one-dimensional vector of doubles of length equal to mesh nodes");
@@ -1908,86 +1620,34 @@ static PyObject *toast_jacobian_optical(PyObject *self, PyObject *args) {
     return NULL;
   }
   double *mua_ptr = (double *)PyArray_DATA(py_mua);
-  RVector mua(n, mua_ptr, SHALLOW_COPY);
+  const RVector mua(n, mua_ptr, SHALLOW_COPY);
 
   double *mus_ptr = (double *)PyArray_DATA(py_mus);
-  RVector mus(n, mus_ptr, SHALLOW_COPY);
+  const RVector mus(n, mus_ptr, SHALLOW_COPY);
 
   double *ref_ptr = (double *)PyArray_DATA(py_ref);
-  RVector ref(n, ref_ptr, SHALLOW_COPY);
+  const RVector ref(n, ref_ptr, SHALLOW_COPY);
 
-  PyObject *J;
-  CalcJacobian(mesh, raster, qvec, mvec, mua, mus, ref, freq, solver, tol, &J);
-  PyObject *res = Py_BuildValue("O", J);
-  Py_DECREF(J);
-  return res;
-}
-
-// Calculate raw Jacobian matrix for CW intensity data (real case)
-void CalcJacobianCW(QMMesh *mesh, Raster *raster,
-                    const RCompRowMatrix &qvec, const RCompRowMatrix &mvec,
-                    const RVector &mua, const RVector &mus, const RVector &ref,
-                    const char *solver, double tol, PyObject **res) {
-  const double c0 = 0.3;
-  int i, n, nQ, nM, ndat, nprm;
-
-  n = mesh->nlen();
-  nQ = mesh->nQ;
-  nM = mesh->nM;
-  ndat = mesh->nQM;
-  nprm = (raster ? raster->SLen() : n);
-
-  RVector *dphi, *aphi;
-  RFwdSolver FWS(mesh, solver, tol);
-  RDenseMatrix J(ndat, nprm);
-
-  // Solution in mesh basis
-  Solution msol(OT_NPARAM, n);
-  msol.SetActive(OT_CMUA, true);
-  msol.SetActive(OT_CKAPPA, true);
-
-  // Set optical coefficients
-  msol.SetParam(OT_CMUA, mua * c0 / ref);
-  msol.SetParam(OT_CKAPPA, c0 / (3.0 * ref * (mua + mus)));
-  RVector c2a(n);
-  for (i = 0; i < n; i++)
-    c2a[i] = c0 / (2.0 * ref[i] * A_Keijzer(ref[i]));
-  msol.SetParam(OT_C2A, c2a);
-
-  // build the field vectors
-  dphi = new RVector[nQ];
-  for (i = 0; i < nQ; i++) {
-    dphi[i].New(n);
-  }
-  aphi = new RVector[nM];
-  for (i = 0; i < nM; i++) {
-    aphi[i].New(n);
-  }
-
-  // Calculate direct and adjoint fields
-  FWS.Allocate();
-  FWS.Reset(msol, 0);
-  FWS.CalcFields(qvec, dphi);
-  FWS.CalcFields(mvec, aphi);
-
-  GenerateJacobian_cw(raster, mesh, mvec, dphi, aphi, DATA_LOG, &J);
-
-  delete[] dphi;
-  delete[] aphi;
-
-  npy_intp J_dims[2] = {ndat, nprm};
+  RDenseMatrix J;
+  CalcJacobian(mesh, raster, qvec, mvec, mua, mus, ref, freq, solver, tol, J);
+    
+  npy_intp J_dims[2] = {J.nRows(), J.nCols()};
   PyObject *pyJ = PyArray_SimpleNew(2, J_dims, NPY_DOUBLE);
   double *pyJ_data = (double *)PyArray_DATA((PyArrayObject *)pyJ);
   const double *J_data = J.ValPtr();
-  memcpy(pyJ_data, J_data, ndat * nprm * sizeof(double));
-  *res = pyJ;
+  memcpy(pyJ_data, J_data, J.nRows() * J.nCols() * sizeof(double));
+  
+  PyObject *res = Py_BuildValue("O", pyJ);
+  Py_DECREF(pyJ);
+  return res;
 }
+
 
 static PyObject *toast_jacobianCW(PyObject *self, PyObject *args) {
   int hmesh, hraster;
   QMMesh *mesh;
   Raster *raster;
-  const char *solver;
+  char *solver;
   double tol;
   PyArrayObject *py_qvec_vl, *py_qvec_rp, *py_qvec_ci;
   PyArrayObject *py_mvec_vl, *py_mvec_rp, *py_mvec_ci;
@@ -2029,7 +1689,7 @@ static PyObject *toast_jacobianCW(PyObject *self, PyObject *args) {
   nint *qrowptr = (nint *)PyArray_DATA(py_qvec_rp);
   nint *qcolidx = (nint *)PyArray_DATA(py_qvec_ci);
   double *qval = (double *)PyArray_DATA(py_qvec_vl);
-  RCompRowMatrix qvec(nQ, n, qrowptr, qcolidx, qval /*, SHALLOW_COPY*/);
+  const RCompRowMatrix qvec(nQ, n, qrowptr, qcolidx, qval /*, SHALLOW_COPY*/);
 
   if (!AssertArray(py_mvec_rp, 1, TOAST_NPY_INT)) {
     PyErr_SetString(PyExc_ValueError, "mvec row pointer must be a one-dimensional vector of integers");
@@ -2046,7 +1706,7 @@ static PyObject *toast_jacobianCW(PyObject *self, PyObject *args) {
   nint *mrowptr = (nint *)PyArray_DATA(py_mvec_rp);
   nint *mcolidx = (nint *)PyArray_DATA(py_mvec_ci);
   double *mval = (double *)PyArray_DATA(py_mvec_vl);
-  RCompRowMatrix mvec(nM, n, mrowptr, mcolidx, mval /*, SHALLOW_COPY*/);
+  const RCompRowMatrix mvec(nM, n, mrowptr, mcolidx, mval /*, SHALLOW_COPY*/);
 
   if (!AssertArrayDims(py_mua, NPY_DOUBLE, n)) {
     PyErr_SetString(PyExc_ValueError, "mua must be a one-dimensional vector of doubles of length equal to mesh nodes");
@@ -2061,169 +1721,28 @@ static PyObject *toast_jacobianCW(PyObject *self, PyObject *args) {
     return NULL;
   }
   double *mua_ptr = (double *)PyArray_DATA(py_mua);
-  RVector mua(n, mua_ptr, SHALLOW_COPY);
+  const RVector mua(n, mua_ptr, SHALLOW_COPY);
 
   double *mus_ptr = (double *)PyArray_DATA(py_mus);
-  RVector mus(n, mus_ptr, SHALLOW_COPY);
+  const RVector mus(n, mus_ptr, SHALLOW_COPY);
 
   double *ref_ptr = (double *)PyArray_DATA(py_ref);
-  RVector ref(n, ref_ptr, SHALLOW_COPY);
+  const RVector ref(n, ref_ptr, SHALLOW_COPY);
 
-  PyObject *J;
-  CalcJacobianCW(mesh, raster, qvec, mvec, mua, mus, ref, solver, tol, &J);
+  RDenseMatrix J;
+  CalcJacobianCW(mesh, raster, qvec, mvec, mua, mus, ref, solver, tol, J);
 
-  PyObject *res = Py_BuildValue("O", J);
-  Py_DECREF(J);
+  npy_intp J_dims[2] = {J.nRows(), J.nCols()};
+  PyObject *pyJ = PyArray_SimpleNew(2, J_dims, NPY_DOUBLE);
+  double *pyJ_data = (double *)PyArray_DATA((PyArrayObject *)pyJ);
+  const double *J_data = J.ValPtr();
+  memcpy(pyJ_data, J_data, J.nRows() * J.nCols() * sizeof(double));
+  
+  PyObject *res = Py_BuildValue("O", pyJ);
+  Py_DECREF(pyJ);
   return res;
 }
 
-// ===========================================================================
-// Calculate the gradient of the forward operator
-
-void AddDataGradient(QMMesh *mesh, Raster *raster, const CFwdSolver &FWS,
-                     const RVector &proj, const RVector &data, const RVector &sd, CVector *dphi,
-                     const CCompRowMatrix &mvec, RVector &grad) {
-  int i, j, q, m, n, idx, ofs_mod, ofs_arg;
-  double term;
-  int glen = raster->GLen();
-  int slen = raster->SLen();
-  int dim = raster->Dim();
-  const IVector &gdim = raster->GDim();
-  const RVector &gsize = raster->GSize();
-  const int *elref = raster->Elref();
-  CVector wqa(mesh->nlen());
-  RVector wqb(mesh->nlen());
-  CVector dgrad(slen);
-  ofs_mod = 0;
-  ofs_arg = mesh->nQM;
-  RVector grad_cmua(grad, 0, slen);
-  RVector grad_ckappa(grad, slen, slen);
-
-  for (q = 0; q < mesh->nQ; q++) {
-    // expand field and gradient
-    CVector cdfield(glen);
-    CVector *cdfield_grad = new CVector[dim];
-    raster->Map_MeshToGrid(dphi[q], cdfield);
-    ImageGradient(gdim, gsize, cdfield, cdfield_grad, elref);
-
-    n = mesh->nQMref[q];
-
-    RVector y_mod(data, ofs_mod, n);
-    RVector s_mod(sd, ofs_mod, n);
-    RVector ypm_mod(proj, ofs_mod, n);
-    RVector b_mod(n);
-    b_mod = (y_mod - ypm_mod) / s_mod;
-
-    RVector y_arg(data, ofs_arg, n);
-    RVector s_arg(sd, ofs_arg, n);
-    RVector ypm_arg(proj, ofs_arg, n);
-    RVector b_arg(n);
-    b_arg = (y_arg - ypm_arg) / s_arg;
-
-    RVector ype(n);
-    ype = 1.0;  // will change if data type is normalised
-
-    CVector cproj(n);
-    // Project_cplx (*mesh, q, dphi[q], cproj);
-    cproj = ProjectSingle(mesh, q, mvec, dphi[q]);
-    wqa = std::complex<double>(0, 0);
-    wqb = 0.0;
-
-    for (m = idx = 0; m < mesh->nM; m++) {
-      if (!mesh->Connected(q, m)) {
-        continue;
-      }
-      const CVector qs = mvec.Row(m);
-      double rp = cproj[idx].real();
-      double ip = cproj[idx].imag();
-      double dn = 1.0 / (rp * rp + ip * ip);
-
-      // amplitude term
-      term = -2.0 * b_mod[idx] / (ype[idx] * s_mod[idx]);
-      wqa += qs * std::complex<double>(term * rp * dn, -term * ip * dn);
-
-      // phase term
-      term = -2.0 * b_arg[idx] / (ype[idx] * s_arg[idx]);
-      wqa += qs * std::complex<double>(-term * ip * dn, -term * rp * dn);
-
-      // wqb += Re(qs) * (term * ypm[idx]);
-      idx++;
-    }
-
-    // adjoint field and gradient
-    CVector wphia(mesh->nlen());
-    FWS.CalcField(wqa, wphia);
-
-    CVector cafield(glen);
-    CVector *cafield_grad = new CVector[dim];
-    raster->Map_MeshToGrid(wphia, cafield);
-    ImageGradient(gdim, gsize, cafield, cafield_grad, elref);
-
-    // absorption contribution
-    raster->Map_GridToSol(cdfield * cafield, dgrad);
-    grad_cmua -= Re(dgrad);
-
-    // diffusion contribution
-    // multiply complex field gradients
-    CVector gk(glen);
-    for (i = 0; i < glen; i++) {
-      for (j = 0; j < dim; j++) {
-        gk[i] += cdfield_grad[j][i] * cafield_grad[j][i];
-      }
-    }
-    raster->Map_GridToSol(gk, dgrad);
-    grad_ckappa -= Re(dgrad);
-
-    delete[] cdfield_grad;
-    delete[] cafield_grad;
-
-    ofs_mod += n;  // step to next source
-    ofs_arg += n;
-  }
-}
-
-void GetGradient(QMMesh *mesh, Raster *raster, CFwdSolver &FWS,
-                 const RVector &mua, const RVector &mus, const RVector &ref, double freq,
-                 const RVector &data, const RVector &sd,
-                 const CCompRowMatrix &qvec, const CCompRowMatrix &mvec,
-                 RVector &grad) {
-  const double c0 = 0.3;
-  int i, n = mesh->nlen();
-  int nQ = mesh->nQ;
-  CVector *dphi;
-  RVector proj(data.Dim());
-
-  // Solution in mesh basis
-  Solution msol(OT_NPARAM, n);
-  msol.SetActive(OT_CMUA, true);
-  msol.SetActive(OT_CKAPPA, true);
-
-  // Set optical coefficients
-  msol.SetParam(OT_CMUA, mua * c0 / ref);
-  msol.SetParam(OT_CKAPPA, c0 / (3.0 * ref * (mua + mus)));
-  RVector c2a(n);
-  for (i = 0; i < n; i++) {
-    c2a[i] = c0 / (2.0 * ref[i] * A_Keijzer(ref[i]));
-  }
-  msol.SetParam(OT_C2A, c2a);
-
-  double omega = freq * 2.0 * Pi * 1e-6;  // convert from MHz to rad
-
-  // build the field vectors
-  dphi = new CVector[nQ];
-  for (i = 0; i < nQ; i++)
-    dphi[i].New(n);
-
-  // Calculate fields
-  FWS.Allocate();
-  FWS.Reset(msol, omega);
-  FWS.CalcFields(qvec, dphi);
-  proj = FWS.ProjectAll_real(mvec, dphi);
-
-  AddDataGradient(mesh, raster, FWS, proj, data, sd, dphi, mvec, grad);
-
-  delete[] dphi;
-}
 
 static PyObject *toast_gradient(PyObject *self, PyObject *args) {
   int hmesh, hraster;
@@ -2332,15 +1851,23 @@ static PyObject *toast_gradient(PyObject *self, PyObject *args) {
   double *sd_ptr = (double *)PyArray_DATA(py_sd);
   RVector sd(nQM * 2, sd_ptr, SHALLOW_COPY);
 
-  CFwdSolver FWS(mesh, solver, tol);
-  FWS.SetDataScaling(DATA_LOG);
+	int nth;
+  #ifdef TOAST_THREAD
+  nth = Task::GetThreadCount();
+  #else
+  nth = 1;
+  #endif
 
+  CFwdSolver FWS (mesh, solver, tol, nth);
+  FWS.SetDataScaling (DATA_LOG);
+  
   npy_intp grad_dim = raster->SLen() * 2;
   PyObject *py_grad = PyArray_SimpleNew(1, &grad_dim, NPY_DOUBLE);
   double *py_grad_data = (double *)PyArray_DATA((PyArrayObject *)py_grad);
   memset(py_grad_data, 0, grad_dim * sizeof(double));
   RVector grad(grad_dim, py_grad_data, SHALLOW_COPY);
-  GetGradient(mesh, raster, FWS, mua, mus, ref, freq, data, sd, qvec, mvec, grad);
+
+  GetGradientCplx (mesh, raster, FWS, mua, mus, ref, freq, data, sd, qvec, mvec, grad);
 
   PyObject *res = Py_BuildValue("O", py_grad);
   Py_DECREF(py_grad);

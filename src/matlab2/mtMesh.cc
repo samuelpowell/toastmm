@@ -10,6 +10,9 @@
 #include "mex.h"
 #include "mexutil.h"
 
+// Computation routines
+#include "../common/calc_mesh.h"
+
 using namespace std;
 
 // =========================================================================
@@ -17,104 +20,29 @@ using namespace std;
 void MatlabToast::MakeMesh (int nlhs, mxArray *plhs[], int nrhs,
     const mxArray *prhs[])
 {
-    int i, j, k;
+    int i;
     int nvtx = (int)mxGetM(prhs[0]);
     int nel  = (int)mxGetM(prhs[1]);
     int dim  = (int)mxGetN(prhs[0]);
     int nnd0 = (int)mxGetN(prhs[1]);
     double *vtx = mxGetPr (prhs[0]);
-    double *idx = mxGetPr (prhs[1]);
-    double *etp = mxGetPr (prhs[2]);
+    double *didx = mxGetPr (prhs[1]);
+    double *detp = mxGetPr (prhs[2]);
 
-    Mesh *mesh = new QMMesh;;
-    mexLock(); // prevent mex file unloading while mesh is allocated
-
-    // create node list
-    mesh->nlist.New (nvtx);
-    for (i = 0; i < nvtx; i++) {
-	mesh->nlist[i].New(dim);
-	mesh->nlist[i].SetBndTp (BND_NONE); // don't know
-    }
-    for (j = k = 0; j < dim; j++) {
-	for (i = 0; i < nvtx; i++) {
-	    mesh->nlist[i][j] = vtx[k++];
-	}
-    }
-
-    // create element list
-    Element *el, **list = new Element*[nel];
-    for (i = 0; i < nel; i++) {
-	int eltp = (int)(etp[i]+0.5);
-	switch (eltp) {
-	case ELID_TRI3OLD:
-	    list[i] = new Triangle3old;
-	    break;
-	case ELID_TET4:
-	    list[i] = new Tetrahedron4;
-	    break;
-	case ELID_WDG6:
-	    list[i] = new Wedge6;
-	    break;
-	case ELID_VOX8:
-	    list[i] = new Voxel8;
-	    break;
-	case ELID_TRI6:
-	    list[i] = new Triangle6;
-	    break;
-	case ELID_TET10:
-	    list[i] = new Tetrahedron10;
-	    break;
-	case ELID_TRI6_IP:
-	    list[i] = new Triangle6_ip;
-	    break;
-	case ELID_TRI10:
-	    list[i] = new Triangle10;
-	    break;
-	case ELID_TRI10_IP:
-	    list[i] = new Triangle10_ip;
-	    break;
-	case ELID_TET10_IP:
-	    list[i] = new Tetrahedron10_ip;
-	    break;
-	case ELID_PIX4:
-	    list[i] = new Pixel4;
-	    break;
-	case ELID_TRI3:
-	    list[i] = new Triangle3;
-	    break;
-	case ELID_TRI3D3:
-	    list[i] = new Triangle3D3;
-	    break;
-	case ELID_TRI3D6:
-	    list[i] = new Triangle3D6;
-	    break;
-	default:
-	    mexErrMsgTxt ("Element type not supported!\n");
-	    list[i] = 0;
-	    break;
-	}
-    }
-    mesh->elist.SetList (nel, list);
-    delete []list;
-
-    for (j = k = 0; j < nnd0; j++) {
-	for (i = 0; i < nel; i++) {
-	    if (el = mesh->elist[i]) {
-		if (j < el->nNode())
-		    el->Node[j] = (int)(idx[k]-0.5);
-	    }
-	    k++;
-	}
-    }
-
-    // check mesh consistency
-    if (mesh->Shrink()) {
-	mexWarnMsgTxt ("toastMesh: removed unused nodes");
-	nvtx = mesh->nlen();
+    // Convert inputs to integral type
+    IVector idx(nel);
+    for(i = 0; i < nel; i++) {
+        idx[i] = (int)(didx[i]-0.5);
     }
     
-    // set up mesh
-    mesh->Setup();
+    IVector etp(nel);
+    for(i = 0; i < nel; i++) {
+        etp[i] = (int)(detp[i]+0.5);
+    }
+
+    QMMesh *mesh;
+    BuildMesh(&mesh, nvtx, nel, dim, nnd0, vtx, idx.data_buffer(), etp.data_buffer());
+    mexLock(); // prevent mex file unloading while mesh is allocated
 
     plhs[0] = mxCreateNumericMatrix (1, 1, mxUINT64_CLASS, mxREAL);
     uint64_T *ptr = (uint64_T*)mxGetData (plhs[0]);
