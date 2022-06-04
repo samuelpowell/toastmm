@@ -12,9 +12,9 @@
 #include "stoastlib.h"
 
 // Computation routines
-#include "../common/calc_gradient.h"
-#include "../common/calc_jacobian.h"
-#include "../common/calc_mesh.h"
+#include "calc_gradient.h"
+#include "calc_jacobian.h"
+#include "calc_mesh.h"
 
 #define TOAST_NPY_INT NPY_INT   // The numpy type for integer output to Python
 typedef int nint;               // The C type for integer input from Python
@@ -1503,9 +1503,9 @@ static PyObject *toast_fields(PyObject *self, PyObject *args) {
 
   CVector *dphi;
   CVector sphi(slen);
- std::cout << "1" << std::endl;
+ 
   CalcFields(mesh, raster, qvec, mua, mus, ref, freq, "DIRECT", 1e-12, &dphi);
-std::cout << "2" << std::endl;
+
   // Map or copy to output
   npy_intp dmx_dims[2] = {slen, nQ};
   PyObject *dmx = PyArray_SimpleNew(2, dmx_dims, NPY_CDOUBLE);
@@ -1522,12 +1522,11 @@ std::cout << "2" << std::endl;
       dp += nQ;
     }
   }
-std::cout << "3" << std::endl;
   delete[] dphi;
-std::cout << "4" << std::endl;
+
   PyObject *ret = Py_BuildValue("O", dmx);
   Py_DECREF(dmx);
-std::cout << "5" << std::endl;
+
   if (ret) {
     return ret;
   } else {
