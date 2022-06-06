@@ -15,7 +15,7 @@ target_include_directories(libmath INTERFACE .)               # Provide headers 
 # Standard build
 #
 target_sources(libmath PRIVATE  mathdef.cc util.cc timing.cc vector.cc gsmatrix.cc 
-                                scrmatrix.cc crmatrix_cm.cc nr.cc error.cc cr_cholesky.cc 
+                                scrmatrix.cc nr.cc error.cc cr_cholesky.cc 
                                 fourn.cc util.cc timing.cc mathdef.cc)
 
 # Otional 

@@ -13,7 +13,6 @@
 #include "matrix.h"
 #include "dgmatrix.h"
 #include "crmatrix.h"
-#include "crmatrix_cm.h"
 
 /// \defgroup iterative linear solver preconditioner types
 //@{
@@ -195,60 +194,5 @@ typedef TPrecon_CG_Multigrid<std::complex<double> > CPrecon_CG_Multigrid;
 typedef TPrecon_CG_Multigrid<std::complex<float> >  SCPrecon_CG_Multigrid;
 typedef TPrecon_CG_Multigrid<int>       IPrecon_CG_Multigrid;
 
-
-// ==========================================================================
-// Specialised preconditioner: single-precision complex compressed-row
-// matrix (requires separate implementation to work with double-precision
-// vectors)
-
-class SCPreconditionerMixed {
-public:
-    SCPreconditionerMixed() {}
-    virtual ~SCPreconditionerMixed() {}
-
-    virtual PreconType Type() = 0;
-
-    virtual void Reset (const SCCompRowMatrixMixed *A) = 0;
-    // Reset preconditioner for matrix A
-    
-    virtual void Apply (const CVector &r, CVector &s)=0;
-    // Apply preconditioner to r and return the result in s
-    // e.g. s = M^-1 r for a preconditioner matrix M
-
-    inline static SCPreconditionerMixed *Create (PreconType type);
-    // create a new preconditioner of type 'type' and return pointer to it
-};
-
-class SCPreconMixed_Null: public SCPreconditionerMixed {
-public:
-    SCPreconMixed_Null() {}
-    PreconType Type() { return PRECON_NULL; }
-    void Reset (const SCCompRowMatrixMixed*) {}
-    void Apply (const CVector &r, CVector &s) { s = r; }
-};
-
-class SCPreconMixed_Diag: public SCPreconditionerMixed {
-public:
-    SCPreconMixed_Diag() {}
-    PreconType Type() { return PRECON_DIAG; }
-    inline void Reset (const SCCompRowMatrixMixed *A);
-    inline void Apply (const CVector &r, CVector &s);
-
-private:
-    CVector idiag;
-};
-
-class SCPreconMixed_DILU: public SCPreconditionerMixed {
-public:
-    SCPreconMixed_DILU() {}
-    PreconType Type() { return PRECON_DILU; }
-    inline void Reset (const SCCompRowMatrixMixed *);
-    inline void Apply (const CVector &r, CVector &s);
-
-private:
-    int dim;                       // problem dimension
-    CVector ipivot;                // inverse pivots
-    const SCCompRowMatrixMixed *A; // pointer to matrix
-};
 
 #endif // !__PRECON_H

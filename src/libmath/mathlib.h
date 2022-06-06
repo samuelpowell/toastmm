@@ -37,7 +37,6 @@
 #include "gsmatrix.h"
 #include "cdmatrix.h"
 #include "crmatrix.h"
-#include "crmatrix_cm.h"
 #include "scrmatrix.h"
 #include "cr_cholesky.h"
 #include "precon.h"
