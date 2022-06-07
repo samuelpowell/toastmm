@@ -31,47 +31,46 @@ hmesh.SetQM(qpos, mpos);
 qvec = hmesh.Qvec ('Neumann', 'Gaussian', 2);
 mvec = hmesh.Mvec ('Gaussian', 2, ref);
 
-% The matrix of performance:
-%
-% Library / MATLAB
-%  - DIRECT / CG
-%  - Basis / Mesh
+% Build a basis
+hbasis = toastBasis([20 20 20]);
 
-% Mesh Jacobian all styles
-tic
-JmDM = toastJacobianCW(hmesh, 0, qvec, mvec, mua, mus, ref, 'direct', tol, 'matlab');
-t_JmDM = toc
+% Continuous wave
 
-tic
-JmIM = toastJacobianCW(hmesh, 0, qvec, mvec, mua, mus, ref, 'cg', tol, 'matlab');
-t_JmIM = toc
-
-% tic
-% JmDT = toastJacobianCW(hmesh, 0, qvec, mvec, mua, mus, ref, 'direct', tol, 'toast');
-% t_JmDT = toc
-% 
-tic
-JmCT = toastJacobianCW(hmesh, 0, qvec, mvec, mua, mus, ref, 'cg', tol, 'toast');
-t_JmCT = toc
-
-% Basis Jacobian all styles
-hbasis = toastBasis(hmesh, [20 20 20]);
+% Compute the fields to exclude this from the computation timing
+phi_cw = toastFields(hmesh,0,[qvec mvec],mua,mus,ref,0,'cg',tol);
+dphi_cw = phi_cw(:, 1:size(qvec,2));
+aphi_cw = phi_cw(:, (size(qvec,2)+1) : end);
+        
+% Build projection data, reduce by linklist
+proj_cw = reshape (mvec.' * dphi_cw, [], 1);
+proj_cw = proj_cw(hmesh.DataLinkList());
 
 tic
-JbDM = toastJacobianCW(hmesh, hbasis, qvec, mvec, mua, mus, ref, 'direct', tol, 'matlab');
-t_JmDM = toc
+J_mCW = toastJacobianCW(hmesh, 0, dphi_cw, aphi_cw, proj_cw);
+t_mCW = toc
 
 tic
-JbIM = toastJacobianCW(hmesh, hbasis, qvec, mvec, mua, mus, ref, 'cg', tol, 'matlab');
-t_JmIM = toc
+J_bCW = toastJacobianCW(hmesh, hbasis, dphi_cw, aphi_cw, proj_cw);
+t_bCW = toc
 
-% tic
-% JbDT = toastJacobianCW(hmesh, hbasis, real(qvec), real(mvec), mua, mus, ref, 'direct', tol, 'toast');
-% t_JmDT = toc
+% Frequency domain
+
+% Compute the fields to exclude this from the computation timing
+phi_fd = toastFields(hmesh,100,[qvec mvec],mua,mus,ref,0,'bicgstab',tol);
+dphi_fd = phi_fd(:, 1:size(qvec,2));
+aphi_fd = phi_fd(:, (size(qvec,2)+1) : end);
+        
+% Build projection data, reduce by linklist
+proj_fd = reshape (mvec.' * dphi_fd, [], 1);
+proj_fd = proj_fd(hmesh.DataLinkList());
 
 tic
-JbCT = toastJacobianCW(hmesh, hbasis, real(qvec), real(mvec), mua, mus, ref, 'cg', tol, 'toast');
-t_JmCT = toc
+J_mFD = toastJacobianCW(hmesh, 0, dphi_fd, aphi_fd, proj_fd);
+t_mFD = toc
+
+tic
+J_bFD = toastJacobianCW(hmesh, hbasis, dphi_fd, aphi_fd, proj_fd);
+t_bFD = toc
 
 
 
