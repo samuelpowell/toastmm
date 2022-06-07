@@ -27,3 +27,6 @@ script/matlab/demos/*.mat
 # Python build outputs
 *.egg-info
 *.whl
+
+# Performance inputs
+perf/matlab/*.mat
