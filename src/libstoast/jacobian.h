@@ -148,6 +148,20 @@ STOASTLIB void GenerateJacobian_cw (const Raster *raster,
 
 /// @}
 
+
+template<class T>
+STOASTLIB TVector<T> IntFG (const Mesh &mesh, const TVector<T> &f, const TVector<T> &g);
+
+template<class T>
+STOASTLIB TVector<T> IntGradFGradG (const Mesh &mesh,
+    const TVector<T> &f, const TVector<T> &g);
+
+template<class T>
+STOASTLIB TVector<T> IntFG_el (const Mesh &mesh, const TVector<T> &f, const TVector<T> &g);
+
+template<class T>
+STOASTLIB TVector<T> IntGradFGradG_el (const Mesh &mesh, const TVector<T> &f, const TVector<T> &g);
+
 template<class T>
 STOASTLIB void ImageGradient (const IVector &dim, const RVector &size,
     const TVector<T> &im, TVector<T> *grad, const int *mask = 0);

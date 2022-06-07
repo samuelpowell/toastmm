@@ -36,20 +36,6 @@ void GenerateJacobian_mesh (const QMMesh *mesh,
     const CVector *dphi, const CVector *aphi, const CVector *proj,
     DataScale dscale, RDenseMatrix &J, bool elbasis);
 
-template<class T>
-TVector<T> IntFG (const Mesh &mesh, const TVector<T> &f, const TVector<T> &g);
-
-template<class T>
-TVector<T> IntGradFGradG (const Mesh &mesh,
-    const TVector<T> &f, const TVector<T> &g);
-
-template<class T>
-TVector<T> IntFG_el (const Mesh &mesh, const TVector<T> &f, const TVector<T> &g);
-
-template<class T>
-TVector<T> IntGradFGradG_el (const Mesh &mesh,
-    const TVector<T> &f, const TVector<T> &g);
-
 // ============================================================================
 // PMDF calculations
 
