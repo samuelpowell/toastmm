@@ -4,7 +4,6 @@
 
 #define STOASTLIB_IMPLEMENTATION
 #include "stoastlib.h"
-#include "util.h"
 #include "timing.h"
 #include <fstream>
 
