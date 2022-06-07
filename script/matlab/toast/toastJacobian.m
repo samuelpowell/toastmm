@@ -46,11 +46,13 @@ else
 end
 
 if nargin==5
+    % Compute from fields
     dphi = varargin{1};
     aphi = varargin{2};
     proj = varargin{3};
     J = toastmex(uint32(53),hmesh.handle,hb,dphi,aphi,proj);
 else
+    % Compute fields
     qvec = varargin{1};
     mvec = varargin{2};
     mua = varargin{3};
@@ -59,13 +61,28 @@ else
     freq = varargin{6};
     solver = 'direct';
     tol = 1e-8;
+    impl= 'auto'
     if nargin >= 9
         solver = varargin{7};
         if nargin >= 10
             tol = varargin{8};
+            if nargin >= 11
+                impl = varargin{9};
+            end
         end
     end
-    J = toastmex(uint32(53),hmesh.handle,hb,qvec,mvec,mua,mus,ref,freq,solver,tol);
+
+    % Compute fields in mesh basis
+    phi = toastFields(mesh,0,[qvec mvec],mua,mus,ref,freq,solver,tol,impl);
+    dphi = phi(:, 1:size(qvec,2));
+    aphi = phi(:, (size(qvec,2)+1) : end);
+        
+    % Build projection data, reduce by linklist
+    proj = reshape (mvec.' * dphi, [], 1);
+    proj = proj(mesh.DataLinkList());
+
+    % Compute Jacobian
+    J = toastmex(uint32(53),hmesh.handle,hb,dphi,aphi,proj);
 end
 
 end

@@ -1,8 +1,8 @@
 function J = toastJacobianCW(mesh,basis,varargin)
 % Jacobian for DOT continuous wave problem for mua parameter
 %
-% Syntax: [J, proj] = toastJacobianCW (mesh, basis, qvec, mvec, mua, mus, ref,
-%                                      solver, tol, impl)
+% Syntax: J = toastJacobianCW (mesh, basis, qvec, mvec, mua, mus, ref, solver, tol, impl)
+%         J = toastJacobianCW (mesh, basis, dphi, aphi, proj)
 %
 % Parameters:
 %         mesh [toastMesh object]:
