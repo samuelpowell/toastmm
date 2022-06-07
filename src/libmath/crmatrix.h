@@ -94,22 +94,6 @@ template<class MT>
 void LUSolve (const TCompRowMatrix<MT> &LU, const TVector<MT> &b,
     TVector<MT> &x);
 
-// template<class MT>
-// void LU (TCompRowMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x);
-
-#ifdef ML_INTERFACE
-
-template<class MT>
-int ML_matvec (ML_Operator *Amat, int in_length, double p[],
-    int out_length, double ap[]);
-
-template<class MT>
-int ML_getrow (ML_Operator *Amat, int N_requested_rows,
-    int requested_rows[], int allocated_space, int columns[],
-    double values[], int row_lenghts[]);
-
-#endif // ML_INTERFACE
-
 template<class MT>
 std::istream &operator>> (std::istream &is, TCompRowMatrix<MT> &m);
 
@@ -546,15 +530,6 @@ private:
     mutable idxtype *vofs;
     // vofs[colptr[i]+j] contains the offset into data array val of the j-th
     // entry of column i
-
-#ifdef ML_INTERFACE
-friend int ML_matvec<> (ML_Operator *Amat, int in_length, double p[],
-    int out_length, double ap[]);
-friend int ML_getrow<> (ML_Operator *Amat, int N_requested_rows,
-    int requested_rows[], int allocated_space, int columns[],
-    double values[], int row_lenghts[]);
-#endif // ML_INTERFACE
-
 };
 
 // ==========================================================================
@@ -569,7 +544,7 @@ typedef TCompRowMatrix<int>	 ICompRowMatrix;	// 'integer'
 // ==========================================================================
 // extern declarations of TCompRowMatrix (only required for VS)
 
-#ifdef UNDEF
+#ifdef UNDEF  // NEED_EXPLICIT_INSTANTIATION
 //#ifndef __CRMATRIX_CC
 extern template class MATHLIB TCompRowMatrix<double>;
 extern template class MATHLIB TCompRowMatrix<float>;

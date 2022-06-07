@@ -22,12 +22,7 @@
 
 using namespace std;
 
-const char *TOAST_VERSION = "15";
-
 #define ECHOLOG // echo log file entries on screen
-
-#define EXPIRED_MSG "Sorry, the license for this program has expired.\n\
-Please contact S.Arridge@cs.ucl.ac.uk or martins@medphys.ucl.ac.uk\n"
 
 MATHLIB ofstream logfile;   // global log file handler
 MATHLIB char logbuf[256];
@@ -174,13 +169,10 @@ void SetVersion (const char *vstr)
 
 const char *Version (const char *type, const char *date)
 {
-    sprintf (fullversionstr, "TOAST%s distribution [%s] - Build %s\n(c) Martin Schweiger and Simon Arridge\n", TOAST_VERSION, type, date);
+    sprintf (fullversionstr, "TOAST-- distribution [%s] - Build %s\n", type, date);
 #ifdef TOAST_THREAD
     strcat (fullversionstr, "Running parallel (pthreads) version\n");
 #endif
-    //if (versionstr[0]) sprintf (fullversionstr, "%s version %s, build %s",
-    //	type, versionstr, date);
-    //else sprintf (fullversionstr, "%s version, build %s", type, date);
     return fullversionstr;
 }
 

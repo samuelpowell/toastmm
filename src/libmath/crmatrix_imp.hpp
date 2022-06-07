@@ -16,11 +16,6 @@
 
 #include "mathlib.h"
 
-#ifdef ML_INTERFACE
-#include "ml_defs.h"
-#include "ml_operator.h"
-#endif // ML_INTERFACE
-
 using namespace std;
 
 // ==========================================================================
@@ -1306,87 +1301,6 @@ void TCompRowMatrix<MT>::AB (const TCompRowMatrix<MT> &B,
     delete []fillrow;
 }
 
-#ifdef UNDEF // old version - slow but tested!
-template<class MT>
-void TCompRowMatrix<MT>::AB (const TCompRowMatrix<MT> &B,
-    TCompRowMatrix<MT> &C) const
-{
-    // Sparse matrix product C = AB
-
-    int i, j, k, ra, ra1, ra2, rb, rb1, rb2, nzero;
-    int nr = this->rows;
-    int nc = B.cols;
-
-    bool *fillrow = new bool[nc];
-    int *Crowptr  = new int[nr+1];
-    int *Crowptr1 = Crowptr+1; // for faster access
-    for (i = 0; i <= nr; i++) Crowptr[i] = 0;
-
-    // pass 1: determine sparsity pattern of product matrix C
-    for (i = 0; i < nr; i++) {
-        for (j = 0; j < nc; j++) fillrow[j] = false;
-        ra1 = rowptr[i];
-	ra2 = rowptr[i+1];
-	for (ra = ra1; ra < ra2; ra++) {
-	    k = colidx[ra];
-	    rb1 = B.rowptr[k];
-	    rb2 = B.rowptr[k+1];
-	    for (rb = rb1; rb < rb2; rb++) {
-	        j = B.colidx[rb];
-		if (!fillrow[j]) {
-		    fillrow[j] = true;
-		    Crowptr1[i]++;
-		}
-	    }
-	}
-    }
-    for (i = 1; i <= nr; i++) Crowptr[i] += Crowptr[i-1];
-
-    nzero = Crowptr[nr];
-    int *Ccolidx = new int[nzero];
-    MT *Cval     = new MT[nzero];
-    MT *rowval   = new MT[nc];
-
-    // pass 2: create product matrix C
-    for (i = 0; i < nr; i++) {
-        for (j = 0; j < nc; j++) {
-	    fillrow[j] = false;
-	    rowval[j] = (MT)0;
-	}
-	ra1 = rowptr[i];
-	ra2 = rowptr[i+1];
-	for (ra = ra1; ra < ra2; ra++) {
-	    k = colidx[ra];
-	    rb1 = B.rowptr[k];
-	    rb2 = B.rowptr[k+1];
-	    for (rb = rb1; rb < rb2; rb++) {
-	        j = B.colidx[rb];
-		fillrow[j] = true;
-		rowval[j] += this->val[ra] * B.val[rb];
-	    }
-	}
-	for (j = k = 0; j < nc; j++) {
-	    if (fillrow[j]) {
-	        ra = Crowptr[i]+k;
-	        Cval[ra] = rowval[j];
-		Ccolidx[ra] = j;
-		k++;
-	    }
-	}
-    }
-
-    C.New (nr, nc);
-    C.Initialise (Crowptr, Ccolidx, Cval);
-
-    // cleanup
-    delete []Crowptr;
-    delete []Ccolidx;
-    delete []Cval;
-    delete []rowval;
-    delete []fillrow;
-}
-#endif
-
 template<class MT>
 void TCompRowMatrix<MT>::Transpone ()
 {
@@ -1800,37 +1714,6 @@ MT TCompRowMatrix<MT>::sparsevec_mult (int *idx1, MT *val1, int n1,
     return sum;
 }
 
-#ifdef UNDEF
-bool overlap (int i, int j, int *col, int *next)
-{
-    // requires col to be sorted
-
-    int lastcol = i-1;
-    int c1, c2;
-
-    if ((c1 = col[i]) < 0) return false; // no entries in row i
-    if ((c2 = col[j]) < 0) return false; // no entries in row j
-
-    if (c1 > lastcol) return false;
-    if (c2 > lastcol) return false;
-
-    for (;;) {
-        if (c1 < c2) {
-	    do {
-	        if ((i = next[i]) < 0) return false; // end of row i
-	    } while ((c1 = col[i]) < c2);
-	    if (c1 > lastcol) return false;
-	} else if (c2 < c1) {
-	    do {
-	        if ((j = next[j]) < 0) return false; // end of row j
-	    } while ((c2 = col[j]) < c1);
-	    if (c2 > lastcol) return false;
-	}
-	if (c1 == c2) return true;
-    }
-}
-#endif
-
 template<class MT>
 void TCompRowMatrix<MT>::SymbolicCholeskyFactorize (idxtype *&frowptr,
     idxtype *&fcolidx) const
@@ -2185,36 +2068,6 @@ int TCompRowMatrix<MT>::bicgstab (const TVector<MT> &b, TVector<MT> &x,
     return BiCGSTAB (*this, b, x, tol, precon, maxit);
 }
 
-#ifdef UNDEF
-template<>
-int TCompRowMatrix<float>::bicgstab (const FVector &b, FVector &x,
-    double &tol, TPreconditioner<float> *precon, int maxit) const
-{
-    return BiCGSTAB (*this, b, x, tol, precon, maxit);
-}
-
-template<>
-int TCompRowMatrix<scomplex>::bicgstab (const SCVector &b, SCVector &x,
-    double &tol, TPreconditioner<scomplex> *precon, int maxit) const
-{
-    return BiCGSTAB (*this, b, x, tol, precon, maxit);
-}
-
-template<>
-int TCompRowMatrix<double>::bicgstab (const RVector &b, RVector &x,
-    double &tol, TPreconditioner<double> *precon, int maxit) const
-{
-    return BiCGSTAB (*this, b, x, tol, precon, maxit);
-}
-
-template<>
-int TCompRowMatrix<complex>::bicgstab (const CVector &b, CVector &x,
-    double &tol, TPreconditioner<complex> *precon, int maxit) const
-{
-    return BiCGSTAB (*this, b, x, tol, precon, maxit);
-}
-#endif
-
 // ==========================================================================
 
 template<class MT>
@@ -2225,32 +2078,6 @@ void TCompRowMatrix<MT>::bicgstab (const TVector<MT> *b, TVector<MT> *x,
     BiCGSTAB (*this, b, x, nrhs, tol, maxit, precon, res);
     //TMatrix<MT>::bicgstab (b, x, nrhs, tol, maxit, precon, res);
 }
-
-#ifdef UNDEF
-template<>
-void TCompRowMatrix<float>::bicgstab (const FVector *b, FVector *x, int nrhs,
-    double tol, int maxit, TPreconditioner<float> *precon,
-    IterativeSolverResult *res) const
-{
-    BiCGSTAB (*this, b, x, nrhs, tol, maxit, precon, res);
-}
-
-template<>
-void TCompRowMatrix<double>::bicgstab (const RVector *b, RVector *x, int nrhs,
-    double tol, int maxit, TPreconditioner<double> *precon,
-    IterativeSolverResult *res) const
-{
-    BiCGSTAB (*this, b, x, nrhs, tol, maxit, precon, res);
-}
-
-template<>
-void TCompRowMatrix<scomplex>::bicgstab (const SCVector *b, SCVector *x,
-    int nrhs, double tol, int maxit, TPreconditioner<scomplex> *precon,
-    IterativeSolverResult *res) const
-{
-    BiCGSTAB (*this, b, x, nrhs, tol, maxit, precon, res);
-}
-#endif
 
 // ==========================================================================
 
@@ -2443,66 +2270,6 @@ ostream &operator<< (ostream &os, const TCompRowMatrix<MT> &m)
     os << endl;
     return os;
 }
-
-
-// ==========================================================================
-// Interface between toast and the ML multigrid preconditioning package.
-
-#ifdef ML_INTERFACE
-
-template<class MT>
-int ML_matvec (ML_Operator *Amat, int in_length, double p[],
-    int out_length, double ap[])
-{
-    ERROR_UNDEF;
-    return 0;
-}
-
-template<> // specialisation: double
-int ML_matvec<double> (ML_Operator *Amat, int in_length, double p[],
-    int out_length, double ap[])
-{
-    RCompRowMatrix *A = (RCompRowMatrix*)ML_Get_MyMatvecData (Amat);
-    RVector b (in_length, p);
-    RVector x (out_length);
-    x = Ax (*A, b);
-    memcpy (ap, x.data_buffer(), out_length*sizeof(double));
-    // would be better if x could be constructed so as to directly use ap
-    // as its data buffer
-    return 1;
-}
-
-template<class MT>
-int ML_getrow (ML_Operator *Amat, int N_requested_rows,
-    int requested_rows[], int allocated_space, int columns[],
-    double values[], int row_lenghts[])
-{
-    ERROR_UNDEF;
-    return 0;
-}
-
-template<> // specialisation: double
-int ML_getrow<double> (ML_Operator *Amat, int N_requested_rows,
-    int requested_rows[], int allocated_space, int columns[],
-    double values[], int row_lenghts[])
-{
-    int i, j, r, c;
-    RCompRowMatrix *A = (RCompRowMatrix*)ML_Get_MyGetrowData (Amat);
-    
-    for (i = j = 0; i < N_requested_rows; i++) {
-	r = requested_rows[i];
-	for (c = A->rowptr[r]; c < A->rowptr[r+1]; c++) {
-	    if (j == allocated_space) return 0; // out of space
-	    columns[j] = A->colidx[c];
-	    values[j] = A->val[c];
-	    j++;
-	}
-	row_lengths[i] = A->rowptr[r+1] - A->rowptr[r];
-    }
-    return 0;
-}
-
-#endif // ML_INTERFACE
 
 // ==========================================================================
 // class and friend instantiations
