@@ -533,8 +533,8 @@ template class TSymCompRowMatrix<std::complex<double> >;
 template class TSymCompRowMatrix<std::complex<float> >;
 template class TSymCompRowMatrix<int>;
 
-template bool CholeskyFactorize (const RSymCompRowMatrix &A, RCompRowMatrix &L,
-    RVector &d, bool recover);
+// template bool CholeskyFactorize (const RSymCompRowMatrix &A, RCompRowMatrix &L,
+//     RVector &d, bool recover);
 
 template istream &operator>> (istream &is, RSymCompRowMatrix &m);
 template istream &operator>> (istream &is, CSymCompRowMatrix &m);
