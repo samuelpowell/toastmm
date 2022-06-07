@@ -21,11 +21,8 @@
 #define MATHLIB DLLIMPORT
 #endif
 
-#ifndef NO_MATH_HEADERS
-#include "util.h"
 #include "mathdef.h"
 #include "error.h"
-#include "nr.h"
 
 #include <complex>
 
@@ -35,11 +32,9 @@
 #include "dnsmatrix.h"
 #include "symatrix.h"
 #include "gsmatrix.h"
-#include "cdmatrix.h"
 #include "crmatrix.h"
-#include "crmatrix_cm.h"
-#include "scrmatrix.h"
 #include "cr_cholesky.h"
+#include "sycrmatrix.h"
 #include "precon.h"
 #include "gmres.h"
 #include "fourn.h" // only needed if using C version rather than C++
@@ -48,12 +43,11 @@
 #include "task.h"
 #endif
 
+
 #ifdef COMPUTE_FLOPS
 extern unsigned int flops_add;
 extern unsigned int flops_mul;
 #endif
-
-#endif // !NO_MATH_HEADERS
 
 #ifndef SQR
 #define SQR(_X) ((_X)*(_X))
@@ -72,6 +66,5 @@ extern unsigned int flops_mul;
 #include "gsmatrix_imp.hpp"
 #include "dgmatrix_imp.hpp"
 #include "crmatrix_imp.hpp"
-#include "cdmatrix_imp.hpp"
 
 #endif // !__MATHLIB_H

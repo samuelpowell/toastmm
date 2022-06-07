@@ -390,79 +390,79 @@ int TSymCompRowMatrix<MT>::Shrink ()
     return i;
 }
 
-template<class MT>
-void TSymCompRowMatrix<MT>::SymbolicCholeskyFactorize (idxtype *&frowptr,
-    idxtype *&fcolidx) const
-{
-    symbolic_cholesky_factor (this->rows, rowptr, colidx, frowptr, fcolidx);
-    // implemented in cr_cholesky.cc
-}
+// template<class MT>
+// void TSymCompRowMatrix<MT>::SymbolicCholeskyFactorize (idxtype *&frowptr,
+//     idxtype *&fcolidx) const
+// {
+//     symbolic_cholesky_factor (this->rows, rowptr, colidx, frowptr, fcolidx);
+//     // implemented in cr_cholesky.cc
+// }
 
-template<class MT>
-bool CholeskyFactorize (const TSymCompRowMatrix<MT> &A, TCompRowMatrix<MT> &L,
-    TVector<MT> &d, bool recover)
-{
-    // This assumes that entries of L are sorted COLUMN-wise, which should
-    // be the case if L has been initialised via SymbolicCholeskyFactorize
-    // Do NOT call L.Sort since this will sort row-wise!
+// template<class MT>
+// bool CholeskyFactorize (const TSymCompRowMatrix<MT> &A, TCompRowMatrix<MT> &L,
+//     TVector<MT> &d, bool recover)
+// {
+//     // This assumes that entries of L are sorted COLUMN-wise, which should
+//     // be the case if L has been initialised via SymbolicCholeskyFactorize
+//     // Do NOT call L.Sort since this will sort row-wise!
 
-    return false; // finish this
+//     return false; // finish this
 
-#ifdef UNDEF
+// #ifdef UNDEF
 
-    const double EPS = 1e-10;
-    int i, k, c, r, cc, term, n = A.nRows();
-    MT idiag, ajk, *fullcol = new MT[n];
-    bool ok = true;
-    //if (!A.col_access) A.SetColAccess();
-    if (!L.col_access) L.SetColAccess();
-    // some shortcuts to improve performance in the inner loops
-    int    *Lrowidx = L.rowidx;
-    int    *Lvofs   = L.vofs;
-    MT     *Lval    = L.val;
-    for (c = 0; c < n; c++) {
-	// expand current column
-        memset (fullcol, 0, n*sizeof(double));
-	for (i = A.rowptr[c]; i < A.rowptr[c+1]; i++)
-	    fullcol[r] = A.val[i];
+//     const double EPS = 1e-10;
+//     int i, k, c, r, cc, term, n = A.nRows();
+//     MT idiag, ajk, *fullcol = new MT[n];
+//     bool ok = true;
+//     //if (!A.col_access) A.SetColAccess();
+//     if (!L.col_access) L.SetColAccess();
+//     // some shortcuts to improve performance in the inner loops
+//     int    *Lrowidx = L.rowidx;
+//     int    *Lvofs   = L.vofs;
+//     MT     *Lval    = L.val;
+//     for (c = 0; c < n; c++) {
+// 	// expand current column
+//         memset (fullcol, 0, n*sizeof(double));
+// 	for (i = A.rowptr[c]; i < A.rowptr[c+1]; i++)
+// 	    fullcol[r] = A.val[i];
 
-	// loop over left columns
-	for (k = L.rowptr[c]; k < L.rowptr[c+1]; k++) {
-	    if ((cc = L.colidx[k]) >= c) continue;
-#ifdef FEM_DEBUG
-	    bool ajk_set = false;
-#endif
-	    for (i = L.colptr[cc], term = L.colptr[cc+1]; i < term; i++) {
-		if ((r = Lrowidx[i]) < c) continue;
-		if (r == c) {
-		    ajk = Lval[Lvofs[i]];
-#ifdef FEM_DEBUG
-		    ajk_set = true;
-#endif
-		}
-		dASSERT(ajk_set, "Cholesky factor not column-sorted");
-		fullcol[r] -= ajk * Lval[Lvofs[i]];
-	    }
-	}
-	// diagonal element
-	if (fullcol[c] > MT(0)) {   /* problem here, if using complex */
-	    d[c] = sqrt (fullcol[c]);
-	} else {
-	    if (!recover) xERROR("Matrix not positive definite");
-	    ok = false;
-	    d[c] = EPS;
-	}
-	idiag = MT(1)/d[c];
-	// scale column with diagonal
-	for (i = L.colptr[c], term = L.colptr[c+1]; i < term; i++) {
-	    r = Lrowidx[i];
-	    Lval[Lvofs[i]] = fullcol[r] * idiag;
-	}
-    }
-    delete []fullcol;
-    return ok;
-#endif
-}
+// 	// loop over left columns
+// 	for (k = L.rowptr[c]; k < L.rowptr[c+1]; k++) {
+// 	    if ((cc = L.colidx[k]) >= c) continue;
+// #ifdef FEM_DEBUG
+// 	    bool ajk_set = false;
+// #endif
+// 	    for (i = L.colptr[cc], term = L.colptr[cc+1]; i < term; i++) {
+// 		if ((r = Lrowidx[i]) < c) continue;
+// 		if (r == c) {
+// 		    ajk = Lval[Lvofs[i]];
+// #ifdef FEM_DEBUG
+// 		    ajk_set = true;
+// #endif
+// 		}
+// 		dASSERT(ajk_set, "Cholesky factor not column-sorted");
+// 		fullcol[r] -= ajk * Lval[Lvofs[i]];
+// 	    }
+// 	}
+// 	// diagonal element
+// 	if (fullcol[c] > MT(0)) {   /* problem here, if using complex */
+// 	    d[c] = sqrt (fullcol[c]);
+// 	} else {
+// 	    if (!recover) xERROR("Matrix not positive definite");
+// 	    ok = false;
+// 	    d[c] = EPS;
+// 	}
+// 	idiag = MT(1)/d[c];
+// 	// scale column with diagonal
+// 	for (i = L.colptr[c], term = L.colptr[c+1]; i < term; i++) {
+// 	    r = Lrowidx[i];
+// 	    Lval[Lvofs[i]] = fullcol[r] * idiag;
+// 	}
+//     }
+//     delete []fullcol;
+//     return ok;
+// #endif
+// }
 
 template<class MT>
 istream &operator>> (istream &is, TSymCompRowMatrix<MT> &m)
@@ -533,8 +533,8 @@ template class TSymCompRowMatrix<std::complex<double> >;
 template class TSymCompRowMatrix<std::complex<float> >;
 template class TSymCompRowMatrix<int>;
 
-template bool CholeskyFactorize (const RSymCompRowMatrix &A, RCompRowMatrix &L,
-    RVector &d, bool recover);
+// template bool CholeskyFactorize (const RSymCompRowMatrix &A, RCompRowMatrix &L,
+//     RVector &d, bool recover);
 
 template istream &operator>> (istream &is, RSymCompRowMatrix &m);
 template istream &operator>> (istream &is, CSymCompRowMatrix &m);
