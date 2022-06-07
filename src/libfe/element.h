@@ -587,6 +587,21 @@ public:
     virtual double IntFFF (int i, int j, int k) const = 0;
 
     /**
+     * \brief Integral of a product of two functions over the
+     *   element.
+     * \param x output vector over which to add element contributions
+     * \param f first function vector
+     * \param g second function vector
+     * \sa IntFFF
+     */
+    virtual void IntFG (RVector &x, const RVector &f, const RVector &g) const 
+    { ERROR_UNDEF; };
+    
+    virtual void IntFG (CVector &x, const CVector &f, const CVector &g) const 
+    { ERROR_UNDEF; };
+    
+
+    /**
      * \brief Integrals of all products of two shape functions and a nodal
      *   function over the element.
      * \param P nodal basis coefficients of a function defined over the mesh

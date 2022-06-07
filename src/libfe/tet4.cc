@@ -151,6 +151,14 @@ void Tetrahedron4::Initialise (const NodeList &nlist)
     intff = sym_intff * size;
 #endif
 
+#ifdef TET4_STORE_INTFFF
+    intf0ff.New(4,4); intf0ff = full_intf0ff * size;
+    intf1ff.New(4,4); intf1ff = full_intf1ff * size;
+    intf2ff.New(4,4); intf2ff = full_intf2ff * size;
+    intf3ff.New(4,4); intf3ff = full_intf3ff * size;
+#endif
+
+
     if (!subsampling_initialised) {
         int i, j, k, idx;
         Point loc(3);
@@ -358,6 +366,94 @@ double Tetrahedron4::IntFFF (int i, int j, int k) const
 {
     RANGE_CHECK(i >= 0 && i < 4 && j >= 0 && j < 4 && k >= 0 && k < 4);
     return full_intfff[i]->Get(j,k) * size;
+}
+
+template <class MT>
+void Tetrahedron4::IntFG (TVector<MT> &x, const TVector<MT> &f, const TVector<MT> &g) const
+{
+    
+#ifdef TET4_STORE_INTFFF
+
+    // SP NB: Manually unrolled for INTFFF
+   
+    int bs;
+
+    bs = Node[0];
+    for (int j = 0; j < 4; j++)
+    {
+        int nj = Node[j];
+        MT sum = (f[nj] * g[nj]) *  intf0ff.Get(j,j);
+        for (int k = 0; k < j; k++)
+        {
+            int nk = Node[k];
+            sum += (f[nj] * g[nk] + f[nk] * g[nj]) *  intf0ff.Get(j,k);
+        }
+        x[bs] += sum;
+    }
+
+    bs = Node[1];
+    for (int j = 0; j < 4; j++)
+    {
+        int nj = Node[j];
+        MT sum = (f[nj] * g[nj]) *  intf1ff.Get(j,j);
+        for (int k = 0; k < j; k++)
+        {
+            int nk = Node[k];
+            sum += (f[nj] * g[nk] + f[nk] * g[nj]) *  intf1ff.Get(j,k);
+        }
+        x[bs] += sum;
+    }
+
+    bs = Node[2];
+    for (int j = 0; j < 4; j++)
+    {
+        int nj = Node[j];
+        MT sum = (f[nj] * g[nj]) *  intf2ff.Get(j,j);
+        for (int k = 0; k < j; k++)
+        {
+            int nk = Node[k];
+            sum += (f[nj] * g[nk] + f[nk] * g[nj]) *  intf2ff.Get(j,k);
+        }
+        x[bs] += sum;
+    }
+
+    bs = Node[3];
+    for (int j = 0; j < 4; j++)
+    {
+        int nj = Node[j];
+        MT sum = (f[nj] * g[nj]) *  intf3ff.Get(j,j);
+        for (int k = 0; k < j; k++)
+        {
+            int nk = Node[k];
+            sum += (f[nj] * g[nk] + f[nk] * g[nj]) *  intf3ff.Get(j,k);
+        }
+        x[bs] += sum;
+    }
+             
+#else 
+
+    // SP TODO: Replace with contexp
+    for (int i = 0; i < 4; i++)
+    {
+        int bs = Node[i];
+        for (int j = 0; j < 4; j++)
+        {
+            int nj = Node[j];
+            MT sum = (f[nj] * g[nj]) *  full_intff[i]->Get(j,j)*size;
+            for (int k = 0; k < j; k++)
+            {
+                int nk = Node[k];
+                sum += (f[nj] * g[nk] + f[nk] * g[nj]) *  full_intff[i]->Get(j,k)*size;
+            }
+            x[bs] += sum;
+        }
+    }        
+
+#endif
+
+
+   
+
 }
 
 RSymMatrix Tetrahedron4::IntPFF (const RVector &P) const

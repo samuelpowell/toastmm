@@ -32,7 +32,7 @@ qvec = hmesh.Qvec ('Neumann', 'Gaussian', 2);
 mvec = hmesh.Mvec ('Gaussian', 2, ref);
 
 % Build a basis
-hbasis = toastBasis([20 20 20]);
+hbasis = toastBasis(hmesh, [20 20 20]);
 
 % Continuous wave
 

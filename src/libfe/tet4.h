@@ -101,6 +101,10 @@ public:
     double IntFF (int i, int j) const;
     RSymMatrix IntFF() const;
     double IntFFF (int i, int j, int k) const;
+
+    template <class MT>
+    void IntFG (TVector<MT> &x, const TVector<MT> &f, const TVector<MT> &g) const;
+
     RSymMatrix IntPFF (const RVector& P) const;
     double IntPFF (int i, int j, const RVector& P) const;
     double IntFDD (int i, int j, int k) const;
@@ -266,6 +270,16 @@ private:
     // stores integral over element of product of shape functions
     // Int_el { F_i(r) F_j(r) } dr
     // set by Initialise
+#endif
+
+#ifdef TET4_STORE_INTFFF
+    RDenseMatrix intf0ff;
+    RDenseMatrix intf1ff;
+    RDenseMatrix intf2ff;
+    RDenseMatrix intf3ff;
+    // stores integral over element of product of shape three functions
+    // Int_el { F_i(r) F_j(r) F_k(r)} dr
+    // set by Initialise, used in IntFG for fast PMDFs
 #endif
 
 };
