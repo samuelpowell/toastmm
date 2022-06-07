@@ -116,3 +116,4 @@ Aim: ensure multithreading where possible, but avoid contention
  - Check propensity for structural nonzeros viz. direct solvers
  - Resolve versioning 
  - Python interface build assumes Release paths on Windows
+ - Default link list after make mesh appears arbitrary, resulting in enormous linklist/qmvec
