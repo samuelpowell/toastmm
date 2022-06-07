@@ -47,7 +47,7 @@ JmIM = toastJacobianCW(hmesh, 0, qvec, mvec, mua, mus, ref, 'cg', tol, 'matlab')
 t_JmIM = toc
 
 % tic
-% JmDT = toastJacobianCW(hmesh, 0, real(qvec), real(mvec), mua, mus, ref, 'direct', tol, 'toast');
+% JmDT = toastJacobianCW(hmesh, 0, qvec, mvec, mua, mus, ref, 'direct', tol, 'toast');
 % t_JmDT = toc
 % 
 tic
@@ -65,9 +65,9 @@ tic
 JbIM = toastJacobianCW(hmesh, hbasis, qvec, mvec, mua, mus, ref, 'cg', tol, 'matlab');
 t_JmIM = toc
 
-tic
-JbDT = toastJacobianCW(hmesh, hbasis, real(qvec), real(mvec), mua, mus, ref, 'direct', tol, 'toast');
-t_JmDT = toc
+% tic
+% JbDT = toastJacobianCW(hmesh, hbasis, real(qvec), real(mvec), mua, mus, ref, 'direct', tol, 'toast');
+% t_JmDT = toc
 
 tic
 JbCT = toastJacobianCW(hmesh, hbasis, real(qvec), real(mvec), mua, mus, ref, 'cg', tol, 'toast');
