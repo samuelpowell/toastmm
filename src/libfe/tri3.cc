@@ -296,17 +296,6 @@ double Triangle3::IntFFF (int i, int j, int k) const {
     return size * intfff_scale[intfff_index[i][j][k]];
 }
 
-#ifdef UNDEF
-  // MS 29.6.99 Removed because incompatible with quadratic shape functions
-
-void Triangle3::IntFFF (double &iii, double &iij, double &ijk) const
-{
-    iii = size * intfff_scale[2];
-    iij = size * intfff_scale[1];
-    ijk = size * intfff_scale[0];
-}
-#endif
-
 RSymMatrix Triangle3::IntPFF (const RVector &P) const
 {
     static RSymMatrix pff(3);
@@ -777,23 +766,6 @@ int Triangle3::Intersection (const Point &p1, const Point &p2,
     return pindx;
 }
 
-#ifdef UNDEF
-void Triangle3::Subdivide (Mesh *mesh)
-{
-    dASSERT(sdnbhr, "Element neighbour list not initialised");
-    dASSERT(subdivdata, "Element subdivision data not initialised");
-
-    int level = subdivdata->level;
-
-    if (level % 2 == 0) {
-	// we are currently at an even (isotropic) subdivision level.
-	// go to the next level by bisection
-
-
-    }
-}
-#endif
-
 void Triangle3::SplitSide (Mesh *mesh, int side, int newnode,
     Element *nbr1, Element *nbr2, Element *el1, Element *el2)
 {
@@ -847,30 +819,6 @@ void Triangle3::Bisect (Mesh *mesh, int side, int newnode,
     // check if the side neighbour is subdivided already
     Element *unsplit_nbr = (newnode >= 0 && nbr1 && nbr2 ? 0 : sdnbhr[1]);
 
-#ifdef UNDEF
-    // if the neighbour isn't split yet, check if we will be splitting its
-    // longest side. Otherwise keep subdividing the neighbour until we do
-    if (unsplit_nbr) {
-	int maxside, splitside;
-	do {
-	    double maxlen = 0;
-	    for (splitside = 0; splitside < unsplit_nbr->nSide(); splitside++)
-		if (unsplit_nbr->sdnbhr[splitside] == this) break;
-	    
-	    for (i = 0; i < 3; i++) {
-		double len = mesh->nlist[unsplit_nbr->Node[i]].Dist
-		    (mesh->nlist[unsplit_nbr->Node[(i+1)%3]]);
-		if (len > maxlen) maxlen = len, maxside = i;
-	    }
-	    if (maxside != splitside) {
-		Element *e1, *e2;
-		unsplit_nbr->Bisect (mesh, maxside, -1, NULL, NULL, e1, e2);
-		unsplit_nbr = sdnbhr[1];
-	    }
-	} while (0/*maxside != splitside*/);
-    }
-#endif
-
     // if the required midpoint node doesn't exist yet, create it now
     if (newnode < 0) {
 	newnode = mesh->nlist.Len();
@@ -923,174 +871,7 @@ void Triangle3::Bisect (Mesh *mesh, int side, int newnode,
 void Triangle3::MergeAndResplit (Mesh *mesh, int side, int newnode,
         Element *nbr1, Element *nbr2, Element *el1, Element *el2)
 {
-#ifdef UNDEF
-
-    // This method can only be applied to triangles at odd subdivision levels:
-    // - Merges the triangle with its sibling
-    // - Splits the merged triangle into 4 self-similar triangles
-    // In total, this operation generates two additional nodes and two
-    // additional triangles
-    // Recursively calls for subdivision of neighbours as required
-
-    dASSERT(subdivdata, "Subdivision data not available");
-    int level = subdivdata->level;
-    dASSERT(level % 2, "Subdivision level must be odd");
-
-    Element *sib = subdivdata->sibling; // the sibling triangle
-    
-    if (!subdivdata->is_sibling0) sib->MergeAndResplit (mesh, );
-    // If we are not sibling0, just perform this method on the other sibling
-    // so that we don't need to consider two different cases
-
-    // We now know that we are sibling0, and that the other sibling is
-    // attached at side 2
-
-    int i;
-
-    // Collect the vertex node indices of the merged triangle
-    int nd[6];
-    nd[0] = Node[0];
-    nd[1] = Node[1];
-    nd[2] = sib->Node[2];
-
-    // The midpoint node for side 1 exists already
-    nd[4] = Node[2];
-
-    // We need two additional nodes to accommodate the 4-way split
-    // One of those may already have been provided on the input
-    int nnd = mesh->nlist.Len();
-    if (side == 0) {
-	if (newnode >= 0) {
-	    nd[3] = newnode;
-	} else {
-	    mesh->nlist.Append(1);
-	    mesh->nlist[nnd].New(2);
-	    for (i = 0; i < 2; i++)
-		mesh->nlist[nnd][i] =
-		    (mesh->nlist[nd[0]][i] + mesh->nlist[nd[1]][i]) * 0.5;
-	    nd[3] = nnd++;
-	}
-	mesh->nlist.Append(1);
-	mesh->nlist[nnd].New(2);
-	for (i = 0; i < 2; i++)
-	    mesh->nlist[nnd][i] =
-		(mesh->nlist[nd[2]][i] + mesh->nlist[nd[0]][i]) * 0.5;
-	nd[5] = nnd++;
-    } else if (side == 2) {
-	mesh->nlist.Append(1);
-	mesh->nlist[nnd].New(2);
-	for (i = 0; i < 2; i++)
-	    mesh->nlist[nnd][i] = 
-		(mesh->nlist[nd[0]][i] + mesh->nlist[nd[1]][i]) * 0.5;
-	nd[3] = nnd++;
-	if (newnode >= 0) {
-	    nd[5] = newnode;
-	} else {
-	    mesh->nlist.Append(1);
-	    mesh->nlist[nnd].New(2);
-	    for (i = 0; i < 2; i++)
-		mesh->nlist[nnd][i] =
-		    (mesh->nlist[nd[2]][i] + mesh->nlist[nd[0]][i]) * 0.5;
-	    nd[5] = nnd++;
-	}
-    } else if (side == 1) {
-	// this is a special case, because this side is not split during
-	// the merge and resplit process. We will have to do another
-	// subdivision after the merge and resplit
-	mesh->nlist.Append(1);
-	mesh->nlist[nnd].New(2);
-	for (i = 0; i < 2; i++)
-	    mesh->nlist[nnd][i] =
-		(mesh->nlist[nd[0]][i] + mesh->nlist[nd[1]][i]) * 0.5;
-	nd[3] = nnd++;
-	mesh->nlist.Append(1);
-	mesh->nlist[nnd].New(2);
-	for (i = 0; i < 2; i++)
-	    mesh->nlist[nnd][i] =
-		(mesh->nlist[nd[2]][i] + mesh->nlist[nd[0]][i]) * 0.5;
-	nd[5] = nnd++
-    }
-	
-	    
-    // Add two nodes to accommodate the two missing midpoints for the
-    // re-split triangle
-    int nnd = mesh->nlist.Len();
-    mesh->nlist.Append(2);
-    mesh->nlist[nnd].New(2);
-    mesh->nlist[nnd+1].New(2);
-
-    // set the vertex node indices of the merged triangle
-    int nd[6];
-    nd[0] = Node[0];
-    nd[1] = Node[1];
-    nd[2] = sib->Node[2];
-
-    // assign the new midpoint nodes
-    for (i = 0; i < 2; i++) {
-	mesh->nlist[nnd][i] = 
-	    (mesh->nlist[nd[0]][i] + mesh->nlist[nd[1]][i])*0.5;
-	mesh->nlist[nnd+1][i] = 
-	    (mesh->nlist[nd[2]][i] + mesh->nlist[nd[0]][i])*0.5;
-    }
-
-    // set the midpoint node indices
-    nd[3] = nnd;
-    nd[4] = Node[2];
-    nd[5] = nnd+1;
-
-    // Create two new triangles to accommodate the split
-    int nel = mesh->elist.Len();
-    Triangle3 *tri1, *tri2;
-    tri1 = new Triangle3;
-    tri1->Node[0] = nd[0];
-    tri1->Node[1] = nd[3];
-    tri1->Node[2] = nd[5];
-    tri1->InitSubdivisionSupport();
-    tri1->subdivdata->level = level+1;
-    mesh->elist.Append(tri1);
-    tri1->Initialise (mesh->nlist);
-    tri1->sdnbhr = new Element*[3];
-    tri2 = new Triangle3;
-    tri2->Node[0] = nd[4];
-    tri2->Node[1] = nd[5];
-    tri2->Node[2] = nd[3];
-    mesh->elist.Append(tri2);
-    tri2->subdivdata->level = level+1;
-    mesh->elist.Append(tri2);
-    tri2->Initialise (mesh->nlist);
-    tri2->sdnbhr = new Element*[3];
-
-    // Re-assign the nodes for the two original siblings to form the other
-    // two split triangles
-    Node[0] = nd[3];
-    subdivdata->level++;
-    Initialise (mesh->nlist);
-    sib->Node[0] = nd[5];
-    sib->subdivdata->level++;
-    sib->Initialise (mesh->nlist);
-
-    // Call for subdivision of the two neighbours whose sides we have split
-    // re-assign the neighbour lists
-    Element *el1a, *el2a, *el1b, *el2b;
-    sdnbhr[0]->Splitside(nd[0], nd[1], tri1, this, el1a, el2a, mesh);
-    sib->sdnbhr[2]->Splitside(nd[2], nd[0], sib, tri1, el1b, el2b, mesh);
-
-    tri1->sdnbhr[0] = el1a;
-    tri1->sdnbhr[1] = tri2;
-    tri1->sdnbhr[2] = el2b;
-
-    tri2->sdnbhr[0] = sib;
-    tri2->sdnbhr[1] = tri1;
-    tri2->sdnbhr[2] = this;
-
-    sib->sdnbhr[0] = tri2;
-    // sib->sdnbhr[1] remains
-    sib->sdnbhr[2] = el1b;
-
-    sdnbhr[0] = el2a;
-    //sdnbhr[1] remains
-    sdnbhr[2] = tri2;
-#endif
+    ERROR_UNDEF;
 }
 
 // ============================================================================

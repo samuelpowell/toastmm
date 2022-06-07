@@ -2,10 +2,6 @@
 #define FDOTFWD_H
 
 #include "fdotlib.h"
-//#include "stoastlib.h"
-//#include "supermatrix.h"
-//#include "fwdsolver.h"
-//#include "qmmesh.h"
 #include "projector.h"
 #include <vector>
 

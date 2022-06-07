@@ -1175,13 +1175,6 @@ double Tetrahedron4::BndIntFD (int sd, int i, int j, int k)
 	return intf;
 }
 
-#ifdef UNDEF
-double Tetrahedron4::BndIntFD (Mesh &mesh, int el2, int i, int j, int k)
-{
-    // todo
-}
-#endif
-
 RVector Tetrahedron4::BndIntFCos (int side, const RVector &cntcos, double a,
     const NodeList &nlist) const
 {

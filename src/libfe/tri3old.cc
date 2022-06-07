@@ -356,17 +356,6 @@ double Triangle3old::IntFFF (int i, int j, int k) const {
     return size * intfff_scale[intfff_index[i][j][k]];
 }
 
-#ifdef UNDEF
-  // MS 29.6.99 Removed because incompatible with quadratic shape functions
-
-void Triangle3old::IntFFF (double &iii, double &iij, double &ijk) const
-{
-    iii = size * intfff_scale[2];
-    iij = size * intfff_scale[1];
-    ijk = size * intfff_scale[0];
-}
-#endif
-
 RSymMatrix Triangle3old::IntPFF (const RVector &P) const
 {
     static RSymMatrix pff(3);

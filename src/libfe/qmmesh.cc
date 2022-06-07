@@ -292,30 +292,6 @@ void QMMesh::SetupQM (const Point *q, int nq, const Point *m, int nm,
     InitM ();
 }
 
-#ifdef UNDEF
-void QMMesh::SetupRegularQM (int nqm)
-{
-    int el, sd, dim = nlist[0].Dim();
-    Point *newQ = new Point[nqm];
-    Point *newM = new Point[nqm];
-    Point cnt(dim);
-    double radius = Size (&cnt);
-    for (int i = 0; i < nqm; i++) {
-	newQ[i].New (dim);
-	newM[i].New (dim);
-	newQ[i][0] = cnt[0] + radius * cos ((2.0 * Pi * i) / nqm);
-	newQ[i][1] = cnt[1] + radius * sin ((2.0 * Pi * i) / nqm);
-	if (dim == 3) newQ[i][2] = cnt[2];
-	newM[i][0] = cnt[0] + radius * cos (2.0 * Pi * (i+0.5) / nqm);
-	newM[i][1] = cnt[1] + radius * sin (2.0 * Pi * (i+0.5) / nqm);
-	if (dim == 3) newM[i][2] = cnt[2];
-	PullToBoundary (newQ[i], newQ[i], el, sd);
-	PullToBoundary (newM[i], newM[i], el, sd);
-    }
-    SetupQM (newQ, nqm, newM, nqm);
-}
-#endif
-
 void QMMesh::LoadQM (istream &is)
 {
     char cbuf[256], flagstr[100], normflagstr[100], c;

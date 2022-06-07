@@ -110,3 +110,6 @@ Aim: ensure multithreading where possible, but avoid contention
  - MATLAB flourescence example performance
  - MATLAB Fix element_integrals.m exmaple dimensionality problems
  - Interleaved API permits shallow copy of various inputs in the MATLAB interface to reduce round-trip, exploit
+ - Review element types in libfe, some contain unfinished defintions of operators and constants, remove
+ - Move semantics for mathlib vectors and matrices
+ - Improved initialisation for element entries

@@ -1,11 +1,6 @@
 #define FDOTLIB_IMPLEMENTATION
 #include "fdotlib.h"
 
-//#include "MLEMSolver.h"
-//#include "matrix.h"
-//#include "util.h"
-
-
 MLEMSolver::MLEMSolver( RFwdSolver & _FEMSolver, QMMesh & mesh, 
 				    Regularisation * reg, Raster * rast,
 				    int numSources, const RCompRowMatrix & qVecs_, 

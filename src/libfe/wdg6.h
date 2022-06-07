@@ -183,17 +183,6 @@ private:
     { return 0; }
     // not implemented
 
-#ifdef UNDEF
-    double UnitLength (Point& /*loc*/, Matrix& geom, int side);
-    // returns the unit length along the specified element side; used for line
-    // integrations
-
-    void ConvLineQuadrature (Point** absc, double* labsc, int nqp, int side,
-        double* coeff);
-    // forms line integration rule along side from equivalent 1d integration
-    // rule
-#endif
-
     RSymMatrix ComputeIntFF (const NodeList &nlist) const;
     // Returns integral over element of product of shape functions:
     // FF = Int_el { F_i(r) F_j(r) } dr

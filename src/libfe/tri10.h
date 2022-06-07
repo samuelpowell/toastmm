@@ -163,7 +163,7 @@ protected:
 
     double ComputeSize (const NodeList &nlist) const;
     RSymMatrix ComputeIntDD (const NodeList &nlist) const;
-    void ComputeIntFD (const NodeList &nlist);
+    //void ComputeIntFD (const NodeList &nlist);
     RSymMatrix ComputeBndIntFF (const NodeList& nlist) const;
 
     int GetLocalSubsampleAbsc (const Point *&absc) const;
