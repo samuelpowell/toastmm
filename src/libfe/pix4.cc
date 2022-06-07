@@ -559,26 +559,6 @@ void Pixel4::ComputeBndIntFFF () const
     bndintfff[3][3](3,1) = scale;
     bndintfff[3][3](3,3) = 3*scale;
 
-#ifdef UNDEF
-    int j, k, nd[2];
-    double area[4];
-    
-    area[0] = area[1] = dx;
-    area[2] = area[3] = dy;
-
-    for (sd = 0; sd < 4; sd++) {
-        area[sd] /= 12.0; // scaling value;
-	
-	for (i = 0; i < 4; i++) bndintfff[sd][i].New(4,4);
-	for (i = 0; i < 2; i++) nd[i] = SideNode (sd,i);
-
-	for (i = 0; i < 2; i++)
-  	    for (j = 0; j < 2; j++)
-	        for (k = 0; k < 2; k++)
-		  bndintfff[sd][nd[i]](nd[j],nd[k]) = 
-		      (i==j && i==k ? 3*area[sd] : area[sd]);
-    }
-#endif
 }
 
 double Pixel4::BndIntPFF (int i, int j, const RVector &P) const

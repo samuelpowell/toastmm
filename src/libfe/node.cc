@@ -97,36 +97,6 @@ FELIB double Dist (const Node &n1, const Node &n2)
     return sqrt (sum);
 }
 
-#ifdef UNDEF
-istream& operator>> (istream& is, Node& nd)
-{
-    double crd[3];
-    char bndid, tp, c;
-    int dim, i;
-
-    is >> bndid >> c;
-    dASSERT(c == '[', "Parse error reading node");
-
-    dim = 0;
-    while (dim < 3 && is >> crd[dim]) dim++;
-    is.clear();
-    is >> c;
-    dASSERT (dim >= 2 && c == ']', "Parse error reading node.");
-
-    nd.New (dim);
-    for (i = 0; i < dim; i++) nd[i] = crd[i];
-
-    for (nd.bndtp = tp = 0; tp < 9; tp++)
-	if (bndid == BndId[tp]) nd.bndtp = tp;
-
-    is.get(c);
-    if (c == 'R') is >> nd.region;
-    else nd.region = -1;
-
-    return is;
-}
-#endif
-
 FELIB istream& operator>> (istream& is, Node& nd)
 {
     double crd[3];

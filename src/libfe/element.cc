@@ -57,26 +57,6 @@ void Element::Initialise (const NodeList& nlist)
     interfaceel = false;
     for (int side = 0; side < nSide(); side++) {
 	bndside[side] = false;
-#ifdef UNDEF
-        bool internal = false;
-	bool boundary = false;
-        bndside[side] = true;
-        for (int n = 0; n < nSideNode (side); n++) {
-	    int nd = Node[SideNode (side, n)]; 
-	    
-	    bool thisboundary = (nlist[nd].isBnd() ? true : false);
-	    bool thisinternal = (nlist[nd].isInternalInterface() ? true:false);
-	    // the following logic is terrible! should be exclusive or
-	    if (!(thisboundary || thisinternal)){bndside[side] = false; break;}
-	    if (boundary && thisinternal || internal && thisboundary)
-		{bndside[side] = false; break; }
-	    boundary = thisboundary;
-	    internal = thisinternal;
-	}
-	if (bndside[side]) 
-	    if(internal) {interfaceel = true;}
-	    else  {bndel = true;}
-#endif
     }
 }
 
@@ -187,23 +167,6 @@ bool Element::IsNode (int node)
     for (i = 0; i < nnode; i++) if (Node[i] == node) return true;
     return false;
 }
-
-/*
-bool Element::IsSide (int node1, int node2)
-{
-    bool found1 = false, found2 = false;
-    for (int i = 0; i < nNode(); i++) {
-	if (Node[i] == node1) {
-	    if (found2) return true;
-	    else found1 = true;
-	} else if (Node[i] == node2) {
-	    if (found1) return true;
-	    else found2 = true;
-	}
-    }
-    return false;
-}
-*/
 
 int Element::IsSide (int nn, int *nd)
 {
