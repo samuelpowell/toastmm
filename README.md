@@ -16,12 +16,16 @@ prior to R2018a are not supported (owing to changes in the complex numeric API).
 To install, download a release for the appropriate platform and unzip the folder in a
 convenient location. Start matlab and change to the folder, then run:
 
-```>> toast_setup```
+```
+>> toast_setup
+```
 
 This script will configure the appropriate include paths. Save these paths to make the
 installation permanent. Check your installation by running one of the included demos:
 
-```>> demo toolbox toast```
+```
+>> demo toolbox toast
+```
 
 ### Python
 
@@ -32,13 +36,16 @@ To install, download a release for the appropriate platform an unzip the foler i
 convenient location. It is recommended that you install the python module in a suitable
 virtual environment:
 
-```> python -m pip install PyToast-<ver>-cp36-abi3-<platform>.whl```
+```
+> python -m pip install PyToast-<ver>-cp36-abi3-<platform>.whl
+```
 
 The Python interface depends upon numpy and scipy, and matplotlib will need to be installed
 to execute some examples. Check your installation by running one of the included examples:
 
-```> cd examples
-   > python recon1.py
+```
+> cd examples
+> python recon1.py
 ```
 
 ## Building from source
