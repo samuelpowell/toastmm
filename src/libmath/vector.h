@@ -18,21 +18,11 @@
 #define __VECTOR_H
 
 #include <string.h>
-#ifndef __APPLE__
-#include <malloc.h>
-#endif
 #include <iostream>
 #include <sstream>
+#include <complex>
 #include "mathdef.h"
 #include "error.h"
-//#include "complex.h"
-//#include "scomplex.h"
-#include <complex>
-#include "fblas.h"
-
-#ifdef USE_CBLAS
-#include <cblas++.h>
-#endif // USE_CBLAS
 
 const int END = -1; // "end" index flag
 

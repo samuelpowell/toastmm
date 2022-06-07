@@ -27,9 +27,9 @@
 
 template<class MT>class TSymCompRowMatrix;
 
-template<class MT>
-bool CholeskyFactorize (const TSymCompRowMatrix<MT> &A, TCompRowMatrix<MT> &L,
-    TVector<MT> &d, bool recover = false);
+// template<class MT>
+// bool CholeskyFactorize (const TSymCompRowMatrix<MT> &A, TCompRowMatrix<MT> &L,
+//     TVector<MT> &d, bool recover = false);
 
 template<class MT>
 std::istream &operator>> (std::istream &is, TSymCompRowMatrix<MT> &m);
@@ -106,17 +106,17 @@ public:
     // Remove all entries with zero value. Return value is the number of
     // eliminated entries.
 
-    void SymbolicCholeskyFactorize (idxtype *&frowptr, idxtype *&fcolidx) const;
-    // Calculate the sparse fill-in structure of the lower triangle of
-    // the Cholesky factorisation of the matrix (excluding diagonal)
-    // and return in index lists `frowptr' and 'fcolidx'
+    // void SymbolicCholeskyFactorize (idxtype *&frowptr, idxtype *&fcolidx) const;
+    // // Calculate the sparse fill-in structure of the lower triangle of
+    // // the Cholesky factorisation of the matrix (excluding diagonal)
+    // // and return in index lists `frowptr' and 'fcolidx'
 
-    friend bool CholeskyFactorize<> (const TSymCompRowMatrix<MT> &A,
-        TCompRowMatrix<MT> &L, TVector<MT> &d, bool recover);
-    // Perform Cholesky factorisation of A and return the result in lower
-    // triangle L and diagonal d (L does not contain diagonal elements)
-    // L must have been initialised with the index lists returned from
-    // A.CalculateCholeskyFillin()
+    // friend bool CholeskyFactorize<> (const TSymCompRowMatrix<MT> &A,
+    //     TCompRowMatrix<MT> &L, TVector<MT> &d, bool recover);
+    // // Perform Cholesky factorisation of A and return the result in lower
+    // // triangle L and diagonal d (L does not contain diagonal elements)
+    // // L must have been initialised with the index lists returned from
+    // // A.CalculateCholeskyFillin()
 
     idxtype *rowptr;
     idxtype *colidx;

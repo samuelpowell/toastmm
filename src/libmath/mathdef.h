@@ -8,9 +8,6 @@
 #ifndef __MATHDEF_H
 #define __MATHDEF_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
 #include <stdlib.h>
 #include <math.h>
 #include <algorithm>
