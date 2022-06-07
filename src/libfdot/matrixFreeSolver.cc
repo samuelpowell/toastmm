@@ -1,11 +1,6 @@
 #define FDOTLIB_IMPLEMENTATION
 #include "fdotlib.h"
 
-//#include "matrixFreeSolver.h"
-//#include "matrix.h"
-//#include "dgmatrix.h"
-//#include "util.h"
-
 MatrixFreeSolver::MatrixFreeSolver( RFwdSolver * _FEMSolver, QMMesh & mesh, 
 				    Regularisation * reg, double & tau_, Raster * rast,
 				    int numSources, const RCompRowMatrix & qVecs_, 
@@ -22,24 +17,6 @@ MatrixFreeSolver::MatrixFreeSolver( RFwdSolver * _FEMSolver, QMMesh & mesh,
     int dataWinW = dataWin[1] - dataWin[0];
     int dataWinH = dataWin[3] - dataWin[2];
     dataWinSize = dataWinW * dataWinH;
-/*    int w = projectors[0]->getImageWidth();
-    int h = projectors[0]->getImageHeight();
-    mask.New(nImagePts, nImagePts, 1.0);
-    
-    RVector r(nImagePts,0.0);
-    for (int i=dataWin[0], row=0; i<dataWin[1]; ++i)
-    {
-	for (int j=dataWin[2]; j<dataWin[3]; ++j)
-	{
-	    int k = i + j*w;
-	    r[k] = 1.0;
-	    mask.SetRow(row, r);
-	    r[k] = 0.0;
-	    ++row;
-	}
-    }
-    
-    maskT = transp(mask);*/
 
     phi_e = new RVector[nQ];
     for (int i=0; i<nQ; ++i)
