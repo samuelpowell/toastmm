@@ -114,3 +114,4 @@ Aim: ensure multithreading where possible, but avoid contention
  - Move semantics for mathlib vectors and matrices
  - Improved initialisation for element entries
  - Check propensity for structural nonzeros viz. direct solvers
+ - Resolve versioning 
