@@ -1816,7 +1816,8 @@ template<class MT>
 bool IncompleteCholeskyFactorize (const TCompRowMatrix<MT> &A,
     TCompRowMatrix<MT> &L, TVector<MT> &d, bool recover)
 {
-    const double EPS = 1e-10;
+    // const double EPS = 1e-10;
+    const MT EPS = std::numeric_limits<MT>::epsilon();
     int i, j, k, n = A.nRows();
     bool ok = true;
     MT x, v, diag, Aj;
