@@ -94,7 +94,6 @@ function [phi] = toastFields(mesh,basis,qvec,mua,mus,ref,freq,method,tol,impl)
     if freq == 0
         cw = true;
         qvec = real(qvec);
-        mvec = real(mvec);
         S = dotSysmat (mesh,mua,mus,ref);
     else
         cw = false;
