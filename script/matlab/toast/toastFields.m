@@ -89,6 +89,7 @@ function [phi] = toastFields(mesh,basis,qvec,mua,mus,ref,freq,method,tol,impl)
     % Get the system matrix
     if freq == 0
         cw = true;
+        qvec = real(qvec);
         S = dotSysmat (mesh,mua,mus,ref);
     else
         cw = false;
@@ -116,19 +117,19 @@ function [phi] = toastFields(mesh,basis,qvec,mua,mus,ref,freq,method,tol,impl)
                 error('Unable to solve complex system with conjugate gradient method');
             end
             for i = 1:nQ
-                [dphi(:,i), flag] = pcg(S,qvec(:,i),tol,maxit,L,L');
+                [dphi(:,i), flag] = pcg(S,full(qvec(:,i)),tol,maxit,L,L');
                 gflag = gflag + flag;
             end
             
         case 'bicgstab'
             if cw
                 for i = 1:nQ
-                    [dphi(:,i), flag] = bicgstab(S,qvec(:,i),tol,maxit,L');
+                    [dphi(:,i), flag] = bicgstab(S,full(qvec(:,i)),tol,maxit,L');
                     gflag = gflag + flag;
                 end
             else
                 for i = 1:nQ
-                    [dphi(:,i), flag] = bicgstab(S,qvec(:,i),tol,maxit,L,U);
+                    [dphi(:,i), flag] = bicgstab(S,full(qvec(:,i)),tol,maxit,L,U);
                     gflag = gflag + flag;
                 end
             end
@@ -136,12 +137,12 @@ function [phi] = toastFields(mesh,basis,qvec,mua,mus,ref,freq,method,tol,impl)
         case 'gmres'        
             if cw
                 for i = 1:nQ
-                    [dphi(:,i), flag] = gmres(S,qvec(:,i),[],tol,maxit,L');
+                    [dphi(:,i), flag] = gmres(S,full(qvec(:,i)),[],tol,maxit,L');
                     gflag = gflag + flag;
                 end
             else
                 for i = 1:nQ
-                    [dphi(:,i), flag] = gmres(S,qvec(:,i),[],tol,maxit,L,U);
+                    [dphi(:,i), flag] = gmres(S,full(qvec(:,i)),[],tol,maxit,L,U);
                     gflag = gflag + flag;
                 end
             end
