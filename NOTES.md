@@ -115,3 +115,4 @@ Aim: ensure multithreading where possible, but avoid contention
  - Improved initialisation for element entries
  - Check propensity for structural nonzeros viz. direct solvers
  - Resolve versioning 
+ - Python interface build assumes Release paths on Windows
