@@ -368,8 +368,7 @@ double Tetrahedron4::IntFFF (int i, int j, int k) const
     return full_intfff[i]->Get(j,k) * size;
 }
 
-template <class MT>
-void Tetrahedron4::IntFG (TVector<MT> &x, const TVector<MT> &f, const TVector<MT> &g) const
+void Tetrahedron4::IntFG (RVector &x, const RVector &f, const RVector &g) const
 {
     
 #ifdef TET4_STORE_INTFFF
@@ -382,7 +381,7 @@ void Tetrahedron4::IntFG (TVector<MT> &x, const TVector<MT> &f, const TVector<MT
     for (int j = 0; j < 4; j++)
     {
         int nj = Node[j];
-        MT sum = (f[nj] * g[nj]) *  intf0ff.Get(j,j);
+        double sum = (f[nj] * g[nj]) *  intf0ff.Get(j,j);
         for (int k = 0; k < j; k++)
         {
             int nk = Node[k];
@@ -395,7 +394,7 @@ void Tetrahedron4::IntFG (TVector<MT> &x, const TVector<MT> &f, const TVector<MT
     for (int j = 0; j < 4; j++)
     {
         int nj = Node[j];
-        MT sum = (f[nj] * g[nj]) *  intf1ff.Get(j,j);
+        double sum = (f[nj] * g[nj]) *  intf1ff.Get(j,j);
         for (int k = 0; k < j; k++)
         {
             int nk = Node[k];
@@ -408,7 +407,7 @@ void Tetrahedron4::IntFG (TVector<MT> &x, const TVector<MT> &f, const TVector<MT
     for (int j = 0; j < 4; j++)
     {
         int nj = Node[j];
-        MT sum = (f[nj] * g[nj]) *  intf2ff.Get(j,j);
+        double sum = (f[nj] * g[nj]) *  intf2ff.Get(j,j);
         for (int k = 0; k < j; k++)
         {
             int nk = Node[k];
@@ -421,7 +420,7 @@ void Tetrahedron4::IntFG (TVector<MT> &x, const TVector<MT> &f, const TVector<MT
     for (int j = 0; j < 4; j++)
     {
         int nj = Node[j];
-        MT sum = (f[nj] * g[nj]) *  intf3ff.Get(j,j);
+        double sum = (f[nj] * g[nj]) *  intf3ff.Get(j,j);
         for (int k = 0; k < j; k++)
         {
             int nk = Node[k];
@@ -439,7 +438,7 @@ void Tetrahedron4::IntFG (TVector<MT> &x, const TVector<MT> &f, const TVector<MT
         for (int j = 0; j < 4; j++)
         {
             int nj = Node[j];
-            MT sum = (f[nj] * g[nj]) *  full_intff[i]->Get(j,j)*size;
+            double sum = (f[nj] * g[nj]) *  full_intff[i]->Get(j,j)*size;
             for (int k = 0; k < j; k++)
             {
                 int nk = Node[k];

@@ -594,7 +594,7 @@ public:
      * \param g second function vector
      * \sa IntFFF
      */
-    virtual void IntFG (RVector &x, const RVector &f, const RVector &g) const 
+    virtual void IntFG (RVector &x, const RVector &f, const RVector &g) const
     { ERROR_UNDEF; };
     
     virtual void IntFG (CVector &x, const CVector &f, const CVector &g) const 

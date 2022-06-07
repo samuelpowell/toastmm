@@ -102,8 +102,7 @@ public:
     RSymMatrix IntFF() const;
     double IntFFF (int i, int j, int k) const;
 
-    template <class MT>
-    void IntFG (TVector<MT> &x, const TVector<MT> &f, const TVector<MT> &g) const;
+    void IntFG (RVector &x, const RVector &f, const RVector &g) const;
 
     RSymMatrix IntPFF (const RVector& P) const;
     double IntPFF (int i, int j, const RVector& P) const;
