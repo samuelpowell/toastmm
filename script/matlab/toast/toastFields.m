@@ -39,7 +39,7 @@
 function [phi] = toastFields(mesh,basis,qvec,mua,mus,ref,freq,method,tol,impl)
 
     if nargin < 10
-        impl = auto;
+        impl = 'auto';
         if nargin < 9
             tol = 1e-10;
             if nargin < 8
