@@ -1,10 +1,10 @@
 function J = toastJacobian(hmesh,hbasis,varargin)
 %toastJacobian        - Generate an unscaled frequecny-domain Jacobian matrix
 %
-% Synopsis: J = toastJacobian (hMesh, hBasis, qvec, mvec, mua, mus, ref,
-%                              freq, solver, tol)
-%           J = toastJacobian (hMesh, hBasis, dphi, aphi, proj)
+% Synopsis: J = toastJacobian (mesh, basis, qvec, mvec, mua, mus, ref, freq, solver, tol)
+%           J = toastJacobian (mesh, basis, dphi, aphi, proj)
 %
+% Parameters:
 %    hMesh:  mesh handle (see toastReadMesh)
 %    hBasis: basis mapper handle (see toastSetBasis)
 %    qvec:   Sparse matrix of source vectors (complex column vectors)
