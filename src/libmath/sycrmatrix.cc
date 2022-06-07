@@ -390,13 +390,13 @@ int TSymCompRowMatrix<MT>::Shrink ()
     return i;
 }
 
-template<class MT>
-void TSymCompRowMatrix<MT>::SymbolicCholeskyFactorize (idxtype *&frowptr,
-    idxtype *&fcolidx) const
-{
-    symbolic_cholesky_factor (this->rows, rowptr, colidx, frowptr, fcolidx);
-    // implemented in cr_cholesky.cc
-}
+// template<class MT>
+// void TSymCompRowMatrix<MT>::SymbolicCholeskyFactorize (idxtype *&frowptr,
+//     idxtype *&fcolidx) const
+// {
+//     symbolic_cholesky_factor (this->rows, rowptr, colidx, frowptr, fcolidx);
+//     // implemented in cr_cholesky.cc
+// }
 
 // template<class MT>
 // bool CholeskyFactorize (const TSymCompRowMatrix<MT> &A, TCompRowMatrix<MT> &L,
