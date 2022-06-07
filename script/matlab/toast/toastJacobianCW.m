@@ -1,8 +1,8 @@
 function J = toastJacobianCW(mesh,basis,varargin)
 % Jacobian for DOT continuous wave problem for mua parameter
 %
-% Syntax: [J, proj] = toastJacobianCW (mesh, basis, qvec, mvec, mua, mus, ref,
-%                                      solver, tol, impl)
+% Syntax: [J, proj] = toastJacobianCW (mesh, basis, qvec, mvec, mua, mus, ref, solver, tol, impl)
+%         [J, proj] = toastJacobianCW (mesh, basis, dphi, aphi, proj)
 %
 % Parameters:
 %         mesh [toastMesh object]:
@@ -25,13 +25,19 @@ function J = toastJacobianCW(mesh,basis,varargin)
 %             linear solver tolerance (optional, iterative solvers only)
 %         impl (string):
 %             solver provider (AUTO|TOAST|MATLAB)
+%         dphi: [nlen x nq real matrix]
+%             real direct fields (nodal basis)
+%         aphi: [nlen x nm real matrix]
+%             real adjoint fields (nodal basis)
+%         proj: [nqm vector]
+%             real (linear) boundary projection data
 %
 % Return values:
 %         J: [nqm x slen dense real matrix]:
 %             Jacobian matrix
 %
 %         proj: [nqm dense real matrix]:
-%             vector of logarithm of boundary measuremnts
+%             loggarithm of boundary projection data
 %
 % Notes:  Calculates the derivative of the logarithm of the CW amplitude
 %         data with respect to the absorption coefficients of the forward
@@ -86,7 +92,8 @@ else
     % Compute Jacobian
     J = toastmex(uint32(54),mesh.handle,hb,dphi,aphi,proj);
 
-
 end
+
+proj = log(proj)
 
 end
