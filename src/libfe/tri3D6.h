@@ -137,16 +137,6 @@ public:
     // shape functions:
     // IntFFF = Int_el { F_i(r) * F_j(r) * F_k(r) } dr
 
-#ifdef UNDEF
-  // MS 29.6.99 Removed because incompatible with quadratic shape functions
-
-  //    void IntFFF (double &iii, double &iij, double &ijk) const;
-    // returns the values of the FFF tensor for:
-    //   all indices equal (iii)
-    //   two indices equal (iij)
-    //   all indices different (ijk)
-#endif
-
   //    RSymMatrix IntPFF (const RVector& P) const;
     // Returns integral over element of product of two shape functions and a
     // function P defined on nodes:

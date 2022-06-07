@@ -18,11 +18,10 @@ target_include_directories(libfe INTERFACE .)           # Provide headers for de
 #
 target_sources(libfe PRIVATE    point.cc node.cc ndlist.cc element.cc ellist.cc surface.cc
                                 ptsource.cc timespec.cc mesh.cc param.cc qmmesh.cc 
-                                tri3old.cc tri3.cc tri6.cc tri6_ip.cc tri10.cc tri10_ip.cc 
-                                quad4.cc pix4.cc vox8.cc vox27.cc 
-                                tet4.cc tet10.cc tet10_ip.cc wdg6.cc wdg18inf.cc 
-                                tri3D3.cc tri3D6.cc line2d2.cc
-                                lin_qr.cc tri_qr.cc tet_qr.cc 
+                                tri_qr.cc tri3old.cc tri3.cc tri6.cc tri6_ip.cc tri10.cc tri10_ip.cc 
+                                pix4.cc vox8.cc
+                                tet_qr.cc tet4.cc tet10.cc tet10_ip.cc wdg6.cc 
+                                lin_qr.cc tri3D3.cc tri3D6.cc line2d2.cc
                                 nim.cc 
                                 refine_mesh.cc)
 

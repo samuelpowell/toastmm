@@ -15,24 +15,6 @@
 #ifndef __PARAM_H
 #define __PARAM_H
 
-#ifdef UNDEF
-// some typedefs
-typedef enum {
-    PRM_MUA,
-    PRM_KAPPA,
-    PRM_N,
-    PRM_CMUA,
-    PRM_CKAPPA,
-    PRM_MUS,
-    PRM_CMUS,
-    PRM_C,
-    PRM_ETA,   // canonical parameter: eta = cmua/ckappa
-    PRM_XI,    // canonical parameter: xi  = 1/ckappa
-    PRM_A,     // boundary reflection term A
-    PRM_C2A,   // c/2A
-    PRM_ZERO   // dummy
-} ParameterType;
-#endif
 // some typedefs
 typedef enum {
     PRM_CMUA,   //    

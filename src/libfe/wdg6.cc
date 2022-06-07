@@ -291,49 +291,6 @@ int Wedge6::QuadRule (const double **wght, const Point **absc) const
 }
 
 // ***************************************************************************
-#ifdef UNDEF
-
-double Wedge6::UnitLength (Point& loc, RDenseMatrix& geom, int side)
-{
-    dASSERT(side >= 0 && side < 5, "Invalid side number.");
-    dASSERT(geom.Dim(ROW) == 6 && geom.Dim(COL) == 3,
-	"Invalid geometry matrix dimension.");
-
-    double g1, g2, g3;
-
-    RDenseMatrix lder = LocalShapeD (loc);
-    RDenseMatrix jac  = lder * geom;
-    switch (side) {
-	case 0:
-	case 1:
-	    xERROR("Sides 0 and 1 not implemented yet.");
-	    break;
-	case 2:  // eta=const
-	    g1 = jac[0][1]*jac[2][2] - jac[0][2]*jac[2][1];
-	    g2 = jac[0][2]*jac[2][0] - jac[0][0]*jac[2][2];
-	    g3 = jac[0][0]*jac[2][1] - jac[0][1]*jac[2][0];
-	    break;
-	case 3:  // bottom, zeta=const
-	case 4:  // top, zeta=const
-	    g1 = jac[0][1]*jac[1][2] - jac[0][2]*jac[1][1];
-	    g2 = jac[0][2]*jac[1][0] - jac[0][0]*jac[1][2];
-	    g3 = jac[0][0]*jac[1][1] - jac[0][1]*jac[1][0];
-	    break;
-    }
-    return sqrt (g1*g1 + g2*g2 + g3*g3);
-}
-
-// ***************************************************************************
-
-void Wedge6::ConvLineQuadrature (Point** absc, double* labsc,
-    int nqp, int side, double* coeff)
-{
-    ERROR_UNDEF;
-}
-
-#endif
-
-// ***************************************************************************
 
 int Wedge6::Intersection (const Point &p1, const Point &p2, Point *s,
     bool add_endpoints, bool boundary_only)

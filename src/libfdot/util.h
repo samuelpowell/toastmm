@@ -9,7 +9,6 @@ from file or console input
 #define UTIL_H
 
 #include "stoastlib.h"
-//#include "slu_zdefs.h"
 #include <string>
 
 #define MAXREGION 100

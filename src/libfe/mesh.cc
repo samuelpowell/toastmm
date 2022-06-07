@@ -782,107 +782,7 @@ int Mesh::BoundaryList (int **bndellist, int **bndsdlist) const
     *bndellist = bellist;
     *bndsdlist = bsdlist;
     return nsd;
-    
-#ifdef UNDEF
-    const int MAXSDND = 10;
-    int i, j, el, sd, n, nnd, nsd, ndi, found, listsize = 0;
-    int *nsdnd, **sdnd, nnsdnd = 0, nsdndi, *sdndi;
-    bndrec *bndlist = NULL, *nptr, *pptr;
-    bool removed, valid, isbndsd;
 
-    for (el = elist.Len()-1; el >= 0; el--) {
-	Element *pel = elist[el];
-	nnd = pel->nNode();
-	nsd = pel->nSide();
-	if (nsd > nnsdnd) {
-	    if (nnsdnd) {
-		delete []nsdnd;
-		for (sd = 0; sd < nnsdnd; sd++) delete []sdnd[sd];
-		delete []sdnd;
-	    }
-	    nsdnd = new int[nnsdnd = nsd];
-	    sdnd = new int*[nsd];
-	    for (sd = 0; sd < nsd; sd++) sdnd[sd] = new int[MAXSDND];
-	}
-	for (sd = 0; sd < nsd; sd++) {
-	    nsdnd[sd] = pel->nSideNode(sd);
-	    for (n = 0; n < nsdnd[sd]; n++)
-		sdnd[sd][n] = pel->Node[pel->SideNode(sd,n)];
-	}
-
-	for (sd = 0; sd < nsd; sd++) {
-	    nsdndi = nsdnd[sd];
-	    sdndi = sdnd[sd];
-	    for (isbndsd = true, n = 0; n < nsdndi; n++)
-		if (!nlist[sdndi[n]].BndTp()) {
-		    isbndsd = false; break;
-		}
-	    if (!isbndsd) continue;
-
-	    if (BndType == MESH_EXTRAPOL) {
-		for (isbndsd = true, n = 0; n < nsdndi; n++)
-		    if (nlist[sdndi[n]].BndTp() != BND_INTERNAL) {
-			    isbndsd=false; break;
-			}
-		if (!isbndsd) continue;
-		for (valid = true, i = 0; i < nnd; i++) {
-		    n = pel->Node[i];
-		    if (nlist[n].BndTp() != BND_INTERNAL && nlist[n].BndTp()
-			!= BND_NONE) {
-			    valid = false; break;
-			}
-		}
-		if (!valid) continue;
-	    }
-
-	    // if combination is already in the list, delete (no real boundary)
-	    removed = false;
-	    for (pptr=NULL, nptr=bndlist; nptr; pptr=nptr, nptr=nptr->next) {
-		for (found = i = 0; i < nsdndi; i++) {
-		    ndi = nptr->nd[i];
-		    for (j = 0; j < nsdndi; j++)
-			if (ndi == sdndi[j]) found++;
-		}
-		if (found == nsdndi) {
-		    if (pptr) pptr->next = nptr->next;
-		    else bndlist = nptr->next;
-		    delete nptr;
-		    removed = true;
-		    listsize--;
-		    break;
-		}
-	    }
-
-	    // otherwise, add entry to list
-	    if (!removed) {
-		nptr = new bndrec;
-		nptr->el = el;
-		nptr->sd = sd;
-		for (i = 0; i < nsdndi; i++)
-		    nptr->nd[i] = sdndi[i];
-		nptr->next = bndlist;
-		bndlist = nptr;
-		listsize++;
-	    }
-	}
-    }
-    if (nnsdnd) {
-	delete []nsdnd;
-	for (sd = 0; sd < nnsdnd; sd++) delete []sdnd[sd];
-	delete []sdnd;
-    }
-
-    // create final list
-    *bndellist = new int[listsize];
-    *bndsdlist = new int[listsize];
-    for (nptr = bndlist, i = 0; i < listsize; i++) {
-	(*bndellist)[i] = nptr->el;
-	(*bndsdlist)[i] = nptr->sd;
-	pptr = nptr; nptr = nptr->next;
-	delete pptr;
-    }
-    return listsize;
-#endif
 }
 
 static int idx_comp_length = 0;
@@ -1426,86 +1326,8 @@ Point Mesh::BndIntersect (const Point &pt1, const Point &pt2, int *el)
 	}
     }
     return pmin;
-#ifdef UNDEF
-    // Calculates the intersection of a straight line, given by points pt1
-    // and pt2, with the mesh surface. The boundary must be bracketed by
-    // pt1 and pt2 such that pt1 is inside, pt2 outside the mesh
-    // This just performs a binary search, and assumes that there is only a
-    // single intersection between pt1 and pt2.
-    // Works in 2D and 3D, but is fairly inefficient
 
-    xASSERT (ElFind (pt1) >= 0, "First point must be inside mesh");
-    xASSERT (ElFind (pt2) <  0, "Second point must be outside mesh");
-
-    const double acc = 1e-6;
-    int i;
-    RVector p1 = pt1;
-    RVector p2 = pt2;
-    RVector pm = (p1+p2) * 0.5;
-    Point m (pm.Dim());
-    double dist = length (p2-p1);
-    while (dist > acc) {
-        for (i = 0; i < pm.Dim(); i++) m[i] = pm[i];
-        bool inside = (ElFind (m) >= 0);
-	if (inside) p1 = pm;
-	else        p2 = pm;
-	dist *= 0.5;
-	pm = (p1+p2) * 0.5;
-    }
-    for (i = 0; i < p1.Dim(); i++) m[i] = p1[i];
-    // we use p1 to ensure that the returned point is inside the mesh
-    return m;
-#endif
 }
-
-// ***********************************************
-
-#ifdef UNDEF
-Point Mesh::BndIntersect (const Point &pt1, const Point &pt2)
-{
-    // this only works in 2D
-
-    const double EPS = 1e-8;
-    int n, nl, nr, nhi, nlo;
-    double dx, dy, dir, dir2, a1, b1, a2, b2;
-    double dirl = -100.0, dirr = 100.0, dirhi = -100.0, dirlo = 100.0;
-    Point sc(2);
-    dx = pt2[0]-pt1[0];
-    dy = pt2[1]-pt1[1];
-    a1 = dy/dx;
-    b1 = pt1[1] - a1*pt1[0];
-    dir = atan2 (dy, dx);
-    for (n = 0; n < nlist.Len(); n++)
-	if ((BndType == MESH_EXTRAPOL && nlist[n].BndTp() == BND_INTERNAL) ||
-		(BndType != MESH_EXTRAPOL && nlist[n].isBnd())) {
-	    dx = nlist[n][0]-pt1[0];
-	    dy = nlist[n][1]-pt1[1];
-	    dir2 = atan2 (dy, dx);
-	    if (dir2 > dir) {
-		if (dir2 < dirr) dirr = dir2, nr = n;
-	    } else {
-		if (dir2 > dirl) dirl = dir2, nl = n;
-	    }
-	    if (dir2 > dirhi) dirhi = dir2, nhi = n;
-	    if (dir2 < dirlo) dirlo = dir2, nlo = n;
-	}
-    if (dirr > 99.0) dirr = dirlo, nr = nlo;	// take care of phase wrapping
-    if (dirl < -99.0) dirl = dirhi, nl = nhi;
-    dx = nlist[nr][0]-nlist[nl][0];
-    dy = nlist[nr][1]-nlist[nl][1];
-
-    // now intersection of two lines
-    if (fabs (dx) < EPS) { // boundary segment vertical
-	sc[0] = nlist[nr][0];
-    } else {
-	a2 = dy/dx;
-	b2 = nlist[nl][1] - a2*nlist[nl][0];	
-	sc[0] = -(b2-b1)/(a2-a1);
-    }
-    sc[1] = a1*sc[0] + b1;
-    return sc;
-}
-#endif
 
 // ***********************************************
 
@@ -3421,13 +3243,6 @@ RGenericSparseMatrix *CubicPix2GridMatrix (const IVector &bdim,
     delete []val;
     return R;
 }
-
-#ifdef UNDEF
-RGenericSparseMatrix *Grid2CubicPixMatrix (const IVector &gdim,
-    const IVector &bdim, const int *elref)
-{
-}
-#endif
 
 void RasterLinPixel (RVector &gf, const RVector &bf, const IVector &gdim,
     const IVector &bdim, const int *elref)

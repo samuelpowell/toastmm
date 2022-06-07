@@ -39,8 +39,6 @@
 #define ELID_TRI10 9       ///< 10-noded triangle
 #define ELID_TRI10_IP 10   ///< 10-noded isoparametric triangle
 #define ELID_TET10_IP 11   ///< 10-noded isoparametric tetrahedron
-#define ELID_WDG18INF 12   ///< 18-noded infinite wedge element
-#define ELID_QUAD4 13      ///< 4-noded quadrilateral
 #define ELID_PIX4 14       ///< 4-noded regular pixel
 #define ELID_TRI3 15       ///< 3-noded triangle
 #define ELID_TRI3D3 16     ///< 3-noded surface triangle
@@ -587,16 +585,6 @@ public:
      * \sa IntF, IntFF, IntDD, IntFD
      */
     virtual double IntFFF (int i, int j, int k) const = 0;
-
-#ifdef UNDEF
-  // MS 29.6.99 Removed because incompatible with quadratic shape functions
-
-    virtual void IntFFF (double &iii, double &iij, double &ijk) const = 0;
-    // returns the values of the FFF tensor for:
-    //   all indices equal (iii)
-    //   two indices equal (iij)
-    //   all indices different (ijk)
-#endif
 
     /**
      * \brief Integrals of all products of two shape functions and a nodal

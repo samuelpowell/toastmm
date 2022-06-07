@@ -1,11 +1,6 @@
 #define FDOTLIB_IMPLEMENTATION
 #include "fdotlib.h"
 
-//#include "muaSolver.h"
-//#include "matrix.h"
-//#include "util.h"
-
-
 MuaSolver::MuaSolver( RFwdSolver & _FEMSolver, QMMesh & mesh, 
 				    Regularisation * reg, Raster * rast,
 				    int numSources, const RCompRowMatrix & qVecs_, 
