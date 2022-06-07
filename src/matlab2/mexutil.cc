@@ -547,7 +547,11 @@ void CopyTMatrix (RCompRowMatrix &mat, const mxArray *array)
     mwIndex m   = mxGetDimensions (array)[0];
     mwIndex n   = mxGetDimensions (array)[1];
     mwIndex nz  = mxGetNzmax (array);
+    #if MX_HAS_INTERLEAVED_COMPLEX
+    mxComplexDouble *pc = mxGetComplexDoubles(array);
+    #else
     double *pr  = mxGetPr (array);
+    #endif
     int *rowptr, *colidx;
 
     mwIndex i;
@@ -560,17 +564,19 @@ void CopyTMatrix (RCompRowMatrix &mat, const mxArray *array)
 
     double *val = new double[nz];
     for (mwIndex i = 0; i < nz; i++) {
-	val[i] = pr[i];
+         #if MX_HAS_INTERLEAVED_COMPLEX
+            val[i] = pc[i].real;
+         #else
+            val[i] = pr[i];
+         #endif
     }
 
     mat.New ((int)n, (int)m);
     mat.Initialise (rowptr, colidx, val);
 
     delete []val;
-#ifdef INDEX64
     delete []rowptr;
     delete []colidx;
-#endif
 }
 
 // ============================================================================
