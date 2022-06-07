@@ -38,13 +38,7 @@ target_include_directories(supertoast_cw_mw PRIVATE ../../include)
 target_link_libraries(supertoast_cw_mw liblbfgs libstoast libfe libmath)
 
 
-# test_basis
-add_executable(test_basis test_basis.cc)
-target_include_directories(test_basis PRIVATE ../../include)
-target_link_libraries(test_basis libstoast libraster libfe libmath)
-
-
-install(TARGETS fwdfem fwdfem_cw fwdfem_tpsf supertoast supertoast_mw supertoast_cw_mw test_basis
+install(TARGETS fwdfem fwdfem_cw fwdfem_tpsf supertoast supertoast_mw supertoast_cw_mw 
         RUNTIME DESTINATION bin)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
