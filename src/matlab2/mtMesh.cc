@@ -29,12 +29,18 @@ void MatlabToast::MakeMesh (int nlhs, mxArray *plhs[], int nrhs,
     double *didx = mxGetPr (prhs[1]);
     double *detp = mxGetPr (prhs[2]);
 
-    // Convert inputs to integral type
-    IVector idx(nel);
-    for(i = 0; i < nel; i++) {
+    if ((mxGetN(prhs[2]) * mxGetM(prhs[2])) != nel)
+    {
+        mexErrMsgTxt("Element type list dimensions do not match element array!\n");
+    }
+
+    // Convert element indices to zero-based integral type
+    IVector idx(nel*nnd0);
+    for(i = 0; i < (nel*nnd0); i++) {
         idx[i] = (int)(didx[i]-0.5);
     }
     
+    // Convert element types to integral type
     IVector etp(nel);
     for(i = 0; i < nel; i++) {
         etp[i] = (int)(detp[i]+0.5);
