@@ -592,14 +592,21 @@ public:
      * \param x output vector over which to add element contributions
      * \param f first function vector
      * \param g second function vector
-     * \sa IntFFF
+     * \sa IntFFF, IntGradFGradG
      */
-    virtual void IntFG (RVector &x, const RVector &f, const RVector &g) const
-    { ERROR_UNDEF; };
-    
-    virtual void IntFG (CVector &x, const CVector &f, const CVector &g) const 
-    { ERROR_UNDEF; };
-    
+    virtual void IntFG (RVector &x, const RVector &f, const RVector &g) const;
+    virtual void IntFG (CVector &x, const CVector &f, const CVector &g) const;
+
+    /**
+     * \brief Integral of the product of the gradients of two functions over the
+     *   element.
+     * \param x output vector over which to add element contributions
+     * \param f first function vector
+     * \param g second function vector
+     * \sa IntFDD, IntFG
+     */
+    virtual void IntGradFGradG (RVector &x, const RVector &f, const RVector &g) const;  
+    virtual void IntGradFGradG (CVector &x, const CVector &f, const CVector &g) const;
 
     /**
      * \brief Integrals of all products of two shape functions and a nodal

@@ -130,6 +130,71 @@ RSymMatrix Element::BndIntFF () const
     return bff;
 }
 
+void Element::IntFG(RVector &x, const RVector &f, const RVector &g) const
+{
+    for (int i = 0; i < nNode(); i++) {
+        int bs = Node[i];
+        for (int j = 0; j < nNode(); j++) {
+            int nj = Node[j];
+            double sum = (f[nj] * g[nj]) *  IntFFF(i,j,j);
+            for (int k = 0; k < j; k++) {
+                int nk = Node[k];
+                sum += (f[nj] * g[nk] + f[nk] * g[nj]) *  IntFFF(i,j,k);
+            }
+            x[bs] += sum;
+        }
+    }        
+}
+
+void Element::IntFG(CVector &x, const CVector &f, const CVector &g) const
+{
+    for (int i = 0; i < nNode(); i++) {
+        int bs = Node[i];
+        for (int j = 0; j < nNode(); j++) {
+            int nj = Node[j];
+            std::complex<double> sum = (f[nj] * g[nj]) *  IntFFF(i,j,j);
+            for (int k = 0; k < j; k++) {
+                int nk = Node[k];
+                sum += (f[nj] * g[nk] + f[nk] * g[nj]) *  IntFFF(i,j,k);
+            }
+            x[bs] += sum;
+        }
+    }
+}
+
+
+void Element::IntGradFGradG(RVector &x, const RVector &f, const RVector &g) const
+{
+    for (int i = 0; i < nNode(); i++) {
+        int bs = Node[i];
+        for (int j = 0; j < nNode(); j++) {
+            int nj = Node[j];
+            double sum = (f[nj] * g[nj]) *  IntFDD(i,j,j);
+            for (int k = 0; k < j; k++) {
+                int nk = Node[k];
+                sum += (f[nj] * g[nk] + f[nk] * g[nj]) *  IntFDD(i,j,k);
+            }
+            x[bs] += sum;
+        }
+    }        
+}
+
+void Element::IntGradFGradG(CVector &x, const CVector &f, const CVector &g) const
+{
+    for (int i = 0; i < nNode(); i++) {
+        int bs = Node[i];
+        for (int j = 0; j < nNode(); j++) {
+            int nj = Node[j];
+            std::complex<double> sum = (f[nj] * g[nj]) *  IntFDD(i,j,j);
+            for (int k = 0; k < j; k++) {
+                int nk = Node[k];
+                sum += (f[nj] * g[nk] + f[nk] * g[nj]) *  IntFDD(i,j,k);
+            }
+            x[bs] += sum;
+        }
+    }
+}
+
 void Element::operator= (const Element& el)
 {
     dASSERT(Type() == el.Type(), "Assignment of incompatible element types.");

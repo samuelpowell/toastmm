@@ -102,7 +102,13 @@ public:
     RSymMatrix IntFF() const;
     double IntFFF (int i, int j, int k) const;
 
+#ifdef TET4_PRECOMPUTE_INTFFF
     void IntFG (RVector &x, const RVector &f, const RVector &g) const;
+#endif
+
+#ifdef TET4_PRECOMPUTE_INTFDD
+    void IntGradFGradG (RVector &x, const RVector &f, const RVector &g) const;
+#endif
 
     RSymMatrix IntPFF (const RVector& P) const;
     double IntPFF (int i, int j, const RVector& P) const;
@@ -271,17 +277,6 @@ private:
     // set by Initialise
 #endif
 
-#ifdef TET4_STORE_INTFFF
-    RDenseMatrix intf0ff;
-    RDenseMatrix intf1ff;
-    RDenseMatrix intf2ff;
-    RDenseMatrix intf3ff;
-    // stores integral over element of product of shape three functions
-    // Int_el { F_i(r) F_j(r) F_k(r)} dr
-    // set by Initialise, used in IntFG for fast PMDFs
-#endif
-
-
 #ifdef TET4_PRECOMPUTE_INTFFF
     double intfff_flat[64];
     // stores flattened representation of the coefficients requred to compute the produce
@@ -290,6 +285,12 @@ private:
     // the ordering and nature is determined by the implementation of the IntFG function
     // itself, and is set by Initialise. This is used in IntFG for fast PMDFs, minimising
     // lookups on virtual methods and matrix indexing operations.
+#endif
+
+#ifdef TET4_PRECOMPUTE_INTFDD
+    double intfdd_flat[64];
+    // stores flattened representation of the coefficients requred to compute the product
+    // of the derivative of three  shape functions, see TET4_PRECOMPUTE_INTFFF
 #endif
 
 };
