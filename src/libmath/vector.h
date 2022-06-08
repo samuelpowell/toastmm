@@ -283,6 +283,13 @@ public:
     TVector (const TVector<VT> &v, int ofs, int dim);
 
     /**
+     * \brief Move constructor. Create a vector identical to the input, resetting
+     *        the contents of the input to permit destruction.
+     * \param v original vector
+     */
+    TVector (TVector<VT> &&v);
+
+    /**
      * \brief Destructor. Delete vector and deallocate data block.
      */
     ~TVector () { Unlink (); }
@@ -306,6 +313,13 @@ public:
     /// - The return value of the operation is the copied vector, so that
     ///   constructs like v1 = v2 = v0 are possible.
     TVector &operator= (const TVector &v) { Copy (v); return *this; }
+
+    /**
+     * \brief Move assignment operator. If the source is not equal to the destination, 
+     *        replace the contents of the destination with the source, unlinking if required.
+     * \param v original vector
+     */
+    TVector &operator=(TVector&& v);
 
     /// Scalar assignment. All vector elements are set to 's'.
     TVector &operator= (VT s);

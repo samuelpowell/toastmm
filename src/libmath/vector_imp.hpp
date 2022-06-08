@@ -122,6 +122,27 @@ TVector<VT>::TVector (const TVector<VT> &v, int ofs, int dim)
 }
 
 // --------------------------------------------------------------------------
+// move constructor
+
+template<class VT>
+TVector<VT>::TVector (TVector<VT> &&v)
+{
+    size = v.size;
+    base_size = v.base_size;
+    base_nref = v.base_nref;
+    data = v.data;
+    base_data = v.base_data;
+    ext_data = v.ext_data;
+
+    v.size = 0;
+    v.base_size = nullptr;
+    v.base_nref = nullptr;
+    v.data = nullptr;
+    v.base_data = nullptr;
+    v.ext_data = false;
+}
+
+// --------------------------------------------------------------------------
 // link to the data block of `vec'. This function must be called by a
 // constructor, or after a call to Unlink()
 
@@ -395,6 +416,35 @@ template<class VT>
 TVector<VT> &TVector<VT>::operator= (VT s)
 {
     for (int i = 0; i < size; i++) data[i] = s;
+    return *this;
+}
+
+// --------------------------------------------------------------------------
+
+template<class VT>
+TVector<VT> &TVector<VT>::operator=(TVector<VT>&& v)
+{
+    if(this != &v) {
+        // Free existing contents
+        Unlink();
+
+        // Take content of input
+        size = v.size;
+        base_size = v.base_size;
+        base_nref = v.base_nref;
+        data = v.data;
+        base_data = v.base_data;
+        ext_data = v.ext_data;     
+
+        // Empty input
+        v.size = 0;
+        v.base_size = nullptr;
+        v.base_nref = nullptr;
+        v.data = nullptr;
+        v.base_data = nullptr;
+        v.ext_data = false;   
+
+    }
     return *this;
 }
 
