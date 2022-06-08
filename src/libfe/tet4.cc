@@ -151,7 +151,7 @@ void Tetrahedron4::Initialise (const NodeList &nlist)
     intff = sym_intff * size;
 #endif
 
-#ifdef TET4_PRECOMPUTE_INTFFF
+#ifdef TET4_PRECOMPUTE_INTFG
     double *intfff_val = intfff_flat;
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
@@ -161,9 +161,7 @@ void Tetrahedron4::Initialise (const NodeList &nlist)
             }
         }
     }        
-#endif
 
-#ifdef TET4_PRECOMPUTE_INTFDD
     double *intfdd_val = intfdd_flat;
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
@@ -385,7 +383,7 @@ double Tetrahedron4::IntFFF (int i, int j, int k) const
 }
 
 
-#ifdef TET4_PRECOMPUTE_INTFFF
+#ifdef TET4_PRECOMPUTE_INTFG
 void Tetrahedron4::IntFG (RVector &x, const RVector &f, const RVector &g) const
 {   
 
@@ -403,9 +401,7 @@ void Tetrahedron4::IntFG (RVector &x, const RVector &f, const RVector &g) const
         }
     }  
 }
-#endif
 
-#ifdef TET4_PRECOMPUTE_INTFDD
 void Tetrahedron4::IntGradFGradG(RVector &x, const RVector &f, const RVector &g) const
 {
     const double *intfdd_val = intfdd_flat;
