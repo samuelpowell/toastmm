@@ -886,15 +886,9 @@ TVector<T> IntFG(const Mesh &mesh, const TVector<T> &f, const TVector<T> &g)
 	dASSERT(f.Dim() == mesh.nlen(), "Wrong vector size");
 	dASSERT(g.Dim() == mesh.nlen(), "Wrong vector size");
 
-	int el, nnode, *node, i, j, k, nj, nk, bs;
-	T sum;
-	Element *pel;
 	TVector<T> tmp(mesh.nlen());
-
-	for (el = 0; el < mesh.elen(); el++)
-	{
-		pel = mesh.elist[el];
-		pel->IntFG(tmp, f, g);
+	for (int el = 0; el < mesh.elen(); el++) {
+		mesh.elist[el]->IntFG(tmp, f, g);
 	}
 	return tmp;
 }

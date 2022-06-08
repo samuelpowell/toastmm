@@ -71,6 +71,7 @@
 #define TRI10_STORE_COORDS
 
 // Store and use precomputed INTFFF factors as required for PMDF calculation
-#define TET4_STORE_INTFFF
+//#define TET4_STORE_INTFFF
+#define TET4_PRECOMPUTE_INTFFF
 
 #endif // !__TOASTDEF_H

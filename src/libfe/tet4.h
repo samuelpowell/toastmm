@@ -281,6 +281,17 @@ private:
     // set by Initialise, used in IntFG for fast PMDFs
 #endif
 
+
+#ifdef TET4_PRECOMPUTE_INTFFF
+    double intfff_flat[64];
+    // stores flattened representation of the coefficients requred to compute the produce
+    // of three shape functions
+    // Int_el { F_i(r) F_j(r) F_k(r)} dr
+    // the ordering and nature is determined by the implementation of the IntFG function
+    // itself, and is set by Initialise. This is used in IntFG for fast PMDFs, minimising
+    // lookups on virtual methods and matrix indexing operations.
+#endif
+
 };
 
 #endif // !__TET4_H

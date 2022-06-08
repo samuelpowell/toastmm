@@ -158,6 +158,17 @@ void Tetrahedron4::Initialise (const NodeList &nlist)
     intf3ff.New(4,4); intf3ff = full_intf3ff * size;
 #endif
 
+#ifdef TET4_PRECOMPUTE_INTFFF
+    double *intfff_val = intfff_flat;
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            *(intfff_val++) = full_intfff[i]->Get(j,j)*size;
+            for (int k = 0; k < j; k++) {
+                *(intfff_val++) = full_intfff[i]->Get(j,k)*size;
+            }
+        }
+    }        
+#endif
 
     if (!subsampling_initialised) {
         int i, j, k, idx;
@@ -371,6 +382,31 @@ double Tetrahedron4::IntFFF (int i, int j, int k) const
 void Tetrahedron4::IntFG (RVector &x, const RVector &f, const RVector &g) const
 {
     
+
+#ifdef TET4_PRECOMPUTE_INTFFF
+
+    // SP TODO: Replace with contexp
+    const double *intfff_val = intfff_flat;
+    for (int i = 0; i < 4; i++)
+    {
+        int bs = Node[i];
+        for (int j = 0; j < 4; j++)
+        {
+            int nj = Node[j];
+            double sum = (f[nj] * g[nj]) *  *(intfff_val++);
+            for (int k = 0; k < j; k++)
+            {
+                int nk = Node[k];
+                sum += (f[nj] * g[nk] + f[nk] * g[nj]) * *(intfff_val++);
+            }
+            x[bs] += sum;
+        }
+    }  
+
+
+
+#else
+
 #ifdef TET4_STORE_INTFFF
 
     // SP NB: Manually unrolled for INTFFF
@@ -438,15 +474,17 @@ void Tetrahedron4::IntFG (RVector &x, const RVector &f, const RVector &g) const
         for (int j = 0; j < 4; j++)
         {
             int nj = Node[j];
-            double sum = (f[nj] * g[nj]) *  full_intff[i]->Get(j,j)*size;
+            double sum = (f[nj] * g[nj]) *  full_intfff[i]->Get(j,j)*size;
             for (int k = 0; k < j; k++)
             {
                 int nk = Node[k];
-                sum += (f[nj] * g[nk] + f[nk] * g[nj]) *  full_intff[i]->Get(j,k)*size;
+                sum += (f[nj] * g[nk] + f[nk] * g[nj]) *  full_intfff[i]->Get(j,k)*size;
             }
             x[bs] += sum;
         }
     }        
+
+#endif
 
 #endif
 
