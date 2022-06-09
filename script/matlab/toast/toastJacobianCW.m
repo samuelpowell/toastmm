@@ -1,4 +1,4 @@
-function J = toastJacobianCW(mesh,basis,varargin)
+function J = toastJacobianCW(hmesh,basis,varargin)
 % Jacobian for DOT continuous wave problem for mua parameter
 %
 % Syntax: [J, proj] = toastJacobianCW (mesh, basis, qvec, mvec, mua, mus, ref, solver, tol, impl)
@@ -59,7 +59,7 @@ if nargin==5
     dphi = varargin{1};
     aphi = varargin{2};
     proj = varargin{3};
-    J = toastmex(uint32(54),mesh.handle,hb,dphi,aphi,proj);
+    J = toastmex(uint32(54),hmesh.handle,hb,dphi,aphi,proj);
 else
     % Compute fields
     qvec = varargin{1};
@@ -81,19 +81,19 @@ else
     end
 
     % Compute fields in mesh basis
-    phi = toastFields(mesh,0,[qvec mvec],mua,mus,ref,0,solver,tol,impl);
+    phi = toastFields(hmesh,0,[qvec mvec],mua,mus,ref,0,solver,tol,impl);
     dphi = phi(:, 1:size(qvec,2));
     aphi = phi(:, (size(qvec,2)+1) : end);
         
     % Build projection data, reduce by linklist
     proj = reshape (mvec.' * dphi, [], 1);
-    proj = proj(mesh.DataLinkList());
+    proj = proj(hmesh.DataLinkList());
 
     % Compute Jacobian
-    J = toastmex(uint32(54),mesh.handle,hb,dphi,aphi,proj);
+    J = toastmex(uint32(54),hmesh.handle,hb,dphi,aphi,proj);
 
 end
 
-proj = log(proj)
+proj = log(proj);
 
 end
