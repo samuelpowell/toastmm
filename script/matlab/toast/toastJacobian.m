@@ -61,7 +61,7 @@ else
     freq = varargin{6};
     solver = 'direct';
     tol = 1e-8;
-    impl= 'auto'
+    impl= 'auto';
     if nargin >= 9
         solver = varargin{7};
         if nargin >= 10
@@ -73,13 +73,13 @@ else
     end
 
     % Compute fields in mesh basis
-    phi = toastFields(mesh,0,[qvec mvec],mua,mus,ref,freq,solver,tol,impl);
+    phi = toastFields(hmesh,0,[qvec mvec],mua,mus,ref,freq,solver,tol,impl);
     dphi = phi(:, 1:size(qvec,2));
     aphi = phi(:, (size(qvec,2)+1) : end);
         
     % Build projection data, reduce by linklist
     proj = reshape (mvec.' * dphi, [], 1);
-    proj = proj(mesh.DataLinkList());
+    proj = proj(hmesh.DataLinkList());
 
     % Compute Jacobian
     J = toastmex(uint32(53),hmesh.handle,hb,dphi,aphi,proj);
