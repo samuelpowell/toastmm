@@ -5,7 +5,79 @@
 #include "Eigen/Sparse"
 #include "Eigen/SparseLU"
 
+#include "cholmod.h"
+
 using namespace std;
+
+// =========================================================================
+
+cholmod_sparse cholmod_wrap(const RCompRowMatrix &F)
+{
+    cholmod_sparse A;
+    A.nrow = F.nRows();
+    A.ncol = F.nCols();
+    A.nzmax = F.nVal();
+    A.p = F.rowptr;
+    A.i = F.colidx;
+    A.nz = 0;
+    A.x = (void *) F.ValPtr();
+    A.z = 0;
+    A.stype = 0;
+    A.itype = CHOLMOD_INT;   
+    A.xtype = CHOLMOD_REAL;
+    A.dtype = CHOLMOD_DOUBLE;
+    A.sorted = 1;
+    A.packed = 1;
+    return A;
+}
+
+cholmod_sparse cholmod_wrap(const FCompRowMatrix &F)
+{
+    cholmod_sparse A;
+    A.nrow = F.nRows();
+    A.ncol = F.nCols();
+    A.nzmax = F.nVal();
+    A.p = F.rowptr;
+    A.i = F.colidx;
+    A.nz = 0;
+    A.x = (void *) F.ValPtr();
+    A.z = 0;
+    A.stype = 0;
+    A.itype = CHOLMOD_INT;   
+    A.xtype = CHOLMOD_REAL;
+    A.dtype = CHOLMOD_SINGLE;
+    A.sorted = 1;
+    A.packed = 1;
+    return A;
+}
+
+cholmod_dense cholmod_wrap(const RVector &v)
+{
+    cholmod_dense b;
+    b.nrow = v.Dim();
+    b.ncol = 1;
+    b.nzmax = b.nrow;
+    b.d = b.nrow;
+    b.x = (void *) v.data_buffer();
+    b.z = 0;
+    b.xtype = CHOLMOD_REAL;
+    b.dtype = CHOLMOD_DOUBLE;
+    return b;
+}
+
+cholmod_dense cholmod_wrap(const FVector &v)
+{
+    cholmod_dense b;
+    b.nrow = v.Dim();
+    b.ncol = 1;
+    b.nzmax = b.nrow;
+    b.d = b.nrow;
+    b.x = (void *) v.data_buffer();
+    b.z = 0;
+    b.xtype = CHOLMOD_REAL;
+    b.dtype = CHOLMOD_SINGLE;
+    return b;
+}
 
 // =========================================================================
 
@@ -25,7 +97,6 @@ TFwdSolver<T>::TFwdSolver (const QMMesh *mesh, const char *solver, double tol, i
 {
     Setup (nth);
     meshptr = mesh;
-    SetLinSolver (solver, tol);
 }
 
 // =========================================================================
@@ -47,7 +118,6 @@ TFwdSolver<T>::~TFwdSolver ()
     if (B)      delete B;
     if (precon) delete precon;
     if (pphi)   delete []pphi;
-
     DeleteType ();
 }
 
@@ -80,12 +150,42 @@ void TFwdSolver<T>::SetupType (int nth)
 {
 }
 
+template<>
+void TFwdSolver<float>::SetupType (int nth)
+{
+    cm_L = 0;
+    cholmod_start (&cm_c);
+}
+
+template<>
+void TFwdSolver<double>::SetupType (int nth)
+{
+    cm_L = 0;
+    cholmod_start (&cm_c);
+}
+
+
 // =========================================================================
 
 template<class T>
 void TFwdSolver<T>::DeleteType ()
 {
 }
+
+template<>
+void TFwdSolver<double>::DeleteType ()
+{
+    cholmod_free_factor(&cm_L, &cm_c);
+    cholmod_finish (&cm_c) ;    
+}
+
+template<>
+void TFwdSolver<float>::DeleteType ()
+{
+    cholmod_free_factor(&cm_L, &cm_c);
+    cholmod_finish (&cm_c) ;   
+}
+
 
 // =========================================================================
 
@@ -133,10 +233,9 @@ void TFwdSolver<float>::Allocate ()
 
     // allocate factorisations and preconditioners
     if (solvertp == LSOLVER_DIRECT) {
-        using namespace Eigen;
-        Map<const SparseMatrix<float, RowMajor> > 
-            RF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr());      
-        rsolver.analyzePattern(RF); 
+        cholmod_sparse A = cholmod_wrap(*F);
+        cholmod_free_factor(&cm_L, &cm_c);
+        cm_L = cholmod_analyze (&A, &cm_c);
     } else {
 	if (precon) delete precon;
 	switch (precontp) {
@@ -163,10 +262,9 @@ void TFwdSolver<double>::Allocate ()
 
     // allocate factorisations and preconditioners
     if (solvertp == LSOLVER_DIRECT) {
-        using namespace Eigen;
-        Map<const SparseMatrix<double, RowMajor> > 
-            RF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr());      
-        rsolver.analyzePattern(RF); 
+        cholmod_sparse A = cholmod_wrap(*F);
+        cholmod_free_factor(&cm_L, &cm_c);
+        cm_L = cholmod_analyze (&A, &cm_c);
     } else {
 	if (precon) delete precon;
 	switch (precontp) {
@@ -380,16 +478,14 @@ void TFwdSolver<float>::Reset (const Solution &sol, double omega, bool elbasis)
     // real version
     AssembleSystemMatrix (sol, omega, elbasis);
     if (solvertp == LSOLVER_DIRECT) {
-      using namespace Eigen;
-      Map<const SparseMatrix<float, RowMajor> > 
-        RF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr());      
-      rsolver.factorize(RF);
-      xASSERT(rsolver.info() == 0, "System matrix factorisation failed");
+        cholmod_sparse A = cholmod_wrap(*F);
+        cholmod_factorize (&A, cm_L, &cm_c);
     }
     else
 	precon->Reset (F);
     if (B) AssembleMassMatrix();
 }
+
 
 template<>
 void TFwdSolver<double>::Reset (const Solution &sol, double omega, bool elbasis)
@@ -397,11 +493,8 @@ void TFwdSolver<double>::Reset (const Solution &sol, double omega, bool elbasis)
     // real version
     AssembleSystemMatrix (sol, omega, elbasis);
     if (solvertp == LSOLVER_DIRECT) {
-      using namespace Eigen;
-      Map<const SparseMatrix<double, RowMajor> > 
-        RF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr());      
-      rsolver.factorize(RF);
-      xASSERT(rsolver.info() == 0, "System matrix factorisation failed");
+        cholmod_sparse A = cholmod_wrap(*F);
+        cholmod_factorize (&A, cm_L, &cm_c);
     }
     else
 	precon->Reset (F);
@@ -451,10 +544,17 @@ void TFwdSolver<float>::CalcField (const TVector<float> &qvec,
     // source distribution. Use only if data type is INTENSITY
 
     if (solvertp == LSOLVER_DIRECT)  {
-        using namespace Eigen;
-        Map<const VectorXf> eqvec(qvec.data_buffer(), qvec.Dim());
-        Map<VectorXf> ecphi(phi.data_buffer(), phi.Dim());
-        ecphi = rsolver.solve(eqvec); 
+
+        cholmod_dense b = cholmod_wrap(qvec);
+        cholmod_dense *x = cholmod_solve(CHOLMOD_A, cm_L, &b, (cholmod_common *) &cm_c);
+
+        // SP TODO: Use cholmod solve 2 to avoid this        
+        double *xd = (double *) x->x;
+        for(int i = 0; i < phi.Dim(); i++) {
+            phi[i] = xd[i];
+        }
+        cholmod_free_dense(&x, (cholmod_common *) &cm_c);
+
     } else {
 	double tol = iterative_tol;
 	int it = IterativeSolve (*F, qvec, phi, tol, precon, iterative_maxit);
@@ -473,10 +573,17 @@ void TFwdSolver<double>::CalcField (const TVector<double> &qvec,
     // source distribution. Use only if data type is INTENSITY
 
     if (solvertp == LSOLVER_DIRECT)  {
-        using namespace Eigen;
-        Map<const VectorXd> eqvec(qvec.data_buffer(), qvec.Dim());
-        Map<VectorXd> ecphi(phi.data_buffer(), phi.Dim());
-        ecphi = rsolver.solve(eqvec); 
+
+        cholmod_dense b = cholmod_wrap(qvec);
+        cholmod_dense *x = cholmod_solve(CHOLMOD_A, cm_L, &b, (cholmod_common *) &cm_c);
+
+        // SP TODO: Use cholmod solve 2 to avoid this        
+        double *xd = (double *) x->x;
+        for(int i = 0; i < phi.Dim(); i++) {
+            phi[i] = xd[i];
+        }
+        cholmod_free_dense(&x, (cholmod_common *) &cm_c);
+
     } else {
 	double tol = iterative_tol;
 	int it = IterativeSolve (*F, qvec, phi, tol, precon, iterative_maxit);

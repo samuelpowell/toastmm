@@ -22,6 +22,8 @@ if(TOAST_THREAD)
     # find_package(OpenMP REQUIRED)
 endif()
 
+find_package(suitesparse CONFIG REQUIRED)
+
 # liblbfgs
 set(LBFGS_USE_SSE ON)
 set(LBFGS_lib_TARGET_NAME liblbfgs)
