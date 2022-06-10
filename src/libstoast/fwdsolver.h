@@ -407,12 +407,10 @@ public:
 
     // Eigen replacement for SuperLU
     Eigen::SparseLU<Eigen::SparseMatrix<T> > csolver;
-    Eigen::SimplicialCholesky<Eigen::SparseMatrix<T> > rsolver;
-
+    
     // CHOLMOD data for real direct solves
-    cholmod_sparse cm_A;
-    cholmod_factor *cm_L;
-    cholmod_common cm_c;
+    cholmod_common  cm_c;               // CHOLMOD common data structure
+    cholmod_factor *cm_L;               // CHOLMOD factor
 
     
 protected:

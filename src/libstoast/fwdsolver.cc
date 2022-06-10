@@ -11,7 +11,7 @@ using namespace std;
 
 // =========================================================================
 
-cholmod_sparse cholmod_wrap(const RCompRowMatrix &F)
+cholmod_sparse cholmod_wrap(const RCompRowMatrix &F, bool pattern = false)
 {
     cholmod_sparse A;
     A.nrow = F.nRows();
@@ -20,18 +20,18 @@ cholmod_sparse cholmod_wrap(const RCompRowMatrix &F)
     A.p = F.rowptr;
     A.i = F.colidx;
     A.nz = 0;
-    A.x = (void *) F.ValPtr();
+    A.x = pattern ? 0 : (void *) F.ValPtr();
     A.z = 0;
     A.stype = 0;
     A.itype = CHOLMOD_INT;   
-    A.xtype = CHOLMOD_REAL;
+    A.xtype = pattern ? CHOLMOD_PATTERN : CHOLMOD_REAL;
     A.dtype = CHOLMOD_DOUBLE;
     A.sorted = 1;
     A.packed = 1;
     return A;
 }
 
-cholmod_sparse cholmod_wrap(const FCompRowMatrix &F)
+cholmod_sparse cholmod_wrap(const FCompRowMatrix &F,bool pattern = false)
 {
     cholmod_sparse A;
     A.nrow = F.nRows();
@@ -40,11 +40,11 @@ cholmod_sparse cholmod_wrap(const FCompRowMatrix &F)
     A.p = F.rowptr;
     A.i = F.colidx;
     A.nz = 0;
-    A.x = (void *) F.ValPtr();
+    A.x = pattern ? 0 : (void *) F.ValPtr();
     A.z = 0;
     A.stype = 0;
     A.itype = CHOLMOD_INT;   
-    A.xtype = CHOLMOD_REAL;
+    A.xtype = pattern ? CHOLMOD_PATTERN : CHOLMOD_REAL;
     A.dtype = CHOLMOD_SINGLE;
     A.sorted = 1;
     A.packed = 1;
@@ -175,14 +175,26 @@ void TFwdSolver<T>::DeleteType ()
 template<>
 void TFwdSolver<double>::DeleteType ()
 {
-    cholmod_free_factor(&cm_L, &cm_c);
+    // Free CHOLMOD factorisation object
+    cholmod_free_factor(&cm_L, &cm_c);  
+
+    // Free CHOLMOD solve workspace 
+    // cholmod_free_dense (& (cholmod_dense *)cm_X, &cm_c);
+    // cholmod_free_dense (& (cholmod_dense *)cm_Y, &cm_c);
+    // cholmod_free_dense (& (cholmod_dense *)cm_E, &cm_c);
     cholmod_finish (&cm_c) ;    
 }
 
 template<>
 void TFwdSolver<float>::DeleteType ()
 {
+    // Free CHOLMOD factorisation object
     cholmod_free_factor(&cm_L, &cm_c);
+    
+    // Free CHOLMOD solve workspace 
+    // cholmod_free_dense (& (cholmod_dense *)cm_X, &cm_c);
+    // cholmod_free_dense (& (cholmod_dense *)cm_Y, &cm_c);
+    // cholmod_free_dense (& (cholmod_dense *)cm_E, &cm_c);
     cholmod_finish (&cm_c) ;   
 }
 
@@ -233,9 +245,10 @@ void TFwdSolver<float>::Allocate ()
 
     // allocate factorisations and preconditioners
     if (solvertp == LSOLVER_DIRECT) {
-        cholmod_sparse A = cholmod_wrap(*F);
+        cholmod_sparse A = cholmod_wrap(*F, true);
         cholmod_free_factor(&cm_L, &cm_c);
         cm_L = cholmod_analyze (&A, &cm_c);
+        xASSERT(cm_L, "System matrix analysis failed!");
     } else {
 	if (precon) delete precon;
 	switch (precontp) {
@@ -262,9 +275,10 @@ void TFwdSolver<double>::Allocate ()
 
     // allocate factorisations and preconditioners
     if (solvertp == LSOLVER_DIRECT) {
-        cholmod_sparse A = cholmod_wrap(*F);
+        cholmod_sparse A = cholmod_wrap(*F, true);
         cholmod_free_factor(&cm_L, &cm_c);
         cm_L = cholmod_analyze (&A, &cm_c);
+        xASSERT(cm_L, "System matrix analysis failed!");
     } else {
 	if (precon) delete precon;
 	switch (precontp) {
@@ -549,12 +563,19 @@ void TFwdSolver<float>::CalcField (const TVector<float> &qvec,
         cholmod_dense *x = cholmod_solve(CHOLMOD_A, cm_L, &b, (cholmod_common *) &cm_c);
 
         // SP TODO: Use cholmod solve 2 to avoid this        
-        double *xd = (double *) x->x;
+        float *xd = (float *) x->x;
         for(int i = 0; i < phi.Dim(); i++) {
             phi[i] = xd[i];
         }
         cholmod_free_dense(&x, (cholmod_common *) &cm_c);
 
+        // cholmod_dense b = cholmod_wrap(qvec);
+        // cholmod_solve2(CHOLMOD_A, cm_L, &b, NULL, & (cholmod_dense *)cm_X, NULL, &(cholmod_dense *)cm_Y, &(cholmod_dense *)cm_E, &(cholmod_common)cm_c);
+        // double *xd = (double *) cm_X->x;
+        // for(int i = 0; i < phi.Dim(); i++) {
+        //     phi[i] = xd[i];
+        // }       
+       
     } else {
 	double tol = iterative_tol;
 	int it = IterativeSolve (*F, qvec, phi, tol, precon, iterative_maxit);
@@ -583,6 +604,13 @@ void TFwdSolver<double>::CalcField (const TVector<double> &qvec,
             phi[i] = xd[i];
         }
         cholmod_free_dense(&x, (cholmod_common *) &cm_c);
+
+        // cholmod_dense b = cholmod_wrap(qvec);
+        // cholmod_solve2(CHOLMOD_A, cm_L, &b, NULL, & (cholmod_dense *)cm_X, NULL, &(cholmod_dense *)cm_Y, &(cholmod_dense *)cm_E, &(cholmod_common)cm_c);
+        // double *xd = (double *) cm_X->x;
+        // for(int i = 0; i < phi.Dim(); i++) {
+        //     phi[i] = xd[i];
+        // }
 
     } else {
 	double tol = iterative_tol;
@@ -762,17 +790,16 @@ void TFwdSolver<T>::CalcFields (const TCompRowMatrix<T> &qvec,
     int i, nq = qvec.nRows();
 
     if (solvertp == LSOLVER_DIRECT) {
-        LOGOUT1_INIT_PROGRESSBAR ("CalcFields", 50, nq);
-	for (i = 0; i < nq; i++) {
-	    CalcField (qvec.Row(i), phi[i], res_single);
-	    if (res) {
-	        if (res_single->it_count > res->it_count)
-		    res->it_count = res_single->it_count;
-		if (res_single->rel_err > res->rel_err)
-		    res->rel_err = res_single->rel_err;
+
+        for (i = 0; i < nq; i++) {
+            CalcField (qvec.Row(i), phi[i], res_single);
+            if (res) {
+                if (res_single->it_count > res->it_count)
+                    res->it_count = res_single->it_count;
+                if (res_single->rel_err > res->rel_err)
+                    res->rel_err = res_single->rel_err;
+            }
 	    }
-	    LOGOUT1_PROGRESS(i);
-	}
     } else {
 #if TOAST_THREAD
 

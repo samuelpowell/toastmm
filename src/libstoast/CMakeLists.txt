@@ -26,7 +26,6 @@ target_sources(libstoast PRIVATE    source.cc fwdsolver.cc
 target_link_libraries(libstoast libfe libmath libraster)
 target_link_libraries(libstoast SuiteSparse::suitesparseconfig
                                 SuiteSparse::amd
-                                SuiteSparse::btf
                                 SuiteSparse::camd
                                 SuiteSparse::ccolamd
                                 SuiteSparse::colamd

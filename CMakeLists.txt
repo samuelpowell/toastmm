@@ -1,4 +1,13 @@
 cmake_minimum_required(VERSION 3.0.0)
+
+set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake"
+  CACHE STRING "Vcpkg toolchain file")
+
+if(WIN32)
+    set(VCPKG_TARGET_TRIPLET "x64-windows-static"
+        CACHE STRING "Vcpkg triplet")
+endif()
+
 project(toastmm VERSION 0.1.0)
 
 include(CTest)

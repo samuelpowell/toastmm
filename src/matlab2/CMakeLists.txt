@@ -30,14 +30,6 @@ if(Matlab_FOUND)
   target_link_libraries(toastmex libfdot)
   target_link_libraries(toastmex ${Matlab_MEX_LIBRARY} ${Matlab_MX_LIBRARY})
 
-  target_link_libraries(toastmex SuiteSparse::suitesparseconfig
-                                 SuiteSparse::amd
-                                 SuiteSparse::btf
-                                 SuiteSparse::camd
-                                 SuiteSparse::ccolamd
-                                 SuiteSparse::colamd
-                                 SuiteSparse::cholmod)
-
   # Install the output dynamic library
   install(TARGETS toastmex
           LIBRARY DESTINATION matlab/toast
