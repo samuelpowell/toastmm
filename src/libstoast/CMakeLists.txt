@@ -29,7 +29,8 @@ target_link_libraries(libstoast SuiteSparse::suitesparseconfig
                                 SuiteSparse::camd
                                 SuiteSparse::ccolamd
                                 SuiteSparse::colamd
-                                SuiteSparse::cholmod)
+                                SuiteSparse::cholmod
+                                SuiteSparse::umfpack)
 
 if(TOAST_THREAD)
         # Enable threading in eigen

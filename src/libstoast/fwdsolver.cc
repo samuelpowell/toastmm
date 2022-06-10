@@ -6,6 +6,7 @@
 #include "Eigen/SparseLU"
 
 #include "cholmod.h"
+#include "umfpack.h"
 
 using namespace std;
 
@@ -150,6 +151,20 @@ void TFwdSolver<T>::SetupType (int nth)
 {
 }
 
+
+template<>
+void TFwdSolver<std::complex<float> >::SetupType (int nth)
+{
+    umfpack_zi_defaults(up_c);
+}
+
+
+template<>
+void TFwdSolver<std::complex<double> >::SetupType (int nth)
+{
+    umfpack_zi_defaults(up_c);
+}
+
 template<>
 void TFwdSolver<float>::SetupType (int nth)
 {
@@ -173,17 +188,21 @@ void TFwdSolver<T>::DeleteType ()
 }
 
 template<>
-void TFwdSolver<double>::DeleteType ()
+void TFwdSolver<std::complex<float> >::DeleteType ()
 {
-    // Free CHOLMOD factorisation object
-    cholmod_free_factor(&cm_L, &cm_c);  
-
-    // Free CHOLMOD solve workspace 
-    // cholmod_free_dense (& (cholmod_dense *)cm_X, &cm_c);
-    // cholmod_free_dense (& (cholmod_dense *)cm_Y, &cm_c);
-    // cholmod_free_dense (& (cholmod_dense *)cm_E, &cm_c);
-    cholmod_finish (&cm_c) ;    
+    // Free UMFPACK factorisations
+    // umfpack_zi_free_numeric(&up_numeric);
+    // umfpack_zi_free_symbolic(&up_symbolic);
 }
+
+template<>
+void TFwdSolver<std::complex<double> >::DeleteType ()
+{
+    // Free UMFPACK factorisations
+    // umfpack_zi_free_numeric(&up_numeric);
+    // umfpack_zi_free_symbolic(&up_symbolic);
+}
+
 
 template<>
 void TFwdSolver<float>::DeleteType ()
@@ -198,6 +217,18 @@ void TFwdSolver<float>::DeleteType ()
     cholmod_finish (&cm_c) ;   
 }
 
+template<>
+void TFwdSolver<double>::DeleteType ()
+{
+    // Free CHOLMOD factorisation object
+    cholmod_free_factor(&cm_L, &cm_c);  
+
+    // Free CHOLMOD solve workspace 
+    // cholmod_free_dense (& (cholmod_dense *)cm_X, &cm_c);
+    // cholmod_free_dense (& (cholmod_dense *)cm_Y, &cm_c);
+    // cholmod_free_dense (& (cholmod_dense *)cm_E, &cm_c);
+    cholmod_finish (&cm_c) ;    
+}
 
 // =========================================================================
 
@@ -305,10 +336,12 @@ void TFwdSolver<std::complex<double> >::Allocate ()
 
     // allocate factorisations and preconditioners
     if (solvertp == LSOLVER_DIRECT) {
-        using namespace Eigen;
-        Map<const SparseMatrix<std::complex<double>, RowMajor> > 
-            RF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr());      
-        csolver.analyzePattern(RF);         
+        // umfpack_zi_free_numeric(&up_numeric);
+        // umfpack_zi_free_symbolic(&up_symbolic);
+        int status = umfpack_zi_symbolic(n, n, F->rowptr, F->colidx,
+                                         (const double *) F->ValPtr(), NULL, 
+                                         &up_symbolic, up_c, NULL);
+        xASSERT(status >= 0, "System matrix analysis failed!");
     } else {
 	if (precon) delete precon;
 	switch (precontp) {
@@ -336,10 +369,17 @@ void TFwdSolver<std::complex<float> >::Allocate ()
 
     // allocate factorisations and preconditioners
     if (solvertp == LSOLVER_DIRECT) {
-        using namespace Eigen;
-        Map<const SparseMatrix<std::complex<float>, RowMajor> > 
-            RF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr());      
-        csolver.analyzePattern(RF); 
+        CVector dcv(n);
+        for(int i = 0; i < n; ++i)
+        {
+            dcv[i] = std::complex<double>(F->Val(i));
+        }     
+        // umfpack_zi_free_numeric(&up_numeric);
+        // umfpack_zi_free_symbolic(&up_symbolic);
+        int status = umfpack_zi_symbolic(n, n, F->rowptr, F->colidx,
+                                         (const double *)dcv.data_buffer(), NULL,
+                                         &up_symbolic, up_c, NULL);
+        xASSERT(status >= 0, "System matrix analysis failed!");
     } else {
 	if (precon) delete precon;
 	switch (precontp) {
@@ -365,14 +405,11 @@ void TFwdSolver<float>::AssembleSystemMatrix (const Solution &sol,
 
     RCompRowMatrix FF (F->nRows(), F->nCols(), F->rowptr, F->colidx);
     prm = sol.GetParam (OT_CMUA);
-    AddToSysMatrix (*meshptr, FF, &prm,
-                    elbasis ? ASSEMBLE_PFF_EL:ASSEMBLE_PFF);
+    AddToSysMatrix (*meshptr, FF, &prm, elbasis ? ASSEMBLE_PFF_EL:ASSEMBLE_PFF);
     prm = sol.GetParam (OT_CKAPPA);
-    AddToSysMatrix (*meshptr, FF, &prm,
-		    elbasis ? ASSEMBLE_PDD_EL:ASSEMBLE_PDD);
+    AddToSysMatrix (*meshptr, FF, &prm, elbasis ? ASSEMBLE_PDD_EL:ASSEMBLE_PDD);
     prm = sol.GetParam (OT_C2A);
-    AddToSysMatrix (*meshptr, FF, &prm,
-		    elbasis ? ASSEMBLE_BNDPFF_EL:ASSEMBLE_BNDPFF);
+    AddToSysMatrix (*meshptr, FF, &prm, elbasis ? ASSEMBLE_BNDPFF_EL:ASSEMBLE_BNDPFF);
 
     int i, nz = F->nVal();
     float *fval = F->ValPtr();
@@ -393,14 +430,11 @@ void TFwdSolver<double>::AssembleSystemMatrix (const Solution &sol,
 
     F->Zero();
     prm = sol.GetParam (OT_CMUA);
-    AddToSysMatrix (*meshptr, *F, &prm,
-		    elbasis ? ASSEMBLE_PFF_EL:ASSEMBLE_PFF);
+    AddToSysMatrix (*meshptr, *F, &prm, elbasis ? ASSEMBLE_PFF_EL:ASSEMBLE_PFF);
     prm = sol.GetParam (OT_CKAPPA);
-    AddToSysMatrix (*meshptr, *F, &prm,
-		    elbasis ? ASSEMBLE_PDD_EL:ASSEMBLE_PDD);
+    AddToSysMatrix (*meshptr, *F, &prm, elbasis ? ASSEMBLE_PDD_EL:ASSEMBLE_PDD);
     prm = sol.GetParam (OT_C2A);
-    AddToSysMatrix (*meshptr, *F, &prm,
-		    elbasis ? ASSEMBLE_BNDPFF_EL:ASSEMBLE_BNDPFF);
+    AddToSysMatrix (*meshptr, *F, &prm, elbasis ? ASSEMBLE_BNDPFF_EL:ASSEMBLE_BNDPFF);
 }
 
 template<>
@@ -417,14 +451,11 @@ void TFwdSolver<std::complex<float> >::AssembleSystemMatrix (
 
     CCompRowMatrix FF (F->nRows(), F->nCols(), F->rowptr, F->colidx);
     prm = sol.GetParam (OT_CMUA);
-    AddToSysMatrix (*meshptr, FF, &prm,
-		    elbasis ? ASSEMBLE_PFF_EL:ASSEMBLE_PFF);
+    AddToSysMatrix (*meshptr, FF, &prm, elbasis ? ASSEMBLE_PFF_EL:ASSEMBLE_PFF);
     prm = sol.GetParam (OT_CKAPPA);
-    AddToSysMatrix (*meshptr, FF, &prm,
-		    elbasis ? ASSEMBLE_PDD_EL:ASSEMBLE_PDD);
+    AddToSysMatrix (*meshptr, FF, &prm, elbasis ? ASSEMBLE_PDD_EL:ASSEMBLE_PDD);
     prm = sol.GetParam (OT_C2A);
-    AddToSysMatrix (*meshptr, FF, &prm,
-		    elbasis ? ASSEMBLE_BNDPFF_EL:ASSEMBLE_BNDPFF);
+    AddToSysMatrix (*meshptr, FF, &prm, elbasis ? ASSEMBLE_BNDPFF_EL:ASSEMBLE_BNDPFF);
     AddToSysMatrix (*meshptr, FF, omega, ASSEMBLE_iCFF);
 
     int i, nz = F->nVal();
@@ -446,14 +477,11 @@ void TFwdSolver<std::complex<double> >::AssembleSystemMatrix (
 
     F->Zero();
     prm = sol.GetParam (OT_CMUA);
-    AddToSysMatrix (*meshptr, *F, &prm,
-        elbasis ? ASSEMBLE_PFF_EL:ASSEMBLE_PFF);
+    AddToSysMatrix (*meshptr, *F, &prm, elbasis ? ASSEMBLE_PFF_EL:ASSEMBLE_PFF);
     prm = sol.GetParam (OT_CKAPPA);
-    AddToSysMatrix (*meshptr, *F, &prm,
-        elbasis ? ASSEMBLE_PDD_EL:ASSEMBLE_PDD);
+    AddToSysMatrix (*meshptr, *F, &prm, elbasis ? ASSEMBLE_PDD_EL:ASSEMBLE_PDD);
     prm = sol.GetParam (OT_C2A);
-    AddToSysMatrix (*meshptr, *F, &prm,
-        elbasis ? ASSEMBLE_BNDPFF_EL:ASSEMBLE_BNDPFF);
+    AddToSysMatrix (*meshptr, *F, &prm, elbasis ? ASSEMBLE_BNDPFF_EL:ASSEMBLE_BNDPFF);
     AddToSysMatrix (*meshptr, *F, omega, ASSEMBLE_iCFF);
 }
 
@@ -522,11 +550,15 @@ void TFwdSolver<std::complex<float> >::Reset (const Solution &sol,
     // single complex version
     AssembleSystemMatrix (sol, omega, elbasis);
     if (solvertp == LSOLVER_DIRECT) {
-      using namespace Eigen;
-      Map<const SparseMatrix<std::complex<float>, RowMajor> > 
-        RF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr());       
-      csolver.factorize(RF);
-      xASSERT(csolver.info() == 0, "System matrix factorisation failed");
+        int n = F->nCols();
+        CVector dcv(n);
+        for(int i = 0; i < n; ++i) {
+            dcv[i] = std::complex<double>(F->Val(i));
+        }      
+        // umfpack_zi_free_numeric(&up_numeric);
+        int status = umfpack_zi_numeric(F->rowptr, F->colidx, (const double *) dcv.data_buffer(), NULL, 
+                                        up_symbolic, &up_numeric, up_c, NULL);
+        xASSERT(status >= 0, "System matrix factorisation failed");
     } else
 	precon->Reset (F);
     if (B) AssembleMassMatrix();
@@ -539,11 +571,10 @@ void TFwdSolver<std::complex<double> >::Reset (const Solution &sol,
     // complex version
     AssembleSystemMatrix (sol, omega, elbasis);
     if (solvertp == LSOLVER_DIRECT) {
-      using namespace Eigen;
-      Map<const SparseMatrix<std::complex<double>, RowMajor> > 
-        RF(F->nRows(), F->nCols(), F->nVal(), F->rowptr, F->colidx, F->ValPtr()); 
-      csolver.factorize(RF);      
-      xASSERT(csolver.info() == 0, "System matrix factorisation failed"); 
+        // umfpack_zi_free_numeric(&up_numeric);
+        int status = umfpack_zi_numeric(F->rowptr, F->colidx, (const double *) F->ValPtr(), NULL,
+                                        up_symbolic, &up_numeric, up_c, NULL);
+        xASSERT(status >= 0, "System matrix factorisation failed");
     }
     else
 	precon->Reset (F);
@@ -628,10 +659,31 @@ void TFwdSolver<std::complex<float> >::CalcField (
     TVector<std::complex<float> > &cphi, IterativeSolverResult *res, int th) const
 {
     if (solvertp == LSOLVER_DIRECT) {
-        using namespace Eigen;
-        Map<const VectorXcf> eqvec(qvec.data_buffer(), qvec.Dim());
-        Map<VectorXcf> ecphi(cphi.data_buffer(), cphi.Dim());
-        ecphi = csolver.solve(eqvec); 
+
+        int n = qvec.Dim();
+        CVector dcphi(cphi.Dim());
+
+        CVector dqvec(qvec.Dim());
+        for(int i = 0; i < n; i++) {
+            dqvec = std::complex<double>(qvec[i]);
+        }
+
+        CVector dcv(n);
+        for(int i = 0; i < n; ++i)
+        {
+            dcv[i] = std::complex<double>(F->Val(i));
+        }   
+
+        int status = umfpack_zi_solve(UMFPACK_A, F->rowptr, F->colidx, (const double *) dcv.data_buffer(), NULL, 
+                                      (double *) dcphi.data_buffer(), NULL,
+                                      (const double *) dqvec.data_buffer(), NULL,
+                                      up_numeric, up_c, NULL);
+        xASSERT(status >= 0, "Sytem matrix solve failed");
+
+        for(int i = 0; i < n; i++) {
+            cphi[i] = std::complex<float>(dcphi[i]);
+        }
+        
     } else {
         double tol = iterative_tol;
 	int it = IterativeSolve (*F, qvec, cphi, tol, precon, iterative_maxit);
@@ -654,10 +706,13 @@ void TFwdSolver<std::complex<double> >::CalcField (
     clock_t time0 = tm.tms_utime;
 #endif
     if (solvertp == LSOLVER_DIRECT) {
-        using namespace Eigen;
-        Map<const VectorXcd> eqvec(qvec.data_buffer(), qvec.Dim());
-        Map<VectorXcd> ecphi(cphi.data_buffer(), cphi.Dim());
-        ecphi = csolver.solve(eqvec); 
+     
+        int status = umfpack_zi_solve(UMFPACK_A, F->rowptr, F->colidx, (const double *) F->ValPtr(), NULL, 
+                                      (double *) cphi.data_buffer(), NULL,
+                                      (const double *) qvec.data_buffer(), NULL,
+                                      up_numeric, up_c, NULL);
+        xASSERT(status >= 0, "Sytem matrix solve failed");
+
     } else {
         double tol = iterative_tol;
 	int it = IterativeSolve (*F, qvec, cphi, tol, precon, iterative_maxit);
@@ -741,14 +796,7 @@ void TFwdSolver<std::complex<double> >::CalcFields (const CCompRowMatrix &qvec,
   
     int nq = qvec.nRows();
     for (int i = 0; i < nq; i++) {
-
-      using namespace Eigen;
-      CVector qveci = qvec.Row(i);
-      Map<const VectorXcd> eqvec(qveci.data_buffer(), qveci.Dim());
-      Map<VectorXcd> ecphi(phi[i].data_buffer(), phi[i].Dim());
-      ecphi = csolver.solve(eqvec);    //Use the factors to solve the linear system 
-
-	  //CalcField (qvec.Row(i), phi[i], res);
+	  CalcField (qvec.Row(i), phi[i], res);
 	  }
     } else {
 #if TOAST_THREAD

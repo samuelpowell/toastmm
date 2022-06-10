@@ -10,10 +10,8 @@
 #include "toasttype.h"
 #include "mathlib.h"
 
-#include "Eigen/SparseLU"
-#include "Eigen/SparseCholesky"
-
 #include "cholmod.h"
+#include "umfpack.h"
 
 class Solution;
 class MWsolution;
@@ -405,9 +403,11 @@ public:
     int iterative_maxit;    ///< iterative solver max iterations (0 for auto)
     PreconType precontp;    ///< preconditioner
 
-    // Eigen replacement for SuperLU
-    Eigen::SparseLU<Eigen::SparseMatrix<T> > csolver;
-    
+    // UMFPACK data for complex direct solves
+    double up_c[UMFPACK_CONTROL];
+    void *up_symbolic;
+    void *up_numeric;
+
     // CHOLMOD data for real direct solves
     cholmod_common  cm_c;               // CHOLMOD common data structure
     cholmod_factor *cm_L;               // CHOLMOD factor
