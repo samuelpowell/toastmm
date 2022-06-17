@@ -27,38 +27,16 @@ function proj = toastProject(hMesh,mua,mus,ref,omega,qvec,mvec,solver,tol)
 
 % Subsititute missing parameters with defaults
 if nargin < 8
-    solver = 'DIRECT';
+    solver = 'direct';
 elseif nargin < 9
     tol = 1e-10;
 end
 
 % Calculate system matrix
-smat = dotSysmat (hMesh, mua, mus, ref, omega);
+phi = toastFields(hMesh, 0,  qvec, mua, mus, ref, omega, solver, tol, 'auto');
 
-% Solve linear system for log complex field and apply boundary operator
-switch upper(solver)
-    case 'DIRECT'
-        % solve with backslash operator
-        lgamma = reshape (log(mvec.' * (smat\qvec)), [], 1);
-    otherwise
-        % for now, use BiCGSTAB for any iterative solver request
-        nq = size(qvec,2);
-        nm = size(mvec,2);
-
-        % incomplete LU factorisation of smat
-        %ilu_setup.type = 'ilutp';
-        %ilu_setup.droptol = 1e-2;
-        ilu_setup.type = 'nofill';
-        [L U] = ilu(smat,ilu_setup);
-        
-        for i=1:nq
-            [phi,flag] = bicgstab(smat,qvec(:,i),tol,1000,L,U);
-            prj = log(mvec.' * phi);
-            lgamma((i-1)*nm+1:i*nm,1) = prj;
-        end
-end
-
-% Strip off unused source-detector combinations
+% Perform projection and remove unused measurements
+lgamma = reshape (log(mvec.' * phi), [], 1);
 lgamma = lgamma(hMesh.DataLinkList());
 
 % Rearrange data in terms of log amplitude and phase shift blocks
