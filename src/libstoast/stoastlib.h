@@ -28,5 +28,6 @@
 #include "regul.h"
 #include "pscaler.h"
 #include "lsearch.h"
+#include "spdirect.h"
 
 #endif // !__STOASTLIB_H

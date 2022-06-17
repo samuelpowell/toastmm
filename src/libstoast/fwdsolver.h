@@ -6,12 +6,9 @@
 #ifndef __FWDSOLVER_H
 #define __FWDSOLVER_H
 
-//#include "supermatrix.h"
 #include "toasttype.h"
 #include "mathlib.h"
-
-#include "cholmod.h"
-#include "umfpack.h"
+#include "spdirect.h"
 
 class Solution;
 class MWsolution;
@@ -393,26 +390,19 @@ public:
         const TCompRowMatrix<T> &mvec, const Solution &sol, double omega,
         DataScale scl = DATA_DEFAULT);
 
-    const QMMesh *meshptr;  ///< pointer to the associated FEM mesh
-    LSOLVER solvertp;       ///< linear solver type
-    IterativeMethod method; ///< iterative solver method, if applicable
-    TCompRowMatrix<T> *F;   ///< FEM system matrix
-    TPreconditioner<T> *precon; ///< preconditioner instance
-    TCompRowMatrix<T> *B;   ///< mass matrix; only used for time-domain problems
-    double iterative_tol;   ///< iterative solver tolerance
-    int iterative_maxit;    ///< iterative solver max iterations (0 for auto)
-    PreconType precontp;    ///< preconditioner
+    const QMMesh *meshptr;          // pointer to the associated FEM mesh
+    LSOLVER solvertp;               // linear solver type
+    IterativeMethod method;         // iterative solver method, if applicable
+    TCompRowMatrix<T> *F;           // FEM system matrix
+    TPreconditioner<T> *precon;     // preconditioner instance
+    TCompRowMatrix<T> *B;           // mass matrix; only used for time-domain problems
+    double iterative_tol;           // iterative solver tolerance
+    int iterative_maxit;            // iterative solver max iterations (0 for auto)
+    PreconType precontp;            // preconditioner
 
-    // UMFPACK data for complex direct solves
-    double up_c[UMFPACK_CONTROL];
-    void *up_symbolic;
-    void *up_numeric;
+    TSPDirectSolver<T> *dsolver;    // direct solver instance
 
-    // CHOLMOD data for real direct solves
-    cholmod_common  cm_c;               // CHOLMOD common data structure
-    cholmod_factor *cm_L;               // CHOLMOD factor
-
-    
+   
 protected:
     void Setup (int nth=1);
     void SetupType (int nth=1);

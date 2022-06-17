@@ -100,6 +100,10 @@ Aim: ensure multithreading where possible, but avoid contention
   - toastJacobianCW mesh integrals multithreaded, 6x speedup on 8x threads
   - Update MEX interface to interleaved complex (>R2018a) format with runtime improvements
   - Remove old MATLAB interface scripts
+  - Implement sparse symmetric system matrix solves with 
+    - (GPL) CHOLMOD, UMFPACK
+    - (LGPL) CHOLMOD (simplicial only), CXSparse (LU)
+  - Remove option to build internal libraries dynamically
 
 # TODO
 

@@ -4,7 +4,7 @@ set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems
   CACHE STRING "Vcpkg toolchain file")
 
 if(WIN32)
-    set(VCPKG_TARGET_TRIPLET "x64-windows-static"
+    set(VCPKG_TARGET_TRIPLET "x64-windows"
         CACHE STRING "Vcpkg triplet")
 endif()
 

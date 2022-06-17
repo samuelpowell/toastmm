@@ -10,15 +10,12 @@ endif()
 set_target_properties(libstoast PROPERTIES PREFIX "")
 
 target_include_directories(libstoast PRIVATE ../../include)            # For blasnames, toastdef, arch
-target_include_directories(libstoast PUBLIC ../../extern/eigen-3.4.0)  # Eigen for solvers, etc.
 target_include_directories(libstoast INTERFACE .)                      # Provide headers for dependents
 
 # Standard build
 #
-# Removed: fwdsolver_zslu.cc, fwdsolver_cslu.cc (reimplemented with Eigen)
-#
-target_sources(libstoast PRIVATE    source.cc fwdsolver.cc 
-                                    fwdsolver_mw.cc jacobian.cc of.cc regul.cc
+target_sources(libstoast PRIVATE    source.cc fwdsolver.cc fwdsolver_mw.cc spdirect.cc
+                                    jacobian.cc of.cc regul.cc
                                     pscaler.cc pparse.cc lsearch.cc
                                     projector.cc camera.cc)
 
@@ -31,11 +28,6 @@ target_link_libraries(libstoast SuiteSparse::suitesparseconfig
                                 SuiteSparse::colamd
                                 SuiteSparse::cholmod
                                 SuiteSparse::umfpack)
-
-if(TOAST_THREAD)
-        # Enable threading in eigen
-        # target_link_libraries(libstoast OpenMP::OpenMP_CXX)
-endif()
 
 install(TARGETS libstoast
         ARCHIVE DESTINATION lib

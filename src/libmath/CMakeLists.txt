@@ -22,8 +22,6 @@ target_sources(libmath PRIVATE  vector.cc gsmatrix.cc sycrmatrix.cc cr_cholesky.
 if(TOAST_THREAD)
         target_sources(libmath PRIVATE task.cc)
         target_link_libraries(libmath PUBLIC Threads::Threads)
-        # Enable threading in Eigen
-        # target_link_libraries(libmath PUBLIC OpenMP::OpenMP_CXX)
 endif()
 
 # Assorted header defines to resolve
