@@ -117,3 +117,24 @@ Aim: ensure multithreading where possible, but avoid contention
  - Resolve versioning 
  - Python interface build assumes Release paths on Windows
  - Default link list after make mesh appears arbitrary, resulting in enormous linklist/qmvec
+
+# Perfromance notes
+
+- Bottlenecks
+  - Mesh sparsity calculation heapsort (single-threaded), called when computing the system matrix for fields
+  - Solvers
+    - Fast direct solvers require supernodal + BLAS implementation. Use of e.g. CHOLMOD for direct solve when computing
+      forward and adjoint fields for an HD problem is optimum (c. N=200k, nQM = 60).
+    - MKL PARDISO less competitive than CHOLMOD.
+    - Simplicial solvers such as Eigen LLT, and legacy Cholesky implementation are not competitive with iterative 
+      solvers. 
+    - Block Krylov methods don't appear to offer significant speedup and are reliant upon fast matrix solves thus
+      indirectly require a decent BLAS.
+    - Iterative solvers (CG, BICGSTAB) readily parallelised and within an order of mangnitude of direct solvers, hot path
+      is Sparse-Dense Ax & Cholesky substitution. No memory issues.
+  - Jacobian computation, fast in basis, slow in mesh. Mesh path is dominated by IntFG cost, which in turn uses a
+    virtual method call to element IntFG in hot loop. Experiments show 50% speedup possible by extracting this call
+    and working over all RHS, and / or precomputing element integrals to avoid scaling and indexing cost.
+
+  
+      
