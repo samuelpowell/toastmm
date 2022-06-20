@@ -7,7 +7,7 @@ build-backend = "setuptools.build_meta:__legacy__"
 # Disable 32-bit builds, PyPy builds, musl
 # NB: musl can be re-enabled if Intel TBB headers are installed
 #     for this target.
-skip = ["*-win32", "*_i686", "pp*", "-musl*"]
+skip = ["*-win32", "*_i686", "pp*", "*-musllinux*"]
 
 # Build the library in the docker container for good core deps
 before-all = [
@@ -17,4 +17,3 @@ before-all = [
      "cmake --build . --target install --config Release",
      "cd .."
      ]
-
