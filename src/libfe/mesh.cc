@@ -395,15 +395,20 @@ Point Mesh::NeighbourBarycentre (int node)
     return bc;
 }
 
+	#include <vector>
+
 void Mesh::SparseRowStructure (idxtype *&rowptr, idxtype *&colidx, int &nzero) const
 {
     // M.S. 1.10.99: Check that this works for higher-order element types
     // (TRI6 and TET10)
 
-    typedef struct {
-	int n1, n2;
-    } IPair;
-    IPair *pair, rra;
+    // typedef struct {
+	// int n1, n2;
+    // } IPair;
+
+	typedef std::pair<int,int> IPair;
+
+    IPair rra;
     int el, nn, nd1, nd2, n1, n2, i, j, l, ir, indx1, indx2, ri, ci, pi;
     int p = 0, npair = 0;
 
@@ -414,7 +419,9 @@ void Mesh::SparseRowStructure (idxtype *&rowptr, idxtype *&colidx, int &nzero) c
 	nn = elist[el]->nNode();
 	npair += nn*nn;
     }
-    pair = new IPair[npair];
+
+	std::vector<IPair> pair(npair);
+    // pair = new IPair[npair];
 
     // collect node pairs
     for (el = 0; el < elist.Len(); el++) {
@@ -423,84 +430,87 @@ void Mesh::SparseRowStructure (idxtype *&rowptr, idxtype *&colidx, int &nzero) c
 	    n1 = elist[el]->Node[nd1];
 	    for (nd2 = 0; nd2 < nn; nd2++) {
 		n2 = elist[el]->Node[nd2];
-		pair[p].n1 = n1;
-		pair[p].n2 = n2;
+		pair[p].first = n1;
+		pair[p].second = n2;
 		dASSERT(p < npair, "Something went wrong ...");
 		p++;
 	    }
 	}
     }
 
-    // sort node pairs for n1 (heapsort)
-    l = (npair >> 1) + 1;
-    ir = npair;
-    for (;;) {
-	if (l > 1) {
-	    l--;
-	    rra.n1 = pair[l-1].n1, rra.n2 = pair[l-1].n2;
-	} else {
-	    rra.n1 = pair[ir-1].n1, rra.n2 = pair[ir-1].n2;
-	    pair[ir-1].n1 = pair[0].n1, pair[ir-1].n2 = pair[0].n2;
-	    if (--ir == 1) {
-		pair[0].n1 = rra.n1, pair[0].n2 = rra.n2;
-		break;
-	    }
-	}
-	i = l, j = l << 1;
-	while (j <= ir) {
-	    if (j<ir && pair[j-1].n1 < pair[j].n1) j++;
-	    if (rra.n1 < pair[j-1].n1) {
-		pair[i-1].n1 = pair[j-1].n1, pair[i-1].n2 = pair[j-1].n2;
-		i = j;
-		j <<= 1;
-	    } else j = ir+1;
-	}
-	pair[i-1].n1 = rra.n1, pair[i-1].n2 = rra.n2;
-    }
+	std::sort(pair.begin(), pair.end());
+	// std::sort(pair.)
 
-    // sort for n2
-    indx1 = indx2 = 0;
-    while (indx1 < npair) {
-	while (indx2 < npair && pair[indx2].n1 == pair[indx1].n1) indx2++;
-	nn = indx2-indx1;
-	if (nn == 1) goto done;	// nothing to do
-	l = (nn >> 1) + 1;
-	ir = nn;
-	for (;;) {
-	    if (l > 1) {
-		l--;
-		rra.n1 = pair[l-1+indx1].n1, rra.n2 = pair[l-1+indx1].n2;
-	    } else {
-		rra.n1 = pair[ir-1+indx1].n1, rra.n2 = pair[ir-1+indx1].n2;
-		pair[ir-1+indx1].n1 = pair[indx1].n1;
-		pair[ir-1+indx1].n2 = pair[indx1].n2;
-		if (--ir == 1) {
-		    pair[indx1].n1 = rra.n1, pair[indx1].n2 = rra.n2;
-		    break;
-		}
-	    }
-	    i = l, j = l << 1;
-	    while (j <= ir) {
-		if (j < ir && pair[j-1+indx1].n2 < pair[j+indx1].n2) j++;
-		if (rra.n2 < pair[j-1+indx1].n2) {
-		    pair[i-1+indx1].n1 = pair[j-1+indx1].n1;
-		    pair[i-1+indx1].n2 = pair[j-1+indx1].n2;
-		    i = j;
-		    j <<= 1;
-		} else j = ir+1;
-	    }
-	    pair[i-1+indx1].n1 = rra.n1, pair[i-1+indx1].n2 = rra.n2;
-	}
-	done:
-	indx1 = indx2;
-    }
+    // // sort node pairs for n1 (heapsort)
+    // l = (npair >> 1) + 1;
+    // ir = npair;
+    // for (;;) {
+	// if (l > 1) {
+	//     l--;
+	//     rra.first = pair[l-1].first, rra.second = pair[l-1].second;
+	// } else {
+	//     rra.first = pair[ir-1].first, rra.second = pair[ir-1].second;
+	//     pair[ir-1].first = pair[0].first, pair[ir-1].second = pair[0].second;
+	//     if (--ir == 1) {
+	// 	pair[0].first = rra.first, pair[0].second = rra.second;
+	// 	break;
+	//     }
+	// }
+	// i = l, j = l << 1;
+	// while (j <= ir) {
+	//     if (j<ir && pair[j-1].first < pair[j].first) j++;
+	//     if (rra.first < pair[j-1].first) {
+	// 	pair[i-1].first = pair[j-1].first, pair[i-1].second = pair[j-1].second;
+	// 	i = j;
+	// 	j <<= 1;
+	//     } else j = ir+1;
+	// }
+	// pair[i-1].first = rra.first, pair[i-1].second = rra.second;
+    // }
+
+    // // sort for n2
+    // indx1 = indx2 = 0;
+    // while (indx1 < npair) {
+	// while (indx2 < npair && pair[indx2].first == pair[indx1].first) indx2++;
+	// nn = indx2-indx1;
+	// if (nn == 1) goto done;	// nothing to do
+	// l = (nn >> 1) + 1;
+	// ir = nn;
+	// for (;;) {
+	//     if (l > 1) {
+	// 	l--;
+	// 	rra.first = pair[l-1+indx1].first, rra.second = pair[l-1+indx1].second;
+	//     } else {
+	// 	rra.first = pair[ir-1+indx1].first, rra.second = pair[ir-1+indx1].second;
+	// 	pair[ir-1+indx1].first = pair[indx1].first;
+	// 	pair[ir-1+indx1].second = pair[indx1].second;
+	// 	if (--ir == 1) {
+	// 	    pair[indx1].first = rra.first, pair[indx1].second = rra.second;
+	// 	    break;
+	// 	}
+	//     }
+	//     i = l, j = l << 1;
+	//     while (j <= ir) {
+	// 	if (j < ir && pair[j-1+indx1].second < pair[j+indx1].second) j++;
+	// 	if (rra.second < pair[j-1+indx1].second) {
+	// 	    pair[i-1+indx1].first = pair[j-1+indx1].first;
+	// 	    pair[i-1+indx1].second = pair[j-1+indx1].second;
+	// 	    i = j;
+	// 	    j <<= 1;
+	// 	} else j = ir+1;
+	//     }
+	//     pair[i-1+indx1].first = rra.first, pair[i-1+indx1].second = rra.second;
+	// }
+	// done:
+	// indx1 = indx2;
+    // }
 
     // mark duplicates
     indx1 = 0;
     nzero = npair;
     for (i = 1; i < npair; i++) {
-	if (pair[i].n1 == pair[indx1].n1 && pair[i].n2 == pair[indx1].n2)
-	    pair[i].n1 = -1, nzero--;
+	if (pair[i].first == pair[indx1].first && pair[i].second == pair[indx1].second)
+	    pair[i].first = -1, nzero--;
 	else indx1 = i;
     }
     //if (pair[0].n1 == 0 && pair[0].n2 == 0) pair[0].n1 = -1, nzero--;
@@ -509,19 +519,19 @@ void Mesh::SparseRowStructure (idxtype *&rowptr, idxtype *&colidx, int &nzero) c
     rowptr = new idxtype[nlen()+1];
     
     for (i = pi = ri = ci = 0; i < npair; i++) {
-	if (pair[i].n1 < 0) continue;
-	if ((i == 0) || (pair[i].n1 > pair[pi].n1)) {
+	if (pair[i].first < 0) continue;
+	if ((i == 0) || (pair[i].first > pair[pi].first)) {
 	    dASSERT(ri < nlen()+1, "ri index out of range");
 	    rowptr[ri++] = ci;
 	}
 	pi = i;
 	dASSERT(ci < nzero, "ci index out of range");
-	colidx[ci++] = pair[i].n2;
+	colidx[ci++] = pair[i].second;
     }
     dASSERT(ci == nzero, "ci index out of sync");
     dASSERT(ri == nlen(), "ri index out of sync");
     rowptr[ri] = nzero;
-    delete []pair;
+    //delete []pair;
 }
 
 void Mesh::NeighbourCount (int *plist, int nnode, bool include_self) const
