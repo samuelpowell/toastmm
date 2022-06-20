@@ -2124,7 +2124,15 @@ void AddToSysMatrixCompound_engine (task_data *td)
 	}
 	      
     Task::UserMutex_lock();
-    *thdata->M += M_local;
+	// The matrices have the same format by construction, so we can directly sum their
+	// value entries, rather than calling into the math routines
+	T *val = thdata->M->ValPtr();
+	T *val_local = M_local.ValPtr();
+
+	for(int i = 0; i < M_local.nVal(); ++i) {
+		val[i] += val_local[i];
+	}
+    
     Task::UserMutex_unlock();
 }
 
