@@ -436,8 +436,12 @@ void Mesh::SparseRowStructure (idxtype *&rowptr, idxtype *&colidx, int &nzero) c
     }
 
 	// Sort by n1, n2 (lexographic by spec.)
+	#if __cpp_lib_execution
 	std::sort(std::execution::par_unseq, pair.begin(), pair.end());
-	
+	#else
+	std::sort(pair.begin(), pair.end());
+	#endif
+
     // mark duplicates
     indx1 = 0;
     nzero = npair;
