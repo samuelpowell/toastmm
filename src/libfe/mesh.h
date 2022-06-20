@@ -37,7 +37,7 @@
 // compound assembly struct
 struct AssemblyParamSet {
     int mode;
-    double  *scoeff;
+    double  scoeff;
     RVector *vcoeff;
 };
 

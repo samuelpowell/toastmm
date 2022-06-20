@@ -2007,35 +2007,49 @@ void AddToElMatrixCompound(const Mesh &mesh, int el, SCGenericSparseMatrix &M,
 				switch (mode)
 				{
 				case ASSEMBLE_FF:
-					re += (float)mesh.elist[el]->IntFF(i, j);
+					re += mesh.elist[el]->IntFF(i, j);
 					break;
 				case ASSEMBLE_DD:
-					re += (float)mesh.elist[el]->IntDD(i, j);
+					re += mesh.elist[el]->IntDD(i, j);
 					break;
 				case ASSEMBLE_PFF:
-					re += (float)mesh.elist[el]->IntPFF(i, j, *coeff);
+					re += mesh.elist[el]->IntPFF(i, j, *coeff);
 					break;
 				case ASSEMBLE_PDD:
-					re += (float)mesh.elist[el]->IntPDD(i, j, *coeff);
+					re += mesh.elist[el]->IntPDD(i, j, *coeff);
 					break;
 				case ASSEMBLE_BNDPFF:
-					re += (float)mesh.elist[el]->BndIntPFF(i, j, *coeff);
+					re += mesh.elist[el]->BndIntPFF(i, j, *coeff);
 					break;
 				case ASSEMBLE_PFF_EL:
-					re += (float)mesh.elist[el]->IntFF(i, j) * (*coeff)[el];
+					re += mesh.elist[el]->IntFF(i, j) * (*coeff)[el];
 					break;
 				case ASSEMBLE_PDD_EL:
-					re += (float)mesh.elist[el]->IntDD(i, j) * (*coeff)[el];
+					re += mesh.elist[el]->IntDD(i, j) * (*coeff)[el];
 					break;
 				case ASSEMBLE_BNDPFF_EL:
-					re += (float)mesh.elist[el]->BndIntFF(i, j) * (*coeff)[el];
+					re += mesh.elist[el]->BndIntFF(i, j) * (*coeff)[el];
 					break;
+				case ASSEMBLE_CFF:
+		    		re += mesh.elist[el]->IntFF (i, j) * param[k].scoeff;
+		    		break;
+				case ASSEMBLE_CDD:
+		    		re += mesh.elist[el]->IntDD (i, j) * param[k].scoeff;
+		    		break;
+				case ASSEMBLE_iCFF:
+		    		im += mesh.elist[el]->IntFF (i, j) * param[k].scoeff;
+		    		break;
+				case ASSEMBLE_iCDD:
+		    		im += mesh.elist[el]->IntDD (i, j) * param[k].scoeff;
+		    		break;					
 				}
 			}
 			M.Add(is, js, std::complex<float>((float)re, (float)im));
 		}
 	}
 }
+
+
 
 void AddToElMatrixCompound(const Mesh &mesh, int el, CGenericSparseMatrix &M,
 						   AssemblyParamSet *param, int nparam)
@@ -2057,32 +2071,44 @@ void AddToElMatrixCompound(const Mesh &mesh, int el, CGenericSparseMatrix &M,
 				switch (mode)
 				{
 				case ASSEMBLE_FF:
-					re = mesh.elist[el]->IntFF(i, j);
+					re += mesh.elist[el]->IntFF(i, j);
 					break;
 				case ASSEMBLE_DD:
-					re = mesh.elist[el]->IntDD(i, j);
+					re += mesh.elist[el]->IntDD(i, j);
 					break;
 				case ASSEMBLE_PFF:
-					re = mesh.elist[el]->IntPFF(i, j, *coeff);
+					re += mesh.elist[el]->IntPFF(i, j, *coeff);
 					break;
 				case ASSEMBLE_PDD:
-					re = mesh.elist[el]->IntPDD(i, j, *coeff);
+					re += mesh.elist[el]->IntPDD(i, j, *coeff);
 					break;
 				case ASSEMBLE_BNDPFF:
-					re = mesh.elist[el]->BndIntPFF(i, j, *coeff);
+					re += mesh.elist[el]->BndIntPFF(i, j, *coeff);
 					break;
 				case ASSEMBLE_PFF_EL:
-					re = mesh.elist[el]->IntFF(i, j) * (*coeff)[el];
+					re += mesh.elist[el]->IntFF(i, j) * (*coeff)[el];
 					break;
 				case ASSEMBLE_PDD_EL:
-					re = mesh.elist[el]->IntDD(i, j) * (*coeff)[el];
+					re += mesh.elist[el]->IntDD(i, j) * (*coeff)[el];
 					break;
 				case ASSEMBLE_BNDPFF_EL:
-					re = mesh.elist[el]->BndIntFF(i, j) * (*coeff)[el];
+					re += mesh.elist[el]->BndIntFF(i, j) * (*coeff)[el];
 					break;
 				case ASSEMBLE_iPFF:
-					im = mesh.elist[el]->IntPFF(i, j, *coeff);
+					im += mesh.elist[el]->IntPFF(i, j, *coeff);
 					break;
+				case ASSEMBLE_CFF:
+		    		re += mesh.elist[el]->IntFF (i, j) * param[k].scoeff;
+		    		break;
+				case ASSEMBLE_CDD:
+		    		re += mesh.elist[el]->IntDD (i, j) * param[k].scoeff;
+		    		break;
+				case ASSEMBLE_iCFF:
+		    		im += mesh.elist[el]->IntFF (i, j) * param[k].scoeff;
+		    		break;
+				case ASSEMBLE_iCDD:
+		    		im += mesh.elist[el]->IntDD (i, j) * param[k].scoeff;
+		    		break;
 				}
 			}
 			M.Add(is, js, std::complex<double>(re, im));

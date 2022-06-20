@@ -306,7 +306,7 @@ void TFwdSolver<std::complex<float> >::AssembleSystemMatrix (
 
     // To improve accuracy, we assemble the system matrix in double
     // precision, and map it to single precision after assembly
-    AssemblyParamSet paramset[3];
+    AssemblyParamSet paramset[4];
 
     RVector prm_cmua = sol.GetParam (OT_CMUA);
     paramset[0].mode = elbasis ? ASSEMBLE_PFF_EL:ASSEMBLE_PFF;
@@ -320,10 +320,12 @@ void TFwdSolver<std::complex<float> >::AssembleSystemMatrix (
     paramset[2].mode = elbasis ? ASSEMBLE_BNDPFF_EL:ASSEMBLE_BNDPFF;
     paramset[2].vcoeff = &prm_c2a;
 
-    CCompRowMatrix FF (F->nRows(), F->nCols(), F->rowptr, F->colidx);
-    AddToSysMatrixCompound(*meshptr, FF, paramset, 3);  
-    AddToSysMatrix (*meshptr, FF, omega, ASSEMBLE_iCFF);
+    paramset[3].mode = ASSEMBLE_iCFF;
+    paramset[3].scoeff = omega;
 
+    CCompRowMatrix FF (F->nRows(), F->nCols(), F->rowptr, F->colidx);
+    AddToSysMatrixCompound(*meshptr, FF, paramset, 4);  
+    
     int i, nz = F->nVal();
     std::complex<float> *sval = F->ValPtr();
     std::complex<double> *cval = FF.ValPtr();
@@ -340,7 +342,7 @@ void TFwdSolver<std::complex<double> >::AssembleSystemMatrix (
 
     F->Zero();
 
-    AssemblyParamSet paramset[3];
+    AssemblyParamSet paramset[4];
 
     RVector prm_cmua = sol.GetParam (OT_CMUA);
     paramset[0].mode = elbasis ? ASSEMBLE_PFF_EL:ASSEMBLE_PFF;
@@ -354,8 +356,10 @@ void TFwdSolver<std::complex<double> >::AssembleSystemMatrix (
     paramset[2].mode = elbasis ? ASSEMBLE_BNDPFF_EL:ASSEMBLE_BNDPFF;
     paramset[2].vcoeff = &prm_c2a;
 
-    AddToSysMatrixCompound(*meshptr, *F, paramset, 3);  
-    AddToSysMatrix (*meshptr, *F, omega, ASSEMBLE_iCFF);
+    paramset[3].mode = ASSEMBLE_iCFF;
+    paramset[3].scoeff = omega;
+
+    AddToSysMatrixCompound(*meshptr, *F, paramset, 4);  
 }
 
 template<class T>
