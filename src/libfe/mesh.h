@@ -56,6 +56,18 @@ FELIB void AddToElMatrix (const Mesh &mesh, int el,
 FELIB void AddToElMatrix (const Mesh &mesh, int el,
     CGenericSparseMatrix &M, const RVector *coeff, int mode);
 
+FELIB void AddToElMatrixCompound (const Mesh &mesh, int el,
+    RGenericSparseMatrix &M,AssemblyParamSet *param, int nparam);
+
+FELIB void AddToElMatrixCompound (const Mesh &mesh, int el,
+    FGenericSparseMatrix &M, AssemblyParamSet *param, int nparam);
+
+FELIB void AddToElMatrixCompound (const Mesh &mesh, int el,
+    SCGenericSparseMatrix &M, AssemblyParamSet *param, int nparam);
+
+FELIB void AddToElMatrixCompound (const Mesh &mesh, int el,
+    CGenericSparseMatrix &M, AssemblyParamSet *param, int nparam);
+
 FELIB void AddToSysMatrix (const Mesh &mesh,
     RGenericSparseMatrix &M, const RVector *coeff, int mode);
 

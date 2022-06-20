@@ -1705,6 +1705,7 @@ RCompRowMatrix *Mesh::MassMatrix () const
     return M;
 }
 
+
 // Add a component to element matrix 'M', given 'mesh' and 'el'
 // Element matrix type is defined by 'mode' (see mesh.h)
 // nodal or element coefficients are given by 'coeff'
@@ -1882,6 +1883,213 @@ void AddToElMatrix (const Mesh &mesh, int el, CGenericSparseMatrix &M,
     }
 }
 
+// Add a component to element matrix 'M', given 'mesh' and 'el'
+// Element matrix type is defined by 'mode' (see mesh.h)
+// nodal or element coefficients are given by 'coeff'
+
+void AddToElMatrixCompound(const Mesh &mesh, int el, RGenericSparseMatrix &M,
+						   AssemblyParamSet *param, int nparam)
+{
+	int i, j, is, js, nnode;
+
+	nnode = mesh.elist[el]->nNode();
+	for (i = 0; i < nnode; i++)
+	{
+		is = mesh.elist[el]->Node[i];
+		for (j = 0; j < nnode; j++)
+		{
+			double entry = 0;
+			js = mesh.elist[el]->Node[j];
+			for (int k = 0; k < nparam; k++)
+			{
+				int mode = param[k].mode;
+				RVector *coeff = param[k].vcoeff;
+				switch (mode)
+				{
+				case ASSEMBLE_FF:
+					entry += mesh.elist[el]->IntFF(i, j);
+					break;
+				case ASSEMBLE_DD:
+					entry += mesh.elist[el]->IntDD(i, j);
+					break;
+				case ASSEMBLE_PFF:
+					entry += mesh.elist[el]->IntPFF(i, j, *coeff);
+					break;
+				case ASSEMBLE_PDD:
+					entry += mesh.elist[el]->IntPDD(i, j, *coeff);
+					break;
+				case ASSEMBLE_BNDPFF:
+					entry += mesh.elist[el]->BndIntPFF(i, j, *coeff);
+					break;
+				case ASSEMBLE_PFF_EL:
+					entry += mesh.elist[el]->IntFF(i, j) * (*coeff)[el];
+					break;
+				case ASSEMBLE_PDD_EL:
+					entry += mesh.elist[el]->IntDD(i, j) * (*coeff)[el];
+					break;
+				case ASSEMBLE_BNDPFF_EL:
+					entry += mesh.elist[el]->BndIntFF(i, j) * (*coeff)[el];
+					break;
+				}
+			}
+			M.Add(is, js, entry);
+		}
+	}
+}
+
+void AddToElMatrixCompound(const Mesh &mesh, int el, FGenericSparseMatrix &M,
+						   AssemblyParamSet *param, int nparam)
+{
+	int i, j, is, js, nnode;
+
+	nnode = mesh.elist[el]->nNode();
+	for (i = 0; i < nnode; i++)
+	{
+		is = mesh.elist[el]->Node[i];
+		for (j = 0; j < nnode; j++)
+		{
+			double entry = 0;
+			js = mesh.elist[el]->Node[j];
+			for (int k = 0; k < nparam; k++)
+			{
+				int mode = param[k].mode;
+				RVector *coeff = param[k].vcoeff;
+				switch (mode)
+				{
+				case ASSEMBLE_FF:
+					entry += mesh.elist[el]->IntFF(i, j);
+					break;
+				case ASSEMBLE_DD:
+					entry += mesh.elist[el]->IntDD(i, j);
+					break;
+				case ASSEMBLE_PFF:
+					entry += mesh.elist[el]->IntPFF(i, j, *coeff);
+					break;
+				case ASSEMBLE_PDD:
+					entry += mesh.elist[el]->IntPDD(i, j, *coeff);
+					break;
+				case ASSEMBLE_BNDPFF:
+					entry += mesh.elist[el]->BndIntPFF(i, j, *coeff);
+					break;
+				case ASSEMBLE_PFF_EL:
+					entry += mesh.elist[el]->IntFF(i, j) * (*coeff)[el];
+					break;
+				case ASSEMBLE_PDD_EL:
+					entry += mesh.elist[el]->IntDD(i, j) * (*coeff)[el];
+					break;
+				case ASSEMBLE_BNDPFF_EL:
+					entry += mesh.elist[el]->BndIntFF(i, j) * (*coeff)[el];
+					break;
+				}
+			}
+			M.Add(is, js, (float) entry);
+		}
+	}
+}
+
+void AddToElMatrixCompound(const Mesh &mesh, int el, SCGenericSparseMatrix &M,
+						   AssemblyParamSet *param, int nparam)
+{
+	int i, j, is, js, nnode;
+
+	nnode = mesh.elist[el]->nNode();
+	for (i = 0; i < nnode; i++)
+	{
+		is = mesh.elist[el]->Node[i];
+		for (j = 0; j < nnode; j++)
+		{
+			double re = 0.0f, im = 0.0f;
+			js = mesh.elist[el]->Node[j];
+			for (int k = 0; k < nparam; k++)
+			{
+				int mode = param[k].mode;
+				RVector *coeff = param[k].vcoeff;
+				switch (mode)
+				{
+				case ASSEMBLE_FF:
+					re += (float)mesh.elist[el]->IntFF(i, j);
+					break;
+				case ASSEMBLE_DD:
+					re += (float)mesh.elist[el]->IntDD(i, j);
+					break;
+				case ASSEMBLE_PFF:
+					re += (float)mesh.elist[el]->IntPFF(i, j, *coeff);
+					break;
+				case ASSEMBLE_PDD:
+					re += (float)mesh.elist[el]->IntPDD(i, j, *coeff);
+					break;
+				case ASSEMBLE_BNDPFF:
+					re += (float)mesh.elist[el]->BndIntPFF(i, j, *coeff);
+					break;
+				case ASSEMBLE_PFF_EL:
+					re += (float)mesh.elist[el]->IntFF(i, j) * (*coeff)[el];
+					break;
+				case ASSEMBLE_PDD_EL:
+					re += (float)mesh.elist[el]->IntDD(i, j) * (*coeff)[el];
+					break;
+				case ASSEMBLE_BNDPFF_EL:
+					re += (float)mesh.elist[el]->BndIntFF(i, j) * (*coeff)[el];
+					break;
+				}
+			}
+			M.Add(is, js, std::complex<float>((float)re, (float)im));
+		}
+	}
+}
+
+void AddToElMatrixCompound(const Mesh &mesh, int el, CGenericSparseMatrix &M,
+						   AssemblyParamSet *param, int nparam)
+{
+	int i, j, is, js, nnode;
+
+	nnode = mesh.elist[el]->nNode();
+	for (i = 0; i < nnode; i++)
+	{
+		is = mesh.elist[el]->Node[i];
+		for (j = 0; j < nnode; j++)
+		{
+			double re = 0.0, im = 0.0;
+			js = mesh.elist[el]->Node[j];
+			for (int k = 0; k < nparam; k++)
+			{
+				int mode = param[k].mode;
+				RVector *coeff = param[k].vcoeff;
+				switch (mode)
+				{
+				case ASSEMBLE_FF:
+					re = mesh.elist[el]->IntFF(i, j);
+					break;
+				case ASSEMBLE_DD:
+					re = mesh.elist[el]->IntDD(i, j);
+					break;
+				case ASSEMBLE_PFF:
+					re = mesh.elist[el]->IntPFF(i, j, *coeff);
+					break;
+				case ASSEMBLE_PDD:
+					re = mesh.elist[el]->IntPDD(i, j, *coeff);
+					break;
+				case ASSEMBLE_BNDPFF:
+					re = mesh.elist[el]->BndIntPFF(i, j, *coeff);
+					break;
+				case ASSEMBLE_PFF_EL:
+					re = mesh.elist[el]->IntFF(i, j) * (*coeff)[el];
+					break;
+				case ASSEMBLE_PDD_EL:
+					re = mesh.elist[el]->IntDD(i, j) * (*coeff)[el];
+					break;
+				case ASSEMBLE_BNDPFF_EL:
+					re = mesh.elist[el]->BndIntFF(i, j) * (*coeff)[el];
+					break;
+				case ASSEMBLE_iPFF:
+					im = mesh.elist[el]->IntPFF(i, j, *coeff);
+					break;
+				}
+			}
+			M.Add(is, js, std::complex<double>(re, im));
+		}
+	}
+}
+
 // Add a component to system matrix 'M', given 'mesh'
 // Element matrix type is defined by 'mode' (see mesh.h)
 // nodal coefficients are given by 'coeff'
@@ -1909,16 +2117,12 @@ void AddToSysMatrixCompound_engine (task_data *td)
     int e0 = (itask*elen)/ntask;
     int e1 = ((itask+1)*elen)/ntask;
 
-    TCompRowMatrix<T> M_local (nlen, nlen, thdata->M->rowptr,
-        thdata->M->colidx);
+    TCompRowMatrix<T> M_local (nlen, nlen, thdata->M->rowptr, thdata->M->colidx);
 
-	// Add subset of integrals
-	for (int i =0; i < thdata->nparam; i++) {
-    	for (el = e0; el < e1; el++) {
-        	AddToElMatrix (*mesh, el, M_local, thdata->param[i].vcoeff, thdata->param[i].mode);
-		}
+	for (el = e0; el < e1; el++) {
+		AddToElMatrixCompound (*mesh, el, M_local, thdata->param, thdata->nparam);
 	}
-      
+	      
     Task::UserMutex_lock();
     *thdata->M += M_local;
     Task::UserMutex_unlock();
