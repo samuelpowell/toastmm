@@ -244,23 +244,26 @@ void TFwdSolver<float>::AssembleSystemMatrix (const Solution &sol,
 {
 	xASSERT (meshptr, "Mesh reference not defined."); 
     xASSERT(omega==0, "Nonzero omega parameter not allowed here");
-	// real version
-
-    RVector prm;
-
+	
     // To improve accuracy, we assemble the system matrix in double
     // precision, and map it to single precision after assembly
 
+    AssemblyParamSet paramset[3];
+
+    RVector prm_cmua = sol.GetParam (OT_CMUA);
+    paramset[0].mode = elbasis ? ASSEMBLE_PFF_EL:ASSEMBLE_PFF;
+    paramset[0].vcoeff = &prm_cmua;
+
+    RVector prm_ckap = sol.GetParam (OT_CKAPPA);
+    paramset[1].mode = elbasis ? ASSEMBLE_PDD_EL:ASSEMBLE_PDD;
+    paramset[1].vcoeff = &prm_ckap;
+
+    RVector prm_c2a = sol.GetParam (OT_C2A);
+    paramset[2].mode = elbasis ? ASSEMBLE_BNDPFF_EL:ASSEMBLE_BNDPFF;
+    paramset[2].vcoeff = &prm_c2a;
+
     RCompRowMatrix FF (F->nRows(), F->nCols(), F->rowptr, F->colidx);
-    prm = sol.GetParam (OT_CMUA);
-    AddToSysMatrix (*meshptr, FF, &prm,
-                    elbasis ? ASSEMBLE_PFF_EL:ASSEMBLE_PFF);
-    prm = sol.GetParam (OT_CKAPPA);
-    AddToSysMatrix (*meshptr, FF, &prm,
-		    elbasis ? ASSEMBLE_PDD_EL:ASSEMBLE_PDD);
-    prm = sol.GetParam (OT_C2A);
-    AddToSysMatrix (*meshptr, FF, &prm,
-		    elbasis ? ASSEMBLE_BNDPFF_EL:ASSEMBLE_BNDPFF);
+    AddToSysMatrixCompound(*meshptr, FF, paramset, 3); 
 
     int i, nz = F->nVal();
     float *fval = F->ValPtr();
@@ -275,20 +278,24 @@ void TFwdSolver<double>::AssembleSystemMatrix (const Solution &sol,
 {
     xASSERT (meshptr, "Mesh reference not defined."); 
     xASSERT(omega==0, "Nonzero omega parameter not allowed here");
-    // real version
-
-    RVector prm;
-
+    
     F->Zero();
-    prm = sol.GetParam (OT_CMUA);
-    AddToSysMatrix (*meshptr, *F, &prm,
-		    elbasis ? ASSEMBLE_PFF_EL:ASSEMBLE_PFF);
-    prm = sol.GetParam (OT_CKAPPA);
-    AddToSysMatrix (*meshptr, *F, &prm,
-		    elbasis ? ASSEMBLE_PDD_EL:ASSEMBLE_PDD);
-    prm = sol.GetParam (OT_C2A);
-    AddToSysMatrix (*meshptr, *F, &prm,
-		    elbasis ? ASSEMBLE_BNDPFF_EL:ASSEMBLE_BNDPFF);
+    
+    AssemblyParamSet paramset[3];
+
+    RVector prm_cmua = sol.GetParam (OT_CMUA);
+    paramset[0].mode = elbasis ? ASSEMBLE_PFF_EL:ASSEMBLE_PFF;
+    paramset[0].vcoeff = &prm_cmua;
+
+    RVector prm_ckap = sol.GetParam (OT_CKAPPA);
+    paramset[1].mode = elbasis ? ASSEMBLE_PDD_EL:ASSEMBLE_PDD;
+    paramset[1].vcoeff = &prm_ckap;
+
+    RVector prm_c2a = sol.GetParam (OT_C2A);
+    paramset[2].mode = elbasis ? ASSEMBLE_BNDPFF_EL:ASSEMBLE_BNDPFF;
+    paramset[2].vcoeff = &prm_c2a;
+
+    AddToSysMatrixCompound(*meshptr, *F, paramset, 3);    
 }
 
 template<>
@@ -297,22 +304,24 @@ void TFwdSolver<std::complex<float> >::AssembleSystemMatrix (
 {
     xASSERT (meshptr, "Mesh reference not defined."); 
 
-    // complex version
-    RVector prm;
-
     // To improve accuracy, we assemble the system matrix in double
     // precision, and map it to single precision after assembly
+    AssemblyParamSet paramset[3];
+
+    RVector prm_cmua = sol.GetParam (OT_CMUA);
+    paramset[0].mode = elbasis ? ASSEMBLE_PFF_EL:ASSEMBLE_PFF;
+    paramset[0].vcoeff = &prm_cmua;
+
+    RVector prm_ckap = sol.GetParam (OT_CKAPPA);
+    paramset[1].mode = elbasis ? ASSEMBLE_PDD_EL:ASSEMBLE_PDD;
+    paramset[1].vcoeff = &prm_ckap;
+
+    RVector prm_c2a = sol.GetParam (OT_C2A);
+    paramset[2].mode = elbasis ? ASSEMBLE_BNDPFF_EL:ASSEMBLE_BNDPFF;
+    paramset[2].vcoeff = &prm_c2a;
 
     CCompRowMatrix FF (F->nRows(), F->nCols(), F->rowptr, F->colidx);
-    prm = sol.GetParam (OT_CMUA);
-    AddToSysMatrix (*meshptr, FF, &prm,
-		    elbasis ? ASSEMBLE_PFF_EL:ASSEMBLE_PFF);
-    prm = sol.GetParam (OT_CKAPPA);
-    AddToSysMatrix (*meshptr, FF, &prm,
-		    elbasis ? ASSEMBLE_PDD_EL:ASSEMBLE_PDD);
-    prm = sol.GetParam (OT_C2A);
-    AddToSysMatrix (*meshptr, FF, &prm,
-		    elbasis ? ASSEMBLE_BNDPFF_EL:ASSEMBLE_BNDPFF);
+    AddToSysMatrixCompound(*meshptr, FF, paramset, 3);  
     AddToSysMatrix (*meshptr, FF, omega, ASSEMBLE_iCFF);
 
     int i, nz = F->nVal();
@@ -329,19 +338,23 @@ void TFwdSolver<std::complex<double> >::AssembleSystemMatrix (
 {
 	xASSERT (meshptr, "Mesh reference not defined."); 
 
-	// complex version
-    RVector prm;
-
     F->Zero();
-    prm = sol.GetParam (OT_CMUA);
-    AddToSysMatrix (*meshptr, *F, &prm,
-        elbasis ? ASSEMBLE_PFF_EL:ASSEMBLE_PFF);
-    prm = sol.GetParam (OT_CKAPPA);
-    AddToSysMatrix (*meshptr, *F, &prm,
-        elbasis ? ASSEMBLE_PDD_EL:ASSEMBLE_PDD);
-    prm = sol.GetParam (OT_C2A);
-    AddToSysMatrix (*meshptr, *F, &prm,
-        elbasis ? ASSEMBLE_BNDPFF_EL:ASSEMBLE_BNDPFF);
+
+    AssemblyParamSet paramset[3];
+
+    RVector prm_cmua = sol.GetParam (OT_CMUA);
+    paramset[0].mode = elbasis ? ASSEMBLE_PFF_EL:ASSEMBLE_PFF;
+    paramset[0].vcoeff = &prm_cmua;
+
+    RVector prm_ckap = sol.GetParam (OT_CKAPPA);
+    paramset[1].mode = elbasis ? ASSEMBLE_PDD_EL:ASSEMBLE_PDD;
+    paramset[1].vcoeff = &prm_ckap;
+
+    RVector prm_c2a = sol.GetParam (OT_C2A);
+    paramset[2].mode = elbasis ? ASSEMBLE_BNDPFF_EL:ASSEMBLE_BNDPFF;
+    paramset[2].vcoeff = &prm_c2a;
+
+    AddToSysMatrixCompound(*meshptr, *F, paramset, 3);  
     AddToSysMatrix (*meshptr, *F, omega, ASSEMBLE_iCFF);
 }
 

@@ -34,6 +34,13 @@
 #define RHS_PF          1
 #define RHS_BNDPF       2
 
+// compound assembly struct
+struct AssemblyParamSet {
+    int mode;
+    double  *scoeff;
+    RVector *vcoeff;
+};
+
 // ==========================================================================
 // Prototypes
 
@@ -60,6 +67,18 @@ FELIB void AddToSysMatrix (const Mesh &mesh,
 
 FELIB void AddToSysMatrix (const Mesh &mesh,
     CGenericSparseMatrix &M, const RVector *coeff, int mode);
+
+FELIB void AddToSysMatrixCompound (const Mesh &mesh,
+    RGenericSparseMatrix &M, AssemblyParamSet *param, int nparam);
+
+FELIB void AddToSysMatrixCompound (const Mesh &mesh,
+    FGenericSparseMatrix &M, AssemblyParamSet *param, int nparam);
+
+FELIB void AddToSysMatrixCompound (const Mesh &mesh,
+    SCGenericSparseMatrix &M, AssemblyParamSet *param, int nparam);
+
+FELIB void AddToSysMatrixCompound (const Mesh &mesh,
+    CGenericSparseMatrix &M, AssemblyParamSet *param, int nparam);
 
 FELIB void AddToSysMatrix (const Mesh &mesh,
     CGenericSparseMatrix &M, const double coeff, int mode);

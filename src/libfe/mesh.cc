@@ -1888,6 +1888,120 @@ void AddToElMatrix (const Mesh &mesh, int el, CGenericSparseMatrix &M,
 
 #ifdef TOAST_THREAD_ASSEMBLE
 template<typename T>
+struct AssembleCompound_Threaddata {
+    const Mesh *mesh;
+    TCompRowMatrix<T> *M;
+	AssemblyParamSet *param;
+	int nparam;
+};
+
+template<typename T>
+void AddToSysMatrixCompound_engine (task_data *td)
+{
+    int el;
+    int itask = td->proc;
+    int ntask = td->np;
+    AssembleCompound_Threaddata<T> *thdata =
+        (AssembleCompound_Threaddata<T>*)td->data;
+    const Mesh *mesh = thdata->mesh;
+    int nlen = mesh->nlen();
+    int elen = mesh->elen();
+    int e0 = (itask*elen)/ntask;
+    int e1 = ((itask+1)*elen)/ntask;
+
+    TCompRowMatrix<T> M_local (nlen, nlen, thdata->M->rowptr,
+        thdata->M->colidx);
+
+	// Add subset of integrals
+	for (int i =0; i < thdata->nparam; i++) {
+    	for (el = e0; el < e1; el++) {
+        	AddToElMatrix (*mesh, el, M_local, thdata->param[i].vcoeff, thdata->param[i].mode);
+		}
+	}
+      
+    Task::UserMutex_lock();
+    *thdata->M += M_local;
+    Task::UserMutex_unlock();
+}
+
+#endif // TOAST_THREAD_ASSEMBLE
+
+void AddToSysMatrixCompound (const Mesh &mesh, RGenericSparseMatrix &M,
+    AssemblyParamSet *param, int nparam)
+{
+#ifdef TOAST_THREAD_ASSEMBLE
+    if (M.StorageType() == MATRIX_COMPROW) {
+        AssembleCompound_Threaddata<double> thdata = {
+	    &mesh, (TCompRowMatrix<double>*)&M, param, nparam
+	};
+	Task::Multiprocess (AddToSysMatrixCompound_engine<double>, (void*)&thdata);
+    } else {
+        xERROR("AddToSysMatrix: parallel assembly requires CompRowMatrix");
+    }
+#else
+    xERROR("Compound assembly requires parallel");
+#endif
+}
+
+
+void AddToSysMatrixCompound (const Mesh &mesh, FGenericSparseMatrix &M,
+    AssemblyParamSet *param, int nparam)
+{
+#ifdef TOAST_THREAD_ASSEMBLE
+    if (M.StorageType() == MATRIX_COMPROW) {
+        AssembleCompound_Threaddata<float> thdata = {
+	    &mesh, (TCompRowMatrix<float>*)&M, param, nparam
+	};
+	Task::Multiprocess (AddToSysMatrixCompound_engine<float>, (void*)&thdata);
+    } else {
+        xERROR("AddToSysMatrix: parallel assembly requires CompRowMatrix");
+    }
+#else
+    xERROR("Compound assembly requires parallel");
+#endif
+}
+
+
+void AddToSysMatrixCompound (const Mesh &mesh, CGenericSparseMatrix &M,
+    AssemblyParamSet *param, int nparam)
+{
+#ifdef TOAST_THREAD_ASSEMBLE
+    if (M.StorageType() == MATRIX_COMPROW) {
+        AssembleCompound_Threaddata<std::complex<double> > thdata = {
+	    &mesh, (TCompRowMatrix<std::complex<double> >*)&M, param, nparam
+	};
+	Task::Multiprocess (AddToSysMatrixCompound_engine<std::complex<double> >,
+			    (void*)&thdata);
+    } else {
+        xERROR("AddToSysMatrix: parallel assembly requires CompRowMatrix");
+    }
+#else
+    xERROR("Compound assembly requires parallel");
+#endif
+}
+
+
+void AddToSysMatrixCompound (const Mesh &mesh, SCGenericSparseMatrix &M,
+    AssemblyParamSet *param, int nparam)
+{
+#ifdef TOAST_THREAD_ASSEMBLE
+    if (M.StorageType() == MATRIX_COMPROW) {
+        AssembleCompound_Threaddata<std::complex<float> > thdata = {
+	    &mesh, (TCompRowMatrix<std::complex<float> >*)&M, param, nparam
+	};
+	Task::Multiprocess (AddToSysMatrixCompound_engine<std::complex<float> >,
+			    (void*)&thdata);
+    } else {
+        xERROR("AddToSysMatrix: parallel assembly requires CompRowMatrix");
+    }
+#else
+    xERROR("Compound assembly requires parallel");
+#endif
+}
+
+
+#ifdef TOAST_THREAD_ASSEMBLE
+template<typename T>
 struct Assemble_Threaddata {
     const Mesh *mesh;
     TCompRowMatrix<T> *M;
@@ -1921,6 +2035,7 @@ void AddToSysMatrix_engine (task_data *td)
 }
 
 #endif // TOAST_THREAD_ASSEMBLE
+
 
 void AddToSysMatrix (const Mesh &mesh, RGenericSparseMatrix &M,
     const RVector *coeff, int mode)
