@@ -21,19 +21,19 @@ thread_flag = True
 # rpath of the toast extension itself has to be set accordingly.
 if sys.platform == 'win32':
     lib_names = ['libstoast', 'libraster', 'libfe', 'libmath']
-    compile_args = ['-DTOAST_STATIC']
+    compile_args = ['-std=c++17', '-DTOAST_STATIC']
     link_args = ''
     pkg_files = ''
     lib_dirs = ['build/src/libmath/Release','build/src/libfe/Release','build/src/libraster/Release','build/src/libstoast/Release']
 elif sys.platform == 'linux':
     lib_names = ['pthread', 'stoast', 'raster','fe', 'math']
-    compile_args = ['-std=c++11','-Wno-comment', '-DTOAST_STATIC', '-fPIC']
+    compile_args = ['-std=c++17','-Wno-comment', '-DTOAST_STATIC', '-fPIC']
     link_args = ''
     pkg_files = ''
     lib_dirs = ['build/src/libmath','build/src/libfe','build/src/libraster','build/src/libstoast']
 elif sys.platform == 'darwin':
     lib_names = ['stoast', 'raster', 'fe', 'math']
-    compile_args = ['-DTOAST_STATIC']
+    compile_args = ['-std=c++17', '-DTOAST_STATIC']
     link_args = ''
     pkg_files = ''
     lib_dirs = ['build/src/libmath','build/src/libfe','build/src/libraster','build/src/libstoast']
