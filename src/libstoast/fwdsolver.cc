@@ -121,15 +121,14 @@ void TFwdSolver<T>::SetPrecon (PreconType type)
 template<>
 void TFwdSolver<float>::Allocate ()
 {
-    int *rowptr, *colidx, nzero;
+    const idxtype *rowptr, *colidx;
+    int nzero;
     int n = meshptr->nlen();
 
     // allocate system matrix
     meshptr->SparseRowStructure (rowptr, colidx, nzero);
     if (F) delete F;
     F = new FCompRowMatrix (n, n, rowptr, colidx);
-    delete []rowptr;
-    delete []colidx;
 
     // allocate factorisations and preconditioners
     if (solvertp == LSOLVER_DIRECT) {
@@ -150,7 +149,7 @@ void TFwdSolver<float>::Allocate ()
 template<>
 void TFwdSolver<double>::Allocate ()
 {
-    idxtype *rowptr, *colidx;
+    const idxtype *rowptr, *colidx;
     int nzero;
     int n = meshptr->nlen();
 
@@ -158,8 +157,6 @@ void TFwdSolver<double>::Allocate ()
     meshptr->SparseRowStructure (rowptr, colidx, nzero);
     if (F) delete F;
     F = new RCompRowMatrix (n, n, rowptr, colidx);
-    delete []rowptr;
-    delete []colidx;
 
     // allocate factorisations and preconditioners
     if (solvertp == LSOLVER_DIRECT) {
@@ -180,7 +177,7 @@ void TFwdSolver<double>::Allocate ()
 template<>
 void TFwdSolver<std::complex<double> >::Allocate ()
 {
-    idxtype *rowptr, *colidx;
+    const idxtype *rowptr, *colidx;
 	int nzero;
     int n = meshptr->nlen();
 
@@ -188,8 +185,6 @@ void TFwdSolver<std::complex<double> >::Allocate ()
     meshptr->SparseRowStructure (rowptr, colidx, nzero);
     if (F) delete F;
     F = new CCompRowMatrix (n, n, rowptr, colidx);
-    delete []rowptr;
-    delete []colidx;
 
     // allocate factorisations and preconditioners
     if (solvertp == LSOLVER_DIRECT) {
@@ -212,15 +207,14 @@ void TFwdSolver<std::complex<double> >::Allocate ()
 template<>
 void TFwdSolver<std::complex<float> >::Allocate ()
 {
-    int *rowptr, *colidx, nzero;
+    const idxtype *rowptr, *colidx;
+    int nzero;
     int n = meshptr->nlen();
 
     // allocate system matrix
     meshptr->SparseRowStructure (rowptr, colidx, nzero);
     if (F) delete F;
     F = new SCCompRowMatrix (n, n, rowptr, colidx);
-    delete []rowptr;
-    delete []colidx;
 
     // allocate factorisations and preconditioners
     if (solvertp == LSOLVER_DIRECT) {
@@ -378,12 +372,10 @@ void TFwdSolver<T>::AssembleMassMatrix (const Mesh *mesh)
 	xASSERT (meshptr, "Mesh reference not defined."); 
 
     if (!B) { // allocate on the fly
-	idxtype *rowptr, *colidx;
+	const idxtype *rowptr, *colidx;
 	int nzero, n = mesh->nlen();
 	mesh->SparseRowStructure (rowptr, colidx, nzero);
 	B = new TCompRowMatrix<T> (n, n, rowptr, colidx);
-	delete []rowptr;
-	delete []colidx;
     } else {
 	B->Zero();
     }

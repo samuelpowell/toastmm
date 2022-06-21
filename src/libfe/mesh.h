@@ -346,10 +346,10 @@ public:
     Point NeighbourBarycentre (int node);
     // returns the barycentre position of the neighbours of 'node'.
 
-    void SparseRowStructure (idxtype *&rowptr, idxtype *&colidx, int &nzero) const;
-    // return a copy of the precomputed row and column index lists computed during
-    // mesh setup, caller repsonsible for free
-
+    void SparseRowStructure (const idxtype *&rowptr, const idxtype *&colidx, int &nzero) const;
+    // return a pointers to the precomputed row pointers and column indices precomputed 
+    // during mesh setup, these are read only and must be modified
+     
     void ComputeSparseRowStructure ();
     // generate row and column index lists for a system matrix in
     // compressed row format corresponding to the mesh

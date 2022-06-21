@@ -420,18 +420,22 @@ Point Mesh::NeighbourBarycentre (int node)
 }
 
 
-void Mesh::SparseRowStructure (idxtype *&rowptr, idxtype *&colidx, int &nzero) const
+void Mesh::SparseRowStructure (const idxtype *&rowptr, const idxtype *&colidx, int &nzero) const
 {
 	xASSERT(csr_rowptr, "Row pointer not configured on call for sparse row structure");
 	xASSERT(csr_colidx, "Column indices not set on call for sparse row structure");
 
-    rowptr = new idxtype[nlen()+1];
-	memcpy(rowptr, csr_rowptr, sizeof(idxtype)*(nlen()+1));
-
-	colidx = new idxtype[csr_nzero];
-	memcpy(colidx, csr_colidx, sizeof(idxtype)*csr_nzero);
-
+	rowptr = csr_rowptr;
+	colidx = csr_colidx;
 	nzero = csr_nzero;
+
+    // rowptr = new idxtype[nlen()+1];
+	// memcpy(rowptr, csr_rowptr, sizeof(idxtype)*(nlen()+1));
+
+	// colidx = new idxtype[csr_nzero];
+	// memcpy(colidx, csr_colidx, sizeof(idxtype)*csr_nzero);
+
+	// nzero = csr_nzero;
 }
 
 
@@ -524,7 +528,7 @@ void Mesh::NeighbourCount (int *plist, int nnode, bool include_self) const
 {
     dASSERT(nnode <= nlen(), "Parameter out of range");
     int i, nzero;
-	idxtype *rowptr, *colidx;
+	const idxtype *rowptr, *colidx;
     SparseRowStructure (rowptr, colidx, nzero);
 
     for (i = 0; i < nnode; i++)
@@ -533,9 +537,6 @@ void Mesh::NeighbourCount (int *plist, int nnode, bool include_self) const
     if (!include_self)  // subtract diagonal elements
         for (i = 0; i < nnode; i++)
 	    plist[i]--;
-
-    delete []rowptr;
-    delete []colidx;
 }
 
 void Mesh::SysMatrixStructure (int *_nz, int **_row_ind, int **_col_ind)
@@ -1735,12 +1736,10 @@ void Mesh::WriteGmsh (ostream &os)
 // Return the mass matrix for a mesh
 RCompRowMatrix *Mesh::MassMatrix () const
 {
-    idxtype *rowptr, *colidx;
+    const idxtype *rowptr, *colidx;
     int nzero, n = nlen();
     SparseRowStructure (rowptr, colidx, nzero);
     RCompRowMatrix *M = new RCompRowMatrix (n,n,rowptr,colidx);
-    delete []rowptr;
-    delete []colidx;
     AddToSysMatrix (*this, *M, (RVector*)0, ASSEMBLE_FF);
     return M;
 }

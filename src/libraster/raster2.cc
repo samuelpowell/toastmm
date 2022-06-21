@@ -191,12 +191,10 @@ const RCompRowMatrix *Raster2::GetBvw (const IVector &wdim)
 
 RCompRowMatrix *Raster2::CreateDuu () const
 {
-    idxtype *rowptr, *colidx;
+    const idxtype *rowptr, *colidx;
     int nzero, n = meshptr->nlen();
     meshptr->SparseRowStructure (rowptr, colidx, nzero);
     RCompRowMatrix *M = new RCompRowMatrix (n,n,rowptr,colidx);
-    delete []rowptr;
-    delete []colidx;
     AddToSysMatrix (*meshptr, *M, (RVector*)0, ASSEMBLE_DD);
     return M;
 }
