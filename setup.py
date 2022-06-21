@@ -24,19 +24,19 @@ if sys.platform == 'win32':
     compile_args = ['-std=c++17', '-DTOAST_STATIC']
     link_args = ''
     pkg_files = ''
-    lib_dirs = ['build/src/libmath/Release','build/src/libfe/Release','build/src/libraster/Release','build/src/libstoast/Release']
+    lib_dirs = ['dist/lib']
 elif sys.platform == 'linux':
     lib_names = ['pthread', 'stoast', 'raster','fe', 'math']
     compile_args = ['-std=c++17','-Wno-comment', '-DTOAST_STATIC', '-fPIC']
     link_args = ''
     pkg_files = ''
-    lib_dirs = ['build/src/libmath','build/src/libfe','build/src/libraster','build/src/libstoast']
+    lib_dirs = ['dist/lib']
 elif sys.platform == 'darwin':
     lib_names = ['stoast', 'raster', 'fe', 'math']
     compile_args = ['-std=c++17', '-DTOAST_STATIC']
     link_args = ''
     pkg_files = ''
-    lib_dirs = ['build/src/libmath','build/src/libfe','build/src/libraster','build/src/libstoast']
+    lib_dirs = ['dist/lib']
 else:
     raise Exception('Unknown platform')
 
