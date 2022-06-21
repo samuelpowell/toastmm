@@ -6,7 +6,7 @@ static void CalcSysmat (const Raster2 *raster, RVector &mua, RVector &mus,
 		 RVector &ref, double freq, mxArray **res)
 {
     int i, nz;
-    idxtype *rowptr, *colidx;
+    const idxtype *rowptr, *colidx;
 
     const Mesh &mesh = raster->mesh();
     int n = mesh.nlen();
@@ -14,8 +14,6 @@ static void CalcSysmat (const Raster2 *raster, RVector &mua, RVector &mus,
     int blen = raster->BLen();
     mesh.SparseRowStructure (rowptr, colidx, nz);
     RCompRowMatrix K(n,n,rowptr,colidx);
-    delete []rowptr;
-    delete []colidx;
 
     // parameter transformations
     RVector cmua = mua*c0/ref;

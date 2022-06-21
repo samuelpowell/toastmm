@@ -370,7 +370,8 @@ void MatlabToast::SysmatSparsityStructure (int nlhs, mxArray *plhs[],
     QMMesh *mesh = (QMMesh*)GETMESH_SAFE(0);
 
     int n = mesh->nlen();
-    int *rowptr, *colidx, nzero;
+    const idxtype *rowptr, *colidx;
+    int nzero;
     double *ndata;
     
     mesh->SparseRowStructure (rowptr, colidx, nzero);
@@ -380,8 +381,6 @@ void MatlabToast::SysmatSparsityStructure (int nlhs, mxArray *plhs[],
     
     RCompRowMatrix F(n, n, rowptr, colidx, ndata);
     
-    delete []rowptr;
-    delete []colidx;
     delete []ndata;
     
     CopyMatrix ( &plhs[0], F);
@@ -404,13 +403,12 @@ void CalcSysmatComponent (QMMesh *mesh, RVector &prm, char *integral_type,
     }
     else {
         
-        int *rowptr, *colidx, nzero;
+        const idxtype *rowptr, *colidx;
+        int nzero;
         
         mesh->SparseRowStructure (rowptr, colidx, nzero);
         F.New(n, n);
         F.Initialise(rowptr, colidx);
-        delete []rowptr;
-        delete []colidx;
         
     }
     

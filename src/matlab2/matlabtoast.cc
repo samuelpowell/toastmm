@@ -384,7 +384,7 @@ void CalcSysmat (QMMesh *mesh, RVector &mua, RVector &mus, RVector &ref,
     int nlen = mesh->nlen();
     int elen = mesh->elen();
     int nz, n = (elbasis ? elen : nlen);
-    idxtype *rowptr, *colidx;
+    const idxtype *rowptr, *colidx;
 
     mesh->SparseRowStructure (rowptr, colidx, nz);
 
@@ -417,20 +417,15 @@ void CalcSysmat (QMMesh *mesh, RVector &mua, RVector &mus, RVector &ref,
 	CopyMatrix (res, F);
     }
 
-    delete []rowptr;
-    delete []colidx;
 }
 
 void CalcBndSysmat (QMMesh *mesh, RVector &ref, mxArray **res)
 {
     int nz, nlen = mesh->nlen();
-    idxtype *rowptr, *colidx;
+    const idxtype *rowptr, *colidx;
 
     mesh->SparseRowStructure (rowptr, colidx, nz);
     RCompRowMatrix BF(nlen, nlen, rowptr, colidx);
-    delete []rowptr;
-    delete []colidx;
-
     RVector prm(nlen);
     for (int i = 0; i < nlen; i++)
 	prm[i] = c0/ref[i];
@@ -493,11 +488,10 @@ void CalcVolmat (Mesh *mesh, const char *intstr, RVector &prm, bool elbasis,
 {
     // sysmatrix structure
     int n = mesh->nlen();
-    int *rowptr, *colidx, nzero;
+    const idxtype *rowptr, *colidx;
+    int nzero;
     mesh->SparseRowStructure (rowptr, colidx, nzero);
     RCompRowMatrix F (n, n, rowptr, colidx);
-    delete []rowptr;
-    delete []colidx;
 
     if (!strcasecmp (intstr, "FF")) {
 	AddToSysMatrix (*mesh, F, &prm, ASSEMBLE_FF);
@@ -586,13 +580,12 @@ void CalcBndmat (Mesh *mesh, char *intstr, int dim, int rel, double v,
     int el, i, j, is, js, nside, nnode;
     int n = mesh->nlen();
     int nel = mesh->elen();
-    int *rowptr, *colidx, nzero;
+    const idxtype *rowptr, *colidx;
+    int nzero;
     double val;
     bool subreg = (dim >= 0);
     mesh->SparseRowStructure (rowptr, colidx, nzero);
     RCompRowMatrix F (n, n, rowptr, colidx);
-    delete []rowptr;
-    delete []colidx;
 
     if (!strcasecmp (intstr, "FF")) {
 	for (el = 0; el < nel; el++) {

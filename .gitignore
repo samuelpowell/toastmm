@@ -7,6 +7,9 @@ build/
 # Distribution outputs
 dist/
 
+# Performance 
+perf/
+
 # Test ouptuts
 test/**/*.out
 test/**/*.nim

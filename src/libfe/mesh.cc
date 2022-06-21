@@ -12,6 +12,10 @@
 #include "mathlib.h"
 #include "felib.h"
 
+#include <vector>
+#include <algorithm>
+#include <execution>
+
 using namespace std;
 
 #define MESH_DIRICHLET BND_DIRICHLET
@@ -42,6 +46,10 @@ Mesh::Mesh ()
     is_set_up = false;
     boundary = 0;
     bnd_param = 0;
+
+	csr_rowptr = 0;
+	csr_colidx = 0;
+	csr_nzero = 0;
 }
 
 Mesh::Mesh (const Mesh &mesh)
@@ -56,6 +64,11 @@ Mesh::Mesh (const Mesh &mesh)
     is_set_up = false;
     boundary = 0;
     bnd_param = 0;
+
+	csr_rowptr = 0;
+	csr_colidx = 0;
+	csr_nzero = 0;
+
     Copy (mesh);
 }
 
@@ -73,6 +86,9 @@ Mesh::~Mesh ()
     if (boundary) delete boundary;
     if (bnd_param) delete []bnd_param;
     if (intersect_prm) delete intersect_prm;
+
+	if (csr_rowptr) delete []csr_rowptr;
+	if (csr_colidx) delete []csr_colidx;
 }
 
 void Mesh::Setup (bool mark_boundary)
@@ -128,6 +144,9 @@ void Mesh::Setup (bool mark_boundary)
     }
 
     intersect_prm = 0;
+
+	// Compute CSR structure
+	ComputeSparseRowStructure();
     
     //SetupElementMatrices ();
     is_set_up = true;
@@ -147,6 +166,11 @@ void Mesh::Copy (const Mesh &mesh)
     is_set_up = false;
     boundary = 0;
     bnd_param = 0;
+	
+	csr_rowptr = 0;
+	csr_colidx = 0;
+	csr_nzero = 0;
+
     Setup (false);
 }
 
@@ -395,140 +419,116 @@ Point Mesh::NeighbourBarycentre (int node)
     return bc;
 }
 
-void Mesh::SparseRowStructure (idxtype *&rowptr, idxtype *&colidx, int &nzero) const
+
+void Mesh::SparseRowStructure (const idxtype *&rowptr, const idxtype *&colidx, int &nzero) const
+{
+	xASSERT(csr_rowptr, "Row pointer not configured on call for sparse row structure");
+	xASSERT(csr_colidx, "Column indices not set on call for sparse row structure");
+
+	rowptr = csr_rowptr;
+	colidx = csr_colidx;
+	nzero = csr_nzero;
+
+    // rowptr = new idxtype[nlen()+1];
+	// memcpy(rowptr, csr_rowptr, sizeof(idxtype)*(nlen()+1));
+
+	// colidx = new idxtype[csr_nzero];
+	// memcpy(colidx, csr_colidx, sizeof(idxtype)*csr_nzero);
+
+	// nzero = csr_nzero;
+}
+
+
+
+void Mesh::ComputeSparseRowStructure () 
 {
     // M.S. 1.10.99: Check that this works for higher-order element types
     // (TRI6 and TET10)
 
-    typedef struct {
-	int n1, n2;
-    } IPair;
-    IPair *pair, rra;
-    int el, nn, nd1, nd2, n1, n2, i, j, l, ir, indx1, indx2, ri, ci, pi;
+
+	typedef std::pair<int,int> IPair;
+
+    IPair rra;
+    int el, nn, nd1, nd2, n1, n2, i, indx1, ri, ci, pi;
     int p = 0, npair = 0;
 
     // calc number of node pairs
     // this assumes that within an element, each node is neighbour to
     // every other node
     for (el = 0; el < elist.Len(); el++) {
-	nn = elist[el]->nNode();
-	npair += nn*nn;
+		nn = elist[el]->nNode();
+		npair += nn*nn;
     }
-    pair = new IPair[npair];
+
+	std::vector<IPair> pair(npair);
 
     // collect node pairs
     for (el = 0; el < elist.Len(); el++) {
 	nn = elist[el]->nNode();
-	for (nd1 = 0; nd1 < nn; nd1++) {
-	    n1 = elist[el]->Node[nd1];
-	    for (nd2 = 0; nd2 < nn; nd2++) {
-		n2 = elist[el]->Node[nd2];
-		pair[p].n1 = n1;
-		pair[p].n2 = n2;
-		dASSERT(p < npair, "Something went wrong ...");
-		p++;
-	    }
-	}
-    }
-
-    // sort node pairs for n1 (heapsort)
-    l = (npair >> 1) + 1;
-    ir = npair;
-    for (;;) {
-	if (l > 1) {
-	    l--;
-	    rra.n1 = pair[l-1].n1, rra.n2 = pair[l-1].n2;
-	} else {
-	    rra.n1 = pair[ir-1].n1, rra.n2 = pair[ir-1].n2;
-	    pair[ir-1].n1 = pair[0].n1, pair[ir-1].n2 = pair[0].n2;
-	    if (--ir == 1) {
-		pair[0].n1 = rra.n1, pair[0].n2 = rra.n2;
-		break;
-	    }
-	}
-	i = l, j = l << 1;
-	while (j <= ir) {
-	    if (j<ir && pair[j-1].n1 < pair[j].n1) j++;
-	    if (rra.n1 < pair[j-1].n1) {
-		pair[i-1].n1 = pair[j-1].n1, pair[i-1].n2 = pair[j-1].n2;
-		i = j;
-		j <<= 1;
-	    } else j = ir+1;
-	}
-	pair[i-1].n1 = rra.n1, pair[i-1].n2 = rra.n2;
-    }
-
-    // sort for n2
-    indx1 = indx2 = 0;
-    while (indx1 < npair) {
-	while (indx2 < npair && pair[indx2].n1 == pair[indx1].n1) indx2++;
-	nn = indx2-indx1;
-	if (nn == 1) goto done;	// nothing to do
-	l = (nn >> 1) + 1;
-	ir = nn;
-	for (;;) {
-	    if (l > 1) {
-		l--;
-		rra.n1 = pair[l-1+indx1].n1, rra.n2 = pair[l-1+indx1].n2;
-	    } else {
-		rra.n1 = pair[ir-1+indx1].n1, rra.n2 = pair[ir-1+indx1].n2;
-		pair[ir-1+indx1].n1 = pair[indx1].n1;
-		pair[ir-1+indx1].n2 = pair[indx1].n2;
-		if (--ir == 1) {
-		    pair[indx1].n1 = rra.n1, pair[indx1].n2 = rra.n2;
-		    break;
+		for (nd1 = 0; nd1 < nn; nd1++) {
+			n1 = elist[el]->Node[nd1];
+			for (nd2 = 0; nd2 < nn; nd2++) {
+				n2 = elist[el]->Node[nd2];
+				pair[p].first = n1;
+				pair[p].second = n2;
+				dASSERT(p < npair, "Something went wrong ...");
+				p++;
+			}
 		}
-	    }
-	    i = l, j = l << 1;
-	    while (j <= ir) {
-		if (j < ir && pair[j-1+indx1].n2 < pair[j+indx1].n2) j++;
-		if (rra.n2 < pair[j-1+indx1].n2) {
-		    pair[i-1+indx1].n1 = pair[j-1+indx1].n1;
-		    pair[i-1+indx1].n2 = pair[j-1+indx1].n2;
-		    i = j;
-		    j <<= 1;
-		} else j = ir+1;
-	    }
-	    pair[i-1+indx1].n1 = rra.n1, pair[i-1+indx1].n2 = rra.n2;
-	}
-	done:
-	indx1 = indx2;
     }
+
+	// Sort by n1, n2 (lexographic by spec.)
+	#if __cpp_lib_execution
+	std::sort(std::execution::par_unseq, pair.begin(), pair.end());
+	#else
+	std::sort(pair.begin(), pair.end());
+	#endif
 
     // mark duplicates
     indx1 = 0;
-    nzero = npair;
+    csr_nzero = npair;
     for (i = 1; i < npair; i++) {
-	if (pair[i].n1 == pair[indx1].n1 && pair[i].n2 == pair[indx1].n2)
-	    pair[i].n1 = -1, nzero--;
-	else indx1 = i;
+		if (pair[i] == pair[indx1]) {
+	    	pair[i].first = -1;
+			csr_nzero--;
+		}
+		else {
+			indx1 = i;
+		}
     }
-    //if (pair[0].n1 == 0 && pair[0].n2 == 0) pair[0].n1 = -1, nzero--;
-
-    colidx = new idxtype[nzero];
-    rowptr = new idxtype[nlen()+1];
+    	
+	if (csr_rowptr) delete []csr_rowptr;
+	if (csr_colidx) delete []csr_colidx;
+    csr_colidx = new idxtype[csr_nzero];
+    csr_rowptr = new idxtype[nlen()+1];
     
     for (i = pi = ri = ci = 0; i < npair; i++) {
-	if (pair[i].n1 < 0) continue;
-	if ((i == 0) || (pair[i].n1 > pair[pi].n1)) {
-	    dASSERT(ri < nlen()+1, "ri index out of range");
-	    rowptr[ri++] = ci;
-	}
-	pi = i;
-	dASSERT(ci < nzero, "ci index out of range");
-	colidx[ci++] = pair[i].n2;
+		if (pair[i].first < 0) {
+			// Duplicate
+			continue;
+		}
+		if ((i == 0) || (pair[i].first > pair[pi].first)) {
+			// Next row
+		    dASSERT(ri < nlen()+1, "ri index out of range");
+		    csr_rowptr[ri++] = ci;
+		}
+		// Column entry
+		pi = i;
+		dASSERT(ci < csr_nzero, "ci index out of range");
+		csr_colidx[ci++] = pair[i].second;
     }
-    dASSERT(ci == nzero, "ci index out of sync");
+
+    dASSERT(ci == csr_nzero, "ci index out of sync");
     dASSERT(ri == nlen(), "ri index out of sync");
-    rowptr[ri] = nzero;
-    delete []pair;
+    csr_rowptr[ri] = csr_nzero;
+
 }
 
 void Mesh::NeighbourCount (int *plist, int nnode, bool include_self) const
 {
     dASSERT(nnode <= nlen(), "Parameter out of range");
     int i, nzero;
-	idxtype *rowptr, *colidx;
+	const idxtype *rowptr, *colidx;
     SparseRowStructure (rowptr, colidx, nzero);
 
     for (i = 0; i < nnode; i++)
@@ -537,9 +537,6 @@ void Mesh::NeighbourCount (int *plist, int nnode, bool include_self) const
     if (!include_self)  // subtract diagonal elements
         for (i = 0; i < nnode; i++)
 	    plist[i]--;
-
-    delete []rowptr;
-    delete []colidx;
 }
 
 void Mesh::SysMatrixStructure (int *_nz, int **_row_ind, int **_col_ind)
@@ -1739,15 +1736,14 @@ void Mesh::WriteGmsh (ostream &os)
 // Return the mass matrix for a mesh
 RCompRowMatrix *Mesh::MassMatrix () const
 {
-    idxtype *rowptr, *colidx;
+    const idxtype *rowptr, *colidx;
     int nzero, n = nlen();
     SparseRowStructure (rowptr, colidx, nzero);
     RCompRowMatrix *M = new RCompRowMatrix (n,n,rowptr,colidx);
-    delete []rowptr;
-    delete []colidx;
     AddToSysMatrix (*this, *M, (RVector*)0, ASSEMBLE_FF);
     return M;
 }
+
 
 // Add a component to element matrix 'M', given 'mesh' and 'el'
 // Element matrix type is defined by 'mode' (see mesh.h)
@@ -1926,9 +1922,360 @@ void AddToElMatrix (const Mesh &mesh, int el, CGenericSparseMatrix &M,
     }
 }
 
+// Add a component to element matrix 'M', given 'mesh' and 'el'
+// Element matrix type is defined by 'mode' (see mesh.h)
+// nodal or element coefficients are given by 'coeff'
+
+void AddToElMatrixCompound(const Mesh &mesh, int el, RGenericSparseMatrix &M,
+						   AssemblyParamSet *param, int nparam)
+{
+	int i, j, is, js, nnode;
+
+	nnode = mesh.elist[el]->nNode();
+	for (i = 0; i < nnode; i++)
+	{
+		is = mesh.elist[el]->Node[i];
+		for (j = 0; j < nnode; j++)
+		{
+			double entry = 0;
+			js = mesh.elist[el]->Node[j];
+			for (int k = 0; k < nparam; k++)
+			{
+				int mode = param[k].mode;
+				RVector *coeff = param[k].vcoeff;
+				switch (mode)
+				{
+				case ASSEMBLE_FF:
+					entry += mesh.elist[el]->IntFF(i, j);
+					break;
+				case ASSEMBLE_DD:
+					entry += mesh.elist[el]->IntDD(i, j);
+					break;
+				case ASSEMBLE_PFF:
+					entry += mesh.elist[el]->IntPFF(i, j, *coeff);
+					break;
+				case ASSEMBLE_PDD:
+					entry += mesh.elist[el]->IntPDD(i, j, *coeff);
+					break;
+				case ASSEMBLE_BNDPFF:
+					entry += mesh.elist[el]->BndIntPFF(i, j, *coeff);
+					break;
+				case ASSEMBLE_PFF_EL:
+					entry += mesh.elist[el]->IntFF(i, j) * (*coeff)[el];
+					break;
+				case ASSEMBLE_PDD_EL:
+					entry += mesh.elist[el]->IntDD(i, j) * (*coeff)[el];
+					break;
+				case ASSEMBLE_BNDPFF_EL:
+					entry += mesh.elist[el]->BndIntFF(i, j) * (*coeff)[el];
+					break;
+				}
+			}
+			M.Add(is, js, entry);
+		}
+	}
+}
+
+void AddToElMatrixCompound(const Mesh &mesh, int el, FGenericSparseMatrix &M,
+						   AssemblyParamSet *param, int nparam)
+{
+	int i, j, is, js, nnode;
+
+	nnode = mesh.elist[el]->nNode();
+	for (i = 0; i < nnode; i++)
+	{
+		is = mesh.elist[el]->Node[i];
+		for (j = 0; j < nnode; j++)
+		{
+			double entry = 0;
+			js = mesh.elist[el]->Node[j];
+			for (int k = 0; k < nparam; k++)
+			{
+				int mode = param[k].mode;
+				RVector *coeff = param[k].vcoeff;
+				switch (mode)
+				{
+				case ASSEMBLE_FF:
+					entry += mesh.elist[el]->IntFF(i, j);
+					break;
+				case ASSEMBLE_DD:
+					entry += mesh.elist[el]->IntDD(i, j);
+					break;
+				case ASSEMBLE_PFF:
+					entry += mesh.elist[el]->IntPFF(i, j, *coeff);
+					break;
+				case ASSEMBLE_PDD:
+					entry += mesh.elist[el]->IntPDD(i, j, *coeff);
+					break;
+				case ASSEMBLE_BNDPFF:
+					entry += mesh.elist[el]->BndIntPFF(i, j, *coeff);
+					break;
+				case ASSEMBLE_PFF_EL:
+					entry += mesh.elist[el]->IntFF(i, j) * (*coeff)[el];
+					break;
+				case ASSEMBLE_PDD_EL:
+					entry += mesh.elist[el]->IntDD(i, j) * (*coeff)[el];
+					break;
+				case ASSEMBLE_BNDPFF_EL:
+					entry += mesh.elist[el]->BndIntFF(i, j) * (*coeff)[el];
+					break;
+				}
+			}
+			M.Add(is, js, (float) entry);
+		}
+	}
+}
+
+void AddToElMatrixCompound(const Mesh &mesh, int el, SCGenericSparseMatrix &M,
+						   AssemblyParamSet *param, int nparam)
+{
+	int i, j, is, js, nnode;
+
+	nnode = mesh.elist[el]->nNode();
+	for (i = 0; i < nnode; i++)
+	{
+		is = mesh.elist[el]->Node[i];
+		for (j = 0; j < nnode; j++)
+		{
+			double re = 0.0f, im = 0.0f;
+			js = mesh.elist[el]->Node[j];
+			for (int k = 0; k < nparam; k++)
+			{
+				int mode = param[k].mode;
+				RVector *coeff = param[k].vcoeff;
+				switch (mode)
+				{
+				case ASSEMBLE_FF:
+					re += mesh.elist[el]->IntFF(i, j);
+					break;
+				case ASSEMBLE_DD:
+					re += mesh.elist[el]->IntDD(i, j);
+					break;
+				case ASSEMBLE_PFF:
+					re += mesh.elist[el]->IntPFF(i, j, *coeff);
+					break;
+				case ASSEMBLE_PDD:
+					re += mesh.elist[el]->IntPDD(i, j, *coeff);
+					break;
+				case ASSEMBLE_BNDPFF:
+					re += mesh.elist[el]->BndIntPFF(i, j, *coeff);
+					break;
+				case ASSEMBLE_PFF_EL:
+					re += mesh.elist[el]->IntFF(i, j) * (*coeff)[el];
+					break;
+				case ASSEMBLE_PDD_EL:
+					re += mesh.elist[el]->IntDD(i, j) * (*coeff)[el];
+					break;
+				case ASSEMBLE_BNDPFF_EL:
+					re += mesh.elist[el]->BndIntFF(i, j) * (*coeff)[el];
+					break;
+				case ASSEMBLE_CFF:
+		    		re += mesh.elist[el]->IntFF (i, j) * param[k].scoeff;
+		    		break;
+				case ASSEMBLE_CDD:
+		    		re += mesh.elist[el]->IntDD (i, j) * param[k].scoeff;
+		    		break;
+				case ASSEMBLE_iCFF:
+		    		im += mesh.elist[el]->IntFF (i, j) * param[k].scoeff;
+		    		break;
+				case ASSEMBLE_iCDD:
+		    		im += mesh.elist[el]->IntDD (i, j) * param[k].scoeff;
+		    		break;					
+				}
+			}
+			M.Add(is, js, std::complex<float>((float)re, (float)im));
+		}
+	}
+}
+
+
+
+void AddToElMatrixCompound(const Mesh &mesh, int el, CGenericSparseMatrix &M,
+						   AssemblyParamSet *param, int nparam)
+{
+	int i, j, is, js, nnode;
+
+	nnode = mesh.elist[el]->nNode();
+	for (i = 0; i < nnode; i++)
+	{
+		is = mesh.elist[el]->Node[i];
+		for (j = 0; j < nnode; j++)
+		{
+			double re = 0.0, im = 0.0;
+			js = mesh.elist[el]->Node[j];
+			for (int k = 0; k < nparam; k++)
+			{
+				int mode = param[k].mode;
+				RVector *coeff = param[k].vcoeff;
+				switch (mode)
+				{
+				case ASSEMBLE_FF:
+					re += mesh.elist[el]->IntFF(i, j);
+					break;
+				case ASSEMBLE_DD:
+					re += mesh.elist[el]->IntDD(i, j);
+					break;
+				case ASSEMBLE_PFF:
+					re += mesh.elist[el]->IntPFF(i, j, *coeff);
+					break;
+				case ASSEMBLE_PDD:
+					re += mesh.elist[el]->IntPDD(i, j, *coeff);
+					break;
+				case ASSEMBLE_BNDPFF:
+					re += mesh.elist[el]->BndIntPFF(i, j, *coeff);
+					break;
+				case ASSEMBLE_PFF_EL:
+					re += mesh.elist[el]->IntFF(i, j) * (*coeff)[el];
+					break;
+				case ASSEMBLE_PDD_EL:
+					re += mesh.elist[el]->IntDD(i, j) * (*coeff)[el];
+					break;
+				case ASSEMBLE_BNDPFF_EL:
+					re += mesh.elist[el]->BndIntFF(i, j) * (*coeff)[el];
+					break;
+				case ASSEMBLE_iPFF:
+					im += mesh.elist[el]->IntPFF(i, j, *coeff);
+					break;
+				case ASSEMBLE_CFF:
+		    		re += mesh.elist[el]->IntFF (i, j) * param[k].scoeff;
+		    		break;
+				case ASSEMBLE_CDD:
+		    		re += mesh.elist[el]->IntDD (i, j) * param[k].scoeff;
+		    		break;
+				case ASSEMBLE_iCFF:
+		    		im += mesh.elist[el]->IntFF (i, j) * param[k].scoeff;
+		    		break;
+				case ASSEMBLE_iCDD:
+		    		im += mesh.elist[el]->IntDD (i, j) * param[k].scoeff;
+		    		break;
+				}
+			}
+			M.Add(is, js, std::complex<double>(re, im));
+		}
+	}
+}
+
 // Add a component to system matrix 'M', given 'mesh'
 // Element matrix type is defined by 'mode' (see mesh.h)
 // nodal coefficients are given by 'coeff'
+
+#ifdef TOAST_THREAD_ASSEMBLE
+template<typename T>
+struct AssembleCompound_Threaddata {
+    const Mesh *mesh;
+    TCompRowMatrix<T> *M;
+	AssemblyParamSet *param;
+	int nparam;
+};
+
+template<typename T>
+void AddToSysMatrixCompound_engine (task_data *td)
+{
+    int el;
+    int itask = td->proc;
+    int ntask = td->np;
+    AssembleCompound_Threaddata<T> *thdata =
+        (AssembleCompound_Threaddata<T>*)td->data;
+    const Mesh *mesh = thdata->mesh;
+    int nlen = mesh->nlen();
+    int elen = mesh->elen();
+    int e0 = (itask*elen)/ntask;
+    int e1 = ((itask+1)*elen)/ntask;
+
+    TCompRowMatrix<T> M_local (nlen, nlen, thdata->M->rowptr, thdata->M->colidx);
+
+	for (el = e0; el < e1; el++) {
+		AddToElMatrixCompound (*mesh, el, M_local, thdata->param, thdata->nparam);
+	}
+	      
+    Task::UserMutex_lock();
+	// The matrices have the same format by construction, so we can directly sum their
+	// value entries, rather than calling into the math routines
+	T *val = thdata->M->ValPtr();
+	T *val_local = M_local.ValPtr();
+
+	for(int i = 0; i < M_local.nVal(); ++i) {
+		val[i] += val_local[i];
+	}
+    
+    Task::UserMutex_unlock();
+}
+
+#endif // TOAST_THREAD_ASSEMBLE
+
+void AddToSysMatrixCompound (const Mesh &mesh, RGenericSparseMatrix &M,
+    AssemblyParamSet *param, int nparam)
+{
+#ifdef TOAST_THREAD_ASSEMBLE
+    if (M.StorageType() == MATRIX_COMPROW) {
+        AssembleCompound_Threaddata<double> thdata = {
+	    &mesh, (TCompRowMatrix<double>*)&M, param, nparam
+	};
+	Task::Multiprocess (AddToSysMatrixCompound_engine<double>, (void*)&thdata);
+    } else {
+        xERROR("AddToSysMatrix: parallel assembly requires CompRowMatrix");
+    }
+#else
+    xERROR("Compound assembly requires parallel");
+#endif
+}
+
+
+void AddToSysMatrixCompound (const Mesh &mesh, FGenericSparseMatrix &M,
+    AssemblyParamSet *param, int nparam)
+{
+#ifdef TOAST_THREAD_ASSEMBLE
+    if (M.StorageType() == MATRIX_COMPROW) {
+        AssembleCompound_Threaddata<float> thdata = {
+	    &mesh, (TCompRowMatrix<float>*)&M, param, nparam
+	};
+	Task::Multiprocess (AddToSysMatrixCompound_engine<float>, (void*)&thdata);
+    } else {
+        xERROR("AddToSysMatrix: parallel assembly requires CompRowMatrix");
+    }
+#else
+    xERROR("Compound assembly requires parallel");
+#endif
+}
+
+
+void AddToSysMatrixCompound (const Mesh &mesh, CGenericSparseMatrix &M,
+    AssemblyParamSet *param, int nparam)
+{
+#ifdef TOAST_THREAD_ASSEMBLE
+    if (M.StorageType() == MATRIX_COMPROW) {
+        AssembleCompound_Threaddata<std::complex<double> > thdata = {
+	    &mesh, (TCompRowMatrix<std::complex<double> >*)&M, param, nparam
+	};
+	Task::Multiprocess (AddToSysMatrixCompound_engine<std::complex<double> >,
+			    (void*)&thdata);
+    } else {
+        xERROR("AddToSysMatrix: parallel assembly requires CompRowMatrix");
+    }
+#else
+    xERROR("Compound assembly requires parallel");
+#endif
+}
+
+
+void AddToSysMatrixCompound (const Mesh &mesh, SCGenericSparseMatrix &M,
+    AssemblyParamSet *param, int nparam)
+{
+#ifdef TOAST_THREAD_ASSEMBLE
+    if (M.StorageType() == MATRIX_COMPROW) {
+        AssembleCompound_Threaddata<std::complex<float> > thdata = {
+	    &mesh, (TCompRowMatrix<std::complex<float> >*)&M, param, nparam
+	};
+	Task::Multiprocess (AddToSysMatrixCompound_engine<std::complex<float> >,
+			    (void*)&thdata);
+    } else {
+        xERROR("AddToSysMatrix: parallel assembly requires CompRowMatrix");
+    }
+#else
+    xERROR("Compound assembly requires parallel");
+#endif
+}
+
 
 #ifdef TOAST_THREAD_ASSEMBLE
 template<typename T>
@@ -1965,6 +2312,7 @@ void AddToSysMatrix_engine (task_data *td)
 }
 
 #endif // TOAST_THREAD_ASSEMBLE
+
 
 void AddToSysMatrix (const Mesh &mesh, RGenericSparseMatrix &M,
     const RVector *coeff, int mode)
