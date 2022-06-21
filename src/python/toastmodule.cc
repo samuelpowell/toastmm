@@ -265,7 +265,7 @@ static PyObject *mesh_data(PyObject *self, PyObject *args) {
 
 static PyObject *toast_surf_data(PyObject *self, PyObject *args) {
   int hmesh;
-  Mesh *mesh;
+  QMMesh *mesh;
 
   if (!PyArg_ParseTuple(args, "i", &hmesh)) {
     return NULL;
@@ -344,7 +344,7 @@ static PyObject *toast_surf_data(PyObject *self, PyObject *args) {
 
 static PyObject *toast_mesh_node_count(PyObject *self, PyObject *args) {
   int hmesh;
-  Mesh *mesh;
+  QMMesh *mesh;
   if (!PyArg_ParseTuple(args, "i", &hmesh)) {
     return NULL;
   }
@@ -357,7 +357,7 @@ static PyObject *toast_mesh_node_count(PyObject *self, PyObject *args) {
 
 static PyObject *toast_mesh_element_count(PyObject *self, PyObject *args) {
   int hmesh;
-  Mesh *mesh;
+  QMMesh *mesh;
 
   if (!PyArg_ParseTuple(args, "i", &hmesh)) {
     return NULL;
@@ -371,7 +371,7 @@ static PyObject *toast_mesh_element_count(PyObject *self, PyObject *args) {
 
 static PyObject *toast_mesh_dim(PyObject *self, PyObject *args) {
   int hmesh;
-  Mesh *mesh;
+  QMMesh *mesh;
 
   if (!PyArg_ParseTuple(args, "i", &hmesh)) {
     return NULL;
@@ -385,7 +385,7 @@ static PyObject *toast_mesh_dim(PyObject *self, PyObject *args) {
 
 static PyObject *toast_mesh_bb(PyObject *self, PyObject *args) {
   int hmesh;
-  Mesh *mesh;
+  QMMesh *mesh;
 
   if (!PyArg_ParseTuple(args, "i", &hmesh)) {
     return NULL;
@@ -2597,6 +2597,8 @@ PyMODINIT_FUNC PyInit_toastmod(void) {
 #ifdef TOAST_THREAD
 	Task_Init (0);
 #endif
+
+  toastVerbosity = 1;
 
   if (module == NULL)
     return NULL;

@@ -34,6 +34,13 @@
 #define RHS_PF          1
 #define RHS_BNDPF       2
 
+// compound assembly struct
+struct AssemblyParamSet {
+    int mode;
+    double  scoeff;
+    RVector *vcoeff;
+};
+
 // ==========================================================================
 // Prototypes
 
@@ -49,6 +56,18 @@ FELIB void AddToElMatrix (const Mesh &mesh, int el,
 FELIB void AddToElMatrix (const Mesh &mesh, int el,
     CGenericSparseMatrix &M, const RVector *coeff, int mode);
 
+FELIB void AddToElMatrixCompound (const Mesh &mesh, int el,
+    RGenericSparseMatrix &M,AssemblyParamSet *param, int nparam);
+
+FELIB void AddToElMatrixCompound (const Mesh &mesh, int el,
+    FGenericSparseMatrix &M, AssemblyParamSet *param, int nparam);
+
+FELIB void AddToElMatrixCompound (const Mesh &mesh, int el,
+    SCGenericSparseMatrix &M, AssemblyParamSet *param, int nparam);
+
+FELIB void AddToElMatrixCompound (const Mesh &mesh, int el,
+    CGenericSparseMatrix &M, AssemblyParamSet *param, int nparam);
+
 FELIB void AddToSysMatrix (const Mesh &mesh,
     RGenericSparseMatrix &M, const RVector *coeff, int mode);
 
@@ -60,6 +79,18 @@ FELIB void AddToSysMatrix (const Mesh &mesh,
 
 FELIB void AddToSysMatrix (const Mesh &mesh,
     CGenericSparseMatrix &M, const RVector *coeff, int mode);
+
+FELIB void AddToSysMatrixCompound (const Mesh &mesh,
+    RGenericSparseMatrix &M, AssemblyParamSet *param, int nparam);
+
+FELIB void AddToSysMatrixCompound (const Mesh &mesh,
+    FGenericSparseMatrix &M, AssemblyParamSet *param, int nparam);
+
+FELIB void AddToSysMatrixCompound (const Mesh &mesh,
+    SCGenericSparseMatrix &M, AssemblyParamSet *param, int nparam);
+
+FELIB void AddToSysMatrixCompound (const Mesh &mesh,
+    CGenericSparseMatrix &M, AssemblyParamSet *param, int nparam);
 
 FELIB void AddToSysMatrix (const Mesh &mesh,
     CGenericSparseMatrix &M, const double coeff, int mode);
@@ -147,6 +178,12 @@ public:
 
     NodeList nlist;      // list of mesh nodes
     ElementList elist;   // list of mesh elements
+
+    // Pre-computed CSR structure, constructed during setup
+    idxtype *csr_rowptr;
+    idxtype *csr_colidx;
+    int csr_nzero;
+
 
     mutable int **nbhrs;
     // list of edge-adjacent neighbours for each element
@@ -309,7 +346,11 @@ public:
     Point NeighbourBarycentre (int node);
     // returns the barycentre position of the neighbours of 'node'.
 
-    void SparseRowStructure (idxtype *&rowptr, idxtype *&colidx, int &nzero) const;
+    void SparseRowStructure (const idxtype *&rowptr, const idxtype *&colidx, int &nzero) const;
+    // return a pointers to the precomputed row pointers and column indices precomputed 
+    // during mesh setup, these are read only and must be modified
+     
+    void ComputeSparseRowStructure ();
     // generate row and column index lists for a system matrix in
     // compressed row format corresponding to the mesh
     // See SparseLib++ documentation, "Compressed row storage" for format

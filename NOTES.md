@@ -30,6 +30,8 @@ Aim: ensure multithreading where possible, but avoid contention
    - lower level numerical operations single-threaded, avoiding contention across coarse multithreading
  - (WIP) script interfaces updated with external direct solvers to exploit threading
  - CW Jacobian computation multithreaded
+ - Sparsity structure accellerated and cached
+ - Compound assembly 
 
 # Changelog
 
@@ -100,6 +102,9 @@ Aim: ensure multithreading where possible, but avoid contention
   - toastJacobianCW mesh integrals multithreaded, 6x speedup on 8x threads
   - Update MEX interface to interleaved complex (>R2018a) format with runtime improvements
   - Remove old MATLAB interface scripts
+  - Cache sparsity structure inside mesh
+  - Use C++ stdlib parallel sort for sparsity structure computation
+  - Compound matrix assembly works over all parameters at once, reducing time for local summation
 
 # TODO
 
@@ -117,6 +122,7 @@ Aim: ensure multithreading where possible, but avoid contention
  - Resolve versioning 
  - Python interface build assumes Release paths on Windows
  - Default link list after make mesh appears arbitrary, resulting in enormous linklist/qmvec
+ - Real qvec on forward solver crash
 
 # Perfromance notes
 
@@ -131,7 +137,8 @@ Aim: ensure multithreading where possible, but avoid contention
     - Block Krylov methods don't appear to offer significant speedup and are reliant upon fast matrix solves thus
       indirectly require a decent BLAS.
     - Iterative solvers (CG, BICGSTAB) readily parallelised and within an order of mangnitude of direct solvers, hot path
-      is Sparse-Dense Ax & Cholesky substitution. No memory issues.
+      is Sparse-Dense Ax & Cholesky substitution. No memory issues. SpMv improvements using different CSR structures
+      have shown limited improvement.
   - Jacobian computation, fast in basis, slow in mesh. Mesh path is dominated by IntFG cost, which in turn uses a
     virtual method call to element IntFG in hot loop. Experiments show 50% speedup possible by extracting this call
     and working over all RHS, and / or precomputing element integrals to avoid scaling and indexing cost.
