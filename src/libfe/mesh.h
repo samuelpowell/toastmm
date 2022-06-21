@@ -179,6 +179,12 @@ public:
     NodeList nlist;      // list of mesh nodes
     ElementList elist;   // list of mesh elements
 
+    // Pre-computed CSR structure, constructed during setup
+    idxtype *csr_rowptr;
+    idxtype *csr_colidx;
+    int csr_nzero;
+
+
     mutable int **nbhrs;
     // list of edge-adjacent neighbours for each element
     // this is only defined after a call to SetupNeighbourList
@@ -341,6 +347,10 @@ public:
     // returns the barycentre position of the neighbours of 'node'.
 
     void SparseRowStructure (idxtype *&rowptr, idxtype *&colidx, int &nzero) const;
+    // return a copy of the precomputed row and column index lists computed during
+    // mesh setup, caller repsonsible for free
+
+    void ComputeSparseRowStructure ();
     // generate row and column index lists for a system matrix in
     // compressed row format corresponding to the mesh
     // See SparseLib++ documentation, "Compressed row storage" for format

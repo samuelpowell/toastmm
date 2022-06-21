@@ -46,6 +46,10 @@ Mesh::Mesh ()
     is_set_up = false;
     boundary = 0;
     bnd_param = 0;
+
+	csr_rowptr = 0;
+	csr_colidx = 0;
+	csr_nzero = 0;
 }
 
 Mesh::Mesh (const Mesh &mesh)
@@ -60,6 +64,11 @@ Mesh::Mesh (const Mesh &mesh)
     is_set_up = false;
     boundary = 0;
     bnd_param = 0;
+
+	csr_rowptr = 0;
+	csr_colidx = 0;
+	csr_nzero = 0;
+
     Copy (mesh);
 }
 
@@ -77,6 +86,9 @@ Mesh::~Mesh ()
     if (boundary) delete boundary;
     if (bnd_param) delete []bnd_param;
     if (intersect_prm) delete intersect_prm;
+
+	if (csr_rowptr) delete []csr_rowptr;
+	if (csr_colidx) delete []csr_colidx;
 }
 
 void Mesh::Setup (bool mark_boundary)
@@ -132,6 +144,9 @@ void Mesh::Setup (bool mark_boundary)
     }
 
     intersect_prm = 0;
+
+	// Compute CSR structure
+	ComputeSparseRowStructure();
     
     //SetupElementMatrices ();
     is_set_up = true;
@@ -151,6 +166,11 @@ void Mesh::Copy (const Mesh &mesh)
     is_set_up = false;
     boundary = 0;
     bnd_param = 0;
+	
+	csr_rowptr = 0;
+	csr_colidx = 0;
+	csr_nzero = 0;
+
     Setup (false);
 }
 
@@ -399,10 +419,28 @@ Point Mesh::NeighbourBarycentre (int node)
     return bc;
 }
 
+
 void Mesh::SparseRowStructure (idxtype *&rowptr, idxtype *&colidx, int &nzero) const
+{
+	xASSERT(csr_rowptr, "Row pointer not configured on call for sparse row structure");
+	xASSERT(csr_colidx, "Column indices not set on call for sparse row structure");
+
+    rowptr = new idxtype[nlen()+1];
+	memcpy(rowptr, csr_rowptr, sizeof(idxtype)*(nlen()+1));
+
+	colidx = new idxtype[csr_nzero];
+	memcpy(colidx, csr_colidx, sizeof(idxtype)*csr_nzero);
+
+	nzero = csr_nzero;
+}
+
+
+
+void Mesh::ComputeSparseRowStructure () 
 {
     // M.S. 1.10.99: Check that this works for higher-order element types
     // (TRI6 and TET10)
+
 
 	typedef std::pair<int,int> IPair;
 
@@ -444,19 +482,21 @@ void Mesh::SparseRowStructure (idxtype *&rowptr, idxtype *&colidx, int &nzero) c
 
     // mark duplicates
     indx1 = 0;
-    nzero = npair;
+    csr_nzero = npair;
     for (i = 1; i < npair; i++) {
 		if (pair[i] == pair[indx1]) {
 	    	pair[i].first = -1;
-			nzero--;
+			csr_nzero--;
 		}
 		else {
 			indx1 = i;
 		}
     }
-    
-    colidx = new idxtype[nzero];
-    rowptr = new idxtype[nlen()+1];
+    	
+	if (csr_rowptr) delete []csr_rowptr;
+	if (csr_colidx) delete []csr_colidx;
+    csr_colidx = new idxtype[csr_nzero];
+    csr_rowptr = new idxtype[nlen()+1];
     
     for (i = pi = ri = ci = 0; i < npair; i++) {
 		if (pair[i].first < 0) {
@@ -466,17 +506,17 @@ void Mesh::SparseRowStructure (idxtype *&rowptr, idxtype *&colidx, int &nzero) c
 		if ((i == 0) || (pair[i].first > pair[pi].first)) {
 			// Next row
 		    dASSERT(ri < nlen()+1, "ri index out of range");
-		    rowptr[ri++] = ci;
+		    csr_rowptr[ri++] = ci;
 		}
 		// Column entry
 		pi = i;
-		dASSERT(ci < nzero, "ci index out of range");
-		colidx[ci++] = pair[i].second;
+		dASSERT(ci < csr_nzero, "ci index out of range");
+		csr_colidx[ci++] = pair[i].second;
     }
 
-    dASSERT(ci == nzero, "ci index out of sync");
+    dASSERT(ci == csr_nzero, "ci index out of sync");
     dASSERT(ri == nlen(), "ri index out of sync");
-    rowptr[ri] = nzero;
+    csr_rowptr[ri] = csr_nzero;
 
 }
 
