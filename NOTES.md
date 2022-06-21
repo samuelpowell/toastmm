@@ -30,6 +30,8 @@ Aim: ensure multithreading where possible, but avoid contention
    - lower level numerical operations single-threaded, avoiding contention across coarse multithreading
  - (WIP) script interfaces updated with external direct solvers to exploit threading
  - CW Jacobian computation multithreaded
+ - Sparsity structure accellerated and cached
+ - Compound assembly 
 
 # Changelog
 
