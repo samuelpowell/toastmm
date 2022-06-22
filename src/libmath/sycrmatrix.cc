@@ -528,19 +528,23 @@ ostream &operator<< (ostream &os, const TSymCompRowMatrix<MT> &m)
 #ifdef NEED_EXPLICIT_INSTANTIATION
 
 template class TSymCompRowMatrix<double>;
-template class TSymCompRowMatrix<float>;
 template class TSymCompRowMatrix<std::complex<double> >;
-template class TSymCompRowMatrix<std::complex<float> >;
 template class TSymCompRowMatrix<int>;
+#ifdef TOAST_FEATURE_SINGLEPREC
+template class TSymCompRowMatrix<float>;
+template class TSymCompRowMatrix<std::complex<float> >;
+#endif
 
 // template bool CholeskyFactorize (const RSymCompRowMatrix &A, RCompRowMatrix &L,
 //     RVector &d, bool recover);
 
 template istream &operator>> (istream &is, RSymCompRowMatrix &m);
 template istream &operator>> (istream &is, CSymCompRowMatrix &m);
-template istream &operator>> (istream &is, SCSymCompRowMatrix &m);
 template ostream &operator<< (ostream &os, const RSymCompRowMatrix &m);
 template ostream &operator<< (ostream &os, const CSymCompRowMatrix &m);
+#ifdef TOAST_FEATURE_SINGLEPREC
+template istream &operator>> (istream &is, SCSymCompRowMatrix &m);
 template ostream &operator<< (ostream &os, const SCSymCompRowMatrix &m);
+#endif
 
 #endif // NEED_EXPLICIT_INSTANTIATION

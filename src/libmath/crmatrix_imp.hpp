@@ -2019,12 +2019,14 @@ int TCompRowMatrix<MT>::pcg (const TVector<MT> &b, TVector<MT> &x,
     return TMatrix<MT>::pcg (b, x, tol, precon, maxit);
 }
 
+#ifdef TOAST_FEATURE_SINGLEPREC
 template<>
 inline int TCompRowMatrix<float>::pcg (const FVector &b, FVector &x,
     double &tol, TPreconditioner<float> *precon, int maxit) const
 {
     return PCG (*this, b, x, tol, precon, maxit);
 }
+#endif
 
 template<>
 inline int TCompRowMatrix<double>::pcg (const RVector &b, RVector &x,
@@ -2043,6 +2045,7 @@ void TCompRowMatrix<MT>::pcg (const TVector<MT> *b, TVector<MT> *x, int nrhs,
     TMatrix<MT>::pcg (b, x, nrhs, tol, maxit, precon, res);
 }
 
+#ifdef TOAST_FEATURE_SINGLEPREC
 template<>
 inline void TCompRowMatrix<float>::pcg (const FVector *b, FVector *x, int nrhs,
     double tol, int maxit, TPreconditioner<float> *precon,
@@ -2050,6 +2053,7 @@ inline void TCompRowMatrix<float>::pcg (const FVector *b, FVector *x, int nrhs,
 {
     PCG (*this, b, x, nrhs, tol, maxit, precon, res);
 }
+#endif
 
 template<>
 inline void TCompRowMatrix<double>::pcg (const RVector *b, RVector *x, int nrhs,
@@ -2278,10 +2282,12 @@ ostream &operator<< (ostream &os, const TCompRowMatrix<MT> &m)
 #ifdef UNDEF // NEED_EXPLICIT_INSTANTIATION
 
 template class MATHLIB TCompRowMatrix<double>;
-template class MATHLIB TCompRowMatrix<float>;
 template class MATHLIB TCompRowMatrix<toast::complex>;
-template class MATHLIB TCompRowMatrix<scomplex>;
 template class MATHLIB TCompRowMatrix<int>;
+#ifdef TOAST_FEATURE_SINGLEPREC
+template class MATHLIB TCompRowMatrix<float>;
+template class MATHLIB TCompRowMatrix<scomplex>;
+#endif
 
 template MATHLIB TCompRowMatrix<double> transp (const TCompRowMatrix<double> &m);
 template MATHLIB TCompRowMatrix<toast::complex> transp (const TCompRowMatrix<toast::complex> &m);
@@ -2298,67 +2304,87 @@ template MATHLIB TCompRowMatrix<toast::complex> catv (const TCompRowMatrix<toast
 
 template MATHLIB double l2norm (const TCompRowMatrix<double> &A);
 template MATHLIB double l2norm (const TCompRowMatrix<toast::complex> &A);
+#ifdef TOAST_FEATURE_SINGLEPREC
 template MATHLIB double l2norm (const TCompRowMatrix<scomplex> &A);
+#endif
 
 template MATHLIB TCompRowMatrix<double> kron (const TCompRowMatrix<double> &A,
     const TCompRowMatrix<double> &B);
 template MATHLIB TCompRowMatrix<toast::complex> kron (const TCompRowMatrix<toast::complex> &A,
     const TCompRowMatrix<toast::complex> &B);
-template MATHLIB TCompRowMatrix<scomplex> kron (const TCompRowMatrix<scomplex> &A,
-    const TCompRowMatrix<scomplex> &B);
 template MATHLIB TCompRowMatrix<int> kron (const TCompRowMatrix<int> &A,
     const TCompRowMatrix<int> &B);
+#ifdef TOAST_FEATURE_SINGLEPREC
+template MATHLIB TCompRowMatrix<scomplex> kron (const TCompRowMatrix<scomplex> &A,
+    const TCompRowMatrix<scomplex> &B);
+#endif
 
-template MATHLIB bool CholeskyFactorize (const FCompRowMatrix &A,
-    FCompRowMatrix &L, FVector &d, bool recover);
 template MATHLIB bool CholeskyFactorize (const RCompRowMatrix &A,
     RCompRowMatrix &L, RVector &d, bool recover);
+#ifdef TOAST_FEATURE_SINGLEPREC
+template MATHLIB bool CholeskyFactorize (const FCompRowMatrix &A,
+    FCompRowMatrix &L, FVector &d, bool recover);
+#endif
 
 // complex ones probably not allowed
 
 template bool CholeskyFactorize (const CCompRowMatrix &A, CCompRowMatrix &L,
     CVector &d, bool recover);
+#ifdef TOAST_FEATURE_SINGLEPREC
 template bool CholeskyFactorize (const SCCompRowMatrix &A, SCCompRowMatrix &L,
     SCVector &d, bool recover);
+#endif
 
-template MATHLIB bool IncompleteCholeskyFactorize (const FCompRowMatrix &A,
-    FCompRowMatrix &L, FVector &d, bool recover);
 template MATHLIB bool IncompleteCholeskyFactorize (const RCompRowMatrix &A,
     RCompRowMatrix &L, RVector &d, bool recover);
 template MATHLIB bool IncompleteCholeskyFactorize (const CCompRowMatrix &A,
     CCompRowMatrix &L, CVector &d, bool recover);
+#ifdef TOAST_FEATURE_SINGLEPREC
+template MATHLIB bool IncompleteCholeskyFactorize (const FCompRowMatrix &A,
+    FCompRowMatrix &L, FVector &d, bool recover);
 template MATHLIB bool IncompleteCholeskyFactorize (const SCCompRowMatrix &A,
     SCCompRowMatrix &L, SCVector &d, bool recover);
+#endif
 
 template MATHLIB void LUFactorize (RCompRowMatrix &A, bool LUrealloc);
 template MATHLIB void LUFactorize (CCompRowMatrix &A, bool LUrealloc);
+#ifdef TOAST_FEATURE_SINGLEPREC
 template MATHLIB void LUFactorize (SCCompRowMatrix &A, bool LUrealloc);
+#endif
 
-template MATHLIB void CholeskySolve (const FCompRowMatrix &L,
-    const FVector &d, const FVector &b, FVector &x);
 template MATHLIB void CholeskySolve (const RCompRowMatrix &L,
     const RVector &d, const RVector &b, RVector &x);
+#ifdef TOAST_FEATURE_SINGLEPREC
+template MATHLIB void CholeskySolve (const FCompRowMatrix &L,
+    const FVector &d, const FVector &b, FVector &x);
+#endif
 
 template MATHLIB void CholeskySolve (const RCompRowMatrix &L,
     const RVector &d, const RDenseMatrix &BT, RDenseMatrix&XT, int n);
 template MATHLIB void CholeskySolve (const CCompRowMatrix &L,
     const CVector &d, const CVector &b, CVector &x);
+#ifdef TOAST_FEATURE_SINGLEPREC
 template MATHLIB void CholeskySolve (const SCCompRowMatrix &L, const SCVector &d,
     const SCVector &b, SCVector &x);
+#endif
 
 template MATHLIB RVector CholeskySolve (const RCompRowMatrix &L,
     const RVector &d, const RVector &b);
 template MATHLIB CVector CholeskySolve (const CCompRowMatrix &L,
     const CVector &d, const CVector &b);
+#ifdef TOAST_FEATURE_SINGLEPREC
 template MATHLIB SCVector CholeskySolve (const SCCompRowMatrix &L,
     const SCVector &d, const SCVector &b);
+#endif
 
 template MATHLIB void LUSolve (const RCompRowMatrix &LU, const RVector &b,
     RVector &x);
 template MATHLIB void LUSolve (const CCompRowMatrix &LU, const CVector &b,
     CVector &x);
+#ifdef TOAST_FEATURE_SINGLEPREC
 template MATHLIB void LUSolve (const SCCompRowMatrix &LU, const SCVector &b,
     SCVector &x);
+#endif
 
 template MATHLIB istream &operator>> (istream &is, RCompRowMatrix &m);
 template MATHLIB istream &operator>> (istream &is, CCompRowMatrix &m);

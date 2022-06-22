@@ -170,6 +170,7 @@ inline int CG<std::complex<double> > (const CGenericSparseMatrix &A,
     return 0;
 }
 
+#ifdef TOAST_FEATURE_SINGLEPREC
 template<> // specialisation: complex
 inline int CG<std::complex<float> > (const SCGenericSparseMatrix &A,
     const SCVector &b, SCVector &x, double &tol, SCPreconditioner *cprecon,
@@ -178,6 +179,7 @@ inline int CG<std::complex<float> > (const SCGenericSparseMatrix &A,
     // NOT IMPLEMENTED YET
     return 0;
 }
+#endif
 
 // ==========================================================================
 // Preconditioned bi-conjugate gradient (BiCG) solver
@@ -361,6 +363,7 @@ int IterativeSolve (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
     return niter;
 }
 
+#ifdef TOAST_FEATURE_SINGLEPREC
 template<> // specialisation for single complex case
 inline int IterativeSolve (const SCGenericSparseMatrix &A, const SCVector &b,
     SCVector &x, double &tol, SCPreconditioner *precon, int maxit)
@@ -392,6 +395,7 @@ inline int IterativeSolve (const SCGenericSparseMatrix &A, const SCVector &b,
     }
     return niter;
 }
+#endif
 
 template<> // specialisation for complex case
 inline int IterativeSolve<std::complex<double> > (const CGenericSparseMatrix &A,
@@ -439,6 +443,7 @@ void IterativeSolve (const TGenericSparseMatrix<MT> &A,
     }
 }
 
+#ifdef TOAST_FEATURE_SINGLEPREC
 template<> // specialisation: single complex
 inline void IterativeSolve (const SCGenericSparseMatrix &A, const SCVector *b,
     SCVector *x, int nrhs, double tol, int maxit,
@@ -452,6 +457,7 @@ inline void IterativeSolve (const SCGenericSparseMatrix &A, const SCVector *b,
         ERROR_UNDEF;
     }
 }
+#endif
 
 template<> // specialisation: complex
 inline void IterativeSolve (const CGenericSparseMatrix &A, const CVector *b,
@@ -546,10 +552,12 @@ int ComplexBiCGSolve (const TGenericSparseMatrix<MT>& Are,
 #ifdef UNDEF // NEED_EXPLICIT_INSTANTIATION
 
 template class MATHLIB TGenericSparseMatrix<double>;
-template class MATHLIB TGenericSparseMatrix<float>;
 template class MATHLIB TGenericSparseMatrix<toast::complex>;
-template class MATHLIB TGenericSparseMatrix<scomplex>;
 template class MATHLIB TGenericSparseMatrix<int>;
+#ifdef TOAST_FEATURE_SINGLEPREC
+template class MATHLIB TGenericSparseMatrix<float>;
+template class MATHLIB TGenericSparseMatrix<scomplex>;
+#endif
 
 template int QRFactorize (TGenericSparseMatrix<double> &A, TVector<double> &c,
     TVector<double> &d);
@@ -561,34 +569,41 @@ template void QRSolve (const TGenericSparseMatrix<double> &A,
 
 template MATHLIB int IterativeSolve (const RGenericSparseMatrix &A, const RVector &b,
     RVector &x, double &tol, RPreconditioner *precon, int maxit);
-template MATHLIB int IterativeSolve (const FGenericSparseMatrix &A, const FVector &b,
-    FVector &x, double &tol, FPreconditioner *precon, int maxit);
 template MATHLIB void IterativeSolve (const RGenericSparseMatrix &A,
     const RVector *b, RVector *x, int nrhs, double tol, int maxit,
     RPreconditioner *precon, IterativeSolverResult *res);
+#ifdef TOAST_FEATURE_SINGLEPREC
+template MATHLIB int IterativeSolve (const FGenericSparseMatrix &A, const FVector &b,
+    FVector &x, double &tol, FPreconditioner *precon, int maxit);
 template MATHLIB void IterativeSolve (const FGenericSparseMatrix &A,
     const FVector *b, FVector *x, int nrhs, double tol, int maxit,
     FPreconditioner *precon, IterativeSolverResult *res);
-
+#endif
 
 template MATHLIB int CG (const RGenericSparseMatrix &A, const RVector &b,
     RVector &x, double &tol, RPreconditioner *precon, int maxit);
+#ifdef TOAST_FEATURE_SINGLEPREC    
 template MATHLIB int CG (const FGenericSparseMatrix &A, const FVector &b,
     FVector &x, double &tol, FPreconditioner *precon, int maxit);
+#endif
 
-template MATHLIB int BiCG (const FGenericSparseMatrix &A, const FVector &b,
-    FVector &x, double &tol, FPreconditioner *precon, int maxit);
 template MATHLIB int BiCG (const RGenericSparseMatrix &A, const RVector &b,
     RVector &x, double &tol, RPreconditioner *precon, int maxit);
+#ifdef TOAST_FEATURE_SINGLEPREC
+template MATHLIB int BiCG (const FGenericSparseMatrix &A, const FVector &b,
+    FVector &x, double &tol, FPreconditioner *precon, int maxit);
+#endif
 
-template MATHLIB int GaussSeidel (const FGenericSparseMatrix &A,
-    const FVector &b, FVector &x, double &tol, int maxit);
 template MATHLIB int GaussSeidel (const RGenericSparseMatrix &A,
     const RVector &b, RVector &x, double &tol, int maxit);
 template MATHLIB int GaussSeidel (const CGenericSparseMatrix &A,
     const CVector &b, CVector &x, double &tol, int maxit);
+#ifdef TOAST_FEATURE_SINGLEPREC
+template MATHLIB int GaussSeidel (const FGenericSparseMatrix &A,
+    const FVector &b, FVector &x, double &tol, int maxit);
 template MATHLIB int GaussSeidel (const SCGenericSparseMatrix &A,
     const SCVector &b, SCVector &x, double &tol, int maxit);
+#endif
 
 // Note that specialisations are not explicitly instantiated
 

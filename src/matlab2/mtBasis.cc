@@ -126,6 +126,7 @@ void MatlabToast::SetBasis (int nlhs, mxArray *plhs[], int nrhs,
     case 6:
 	raster = new Raster_SplineBlob (bdim, gdim, mesh, blobrad, bb);
 	break;
+	#ifdef TOAST_FEATURE_RASTER2
     case 7:
 	raster = Raster2::Create<Raster_Pixel2> (bdim, bdim, mesh, bb,
 	    maptol);
@@ -158,6 +159,7 @@ void MatlabToast::SetBasis (int nlhs, mxArray *plhs[], int nrhs,
 	raster = Raster2::Create<Raster_CPixel_Tree> (bdim, bdim, mesh, bb,
             maptol);
 	break;
+	#endif
     }
     if (raster)
 	mexLock(); // prevent mex file unloading while basis is allocated
@@ -232,6 +234,8 @@ void MatlabToast::GetBasisSLen (int nlhs, mxArray *plhs[], int nrhs,
 }
 
 // =========================================================================
+
+#ifdef TOAST_FEATURE_RASTER2
 
 void MatlabToast::GetBasisBuu (int nlhs, mxArray *plhs[], int nrhs,
     const mxArray *prhs[])
@@ -346,6 +350,8 @@ void MatlabToast::GetBasisDuv (int nlhs, mxArray *plhs[], int nrhs,
 	}
     }
 }
+
+#endif // TOAST_FEATURE_RASTER2
 
 // =========================================================================
 

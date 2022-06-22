@@ -68,9 +68,11 @@ inline int pow (int base, int e)
 
 namespace toast {
     
+    #ifdef TOAST_FEATURE_SINGLEPREC
     inline float conj(float a)
     { return a; }
-    
+    #endif
+
     inline double conj(double a)
     { return a; }
     
@@ -87,10 +89,12 @@ inline bool iszero (std::complex<double> d)
     return d.real() == 0 && d.imag() == 0;
 }
 
+#ifdef TOAST_FEATURE_SINGLEPREC
 inline bool iszero (std::complex<float> d)
 {
     return d.real() == 0 && d.imag() == 0;
 }
+#endif
 
 inline bool operator> (const std::complex<double> &z1,
 		       const std::complex<double> &z2)

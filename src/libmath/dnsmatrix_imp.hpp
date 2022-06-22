@@ -245,6 +245,8 @@ void TDenseMatrix<double>::Ax (const TVector<double> &x, TVector<double> &b)
     dgemv_(trans, (int&)cols, (int&)rows, alpha, val, (int&)cols,
            x.data_buffer(), incr, beta, b.data_buffer(), incr);
 }
+
+#ifdef TOAST_FEATURE_SINGLEPREC
 template<>
 void TDenseMatrix<float>::Ax (const TVector<float> &x, TVector<float> &b) const
 {
@@ -260,6 +262,8 @@ void TDenseMatrix<float>::Ax (const TVector<float> &x, TVector<float> &b) const
     sgemv_(trans, (int&)cols, (int&)rows, alpha, val, (int&)cols,
            x.data_buffer(), incr, beta, b.data_buffer(), incr);
 }
+#endif
+
 template<>
 void TDenseMatrix<toast::complex>::Ax (const TVector<toast::complex> &x,
     TVector<toast::complex> &b) const
@@ -311,6 +315,8 @@ void TDenseMatrix<double>::ATx (const TVector<double> &x, TVector<double> &b)
     dgemv_(trans, (int&)cols, (int&)rows, alpha, val, (int&)cols,
            x.data_buffer(), incr, beta, b.data_buffer(), incr);
 }
+
+#ifdef TOAST_FEATURE_SINGLEPREC
 template<>
 void TDenseMatrix<float>::ATx (const TVector<float> &x, TVector<float> &b)
     const
@@ -325,6 +331,8 @@ void TDenseMatrix<float>::ATx (const TVector<float> &x, TVector<float> &b)
     sgemv_(trans, (int&)cols, (int&)rows, alpha, val, (int&)cols,
            x.data_buffer(), incr, beta, b.data_buffer(), incr);
 }
+#endif
+
 template<>
 void TDenseMatrix<toast::complex>::ATx (const TVector<toast::complex> &x,
     TVector<toast::complex> &b) const
@@ -384,6 +392,8 @@ void TDenseMatrix<double>::AB (const TDenseMatrix<double> &A,
     dgemm_(transa, transb, (int&)B.cols, (int&)A.rows, (int&)A.cols, alpha,
 	   B.val, (int&)B.cols, A.val, (int&)A.cols, beta, val, (int&)B.cols);
 }
+
+#ifdef TOAST_FEATURE_SINGLEPREC
 template<>
 void TDenseMatrix<float>::AB (const TDenseMatrix<float> &A,
     const TDenseMatrix<float> &B)
@@ -405,6 +415,8 @@ void TDenseMatrix<float>::AB (const TDenseMatrix<float> &A,
     sgemm_(transa, transb, (int&)B.cols, (int&)A.rows, (int&)A.cols, alpha,
 	   B.val, (int&)B.cols, A.val, (int&)A.cols, beta, val, (int&)B.cols);
 }
+#endif
+
 template<>
 void TDenseMatrix<toast::complex>::AB (const TDenseMatrix<toast::complex> &A,
     const TDenseMatrix<toast::complex> &B)
@@ -483,6 +495,8 @@ TSymMatrix<double> ATA (const TDenseMatrix<double> &A)
     delete []c;
     return ata;
 }
+
+#ifdef TOAST_FEATURE_SINGLEPREC
 template<>
 TSymMatrix<float> ATA (const TDenseMatrix<float> &A)
 {
@@ -509,6 +523,8 @@ TSymMatrix<float> ATA (const TDenseMatrix<float> &A)
     delete []c;
     return ata;
 }
+#endif
+
 template<>
 TSymMatrix<toast::complex> ATA (const TDenseMatrix<toast::complex> &A)
 {
@@ -585,6 +601,8 @@ TSymMatrix<double> AAT (const TDenseMatrix<double> &A)
     return aat;
 }
 template<>
+
+#ifdef TOAST_FEATURE_SINGLEPREC
 TSymMatrix<float> AAT (const TDenseMatrix<float> &A)
 {
     static char uplo = 'U';  // return result in upper triangle
@@ -610,6 +628,8 @@ TSymMatrix<float> AAT (const TDenseMatrix<float> &A)
     delete []c;
     return aat;
 }
+#endif
+
 template<>
 TSymMatrix<toast::complex> AAT (const TDenseMatrix<toast::complex> &A)
 {
@@ -1136,14 +1156,18 @@ template MATHLIB TDenseMatrix<toast::complex> catv (const TDenseMatrix<toast::co
 
 #ifndef USE_BLAS_LEVEL3 // otherwise use BLAS interface specialisations
 template MATHLIB TSymMatrix<double> ATA (const TDenseMatrix<double> &A);
-template MATHLIB TSymMatrix<float> ATA (const TDenseMatrix<float> &A);
 template MATHLIB TSymMatrix<toast::complex> ATA (const TDenseMatrix<toast::complex> &A);
+#ifdef TOAST_FEATURE_SINGLEPREC
+template MATHLIB TSymMatrix<float> ATA (const TDenseMatrix<float> &A);
+#endif
 #endif
 
 #ifndef USE_BLAS_LEVEL3 // otherwise use BLAS interface specialisations
 template MATHLIB TSymMatrix<double> AAT (const TDenseMatrix<double> &A);
-template MATHLIB TSymMatrix<float> AAT (const TDenseMatrix<float> &A);
 template MATHLIB TSymMatrix<toast::complex> AAT (const TDenseMatrix<toast::complex> &A);
+#ifdef TOAST_FEATURE_SINGLEPREC
+template MATHLIB TSymMatrix<float> AAT (const TDenseMatrix<float> &A);
+#endif
 #endif
 
 template MATHLIB TDenseMatrix<double> kron (const TDenseMatrix<double> &A,

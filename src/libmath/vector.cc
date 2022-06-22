@@ -17,12 +17,14 @@ using namespace std;
 /* These ought to be friends really, except that I can't see how to do that
 when using template */
 
+#ifdef TOAST_FEATURE_SINGLEPREC
 MATHLIB TVector<float> Re (const TVector<std::complex<float> > &vec)
 {
     TVector<float> tmp(vec.Dim());
     for (int i = 0; i < vec.Dim(); i++) tmp[i] = vec[i].real();
     return tmp;
 }
+#endif
 
 MATHLIB TVector<double> Re (const TVector<std::complex<double> > &vec)
 {
@@ -31,12 +33,14 @@ MATHLIB TVector<double> Re (const TVector<std::complex<double> > &vec)
     return tmp;
 }
 
+#ifdef TOAST_FEATURE_SINGLEPREC
 MATHLIB TVector<float> Im (const TVector<std::complex<float> > &vec)
 {
     TVector<float> tmp(vec.Dim());
     for (int i = 0; i < vec.Dim(); i++) tmp[i] = vec[i].imag();
     return tmp;
 }
+#endif
 
 MATHLIB TVector<double> Im (const TVector<std::complex<double> > &vec)
 {
@@ -106,6 +110,7 @@ MATHLIB void SetImag (TVector<std::complex<double> > &z,
       z[i] = std::complex<double> (z[i].real(), zim[i]);
 }
 
+#ifdef TOAST_FEATURE_SINGLEPREC
 MATHLIB TVector<std::complex<double> > MakeCVector (
     const TVector<std::complex<float> > &v)
 {
@@ -114,3 +119,4 @@ MATHLIB TVector<std::complex<double> > MakeCVector (
         c[i] = (std::complex<double>)v[i];
     return c;
 }
+#endif

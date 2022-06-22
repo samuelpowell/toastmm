@@ -7,6 +7,7 @@ if(Matlab_FOUND)
 
   message(STATUS "MATLAB located, toast MATLAB interface will be built")
 
+  if(TOAST_FEATURE_RASTER2)
   matlab_add_mex(NAME toastmex    SHARED R2018a 
                                   SRC toastmex.cc 
                                   matlabtoast.cc mexutil.cc util.cc 
@@ -16,7 +17,20 @@ if(Matlab_FOUND)
                                   ../common/calc_jacobian.cc
                                   ../common/calc_gradient.cc
                                   ../common/calc_mesh.cc 
-                                  ../common/calc_qmvec.cc)                               
+                                  ../common/calc_qmvec.cc)      
+  else()
+  matlab_add_mex(NAME toastmex    SHARED R2018a 
+                                  SRC toastmex.cc 
+                                  matlabtoast.cc mexutil.cc util.cc 
+                                  mtMesh.cc mtElement.cc mtQMvec.cc mtBasis.cc mtField.cc mtGradient.cc
+                                  mtJacobian.cc mtRegul.cc toastlbfgs.cc
+                                  matlabfdot.cc mtProjector.cc
+                                  ../common/calc_jacobian.cc
+                                  ../common/calc_gradient.cc
+                                  ../common/calc_mesh.cc 
+                                  ../common/calc_qmvec.cc)  
+  endif()
+                                  
 
   target_include_directories(toastmex PRIVATE Matlab_INCLUDE_DIRS)                                        
   target_include_directories(toastmex PRIVATE ../../include)    # For blasnames, toastdef, arch

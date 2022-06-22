@@ -157,9 +157,11 @@ bool CholeskyFactorize (const TSymCompRowMatrix<MT> &A, TCompRowMatrix<MT> &L,
 // typedefs for specific instances of `TCompRowMatrix'
 
 typedef TSymCompRowMatrix<double>	RSymCompRowMatrix;	// 'real'
-typedef TSymCompRowMatrix<float>	FSymCompRowMatrix;	// 'float'
 typedef TSymCompRowMatrix<std::complex<double> > CSymCompRowMatrix;	// 'complex'
-typedef TSymCompRowMatrix<std::complex<float> >	SCSymCompRowMatrix;	// 'complex'
 typedef TSymCompRowMatrix<int>	        ISymCompRowMatrix;	// 'integer'
+#ifdef TOAST_FEATURE_SINGLEPREC
+typedef TSymCompRowMatrix<float>	FSymCompRowMatrix;	// 'float'
+typedef TSymCompRowMatrix<std::complex<float> >	SCSymCompRowMatrix;	// 'complex'
+#endif
 
 #endif // !__SCRMATRIX_H
