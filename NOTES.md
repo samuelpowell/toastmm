@@ -105,6 +105,7 @@ Aim: ensure multithreading where possible, but avoid contention
   - Cache sparsity structure inside mesh
   - Use C++ stdlib parallel sort for sparsity structure computation
   - Compound matrix assembly works over all parameters at once, reducing time for local summation
+  - Make single precision (for CUDA) and the new raster interface optional compile time defines
 
 # TODO
 

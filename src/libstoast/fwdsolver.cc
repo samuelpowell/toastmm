@@ -118,6 +118,7 @@ void TFwdSolver<T>::SetPrecon (PreconType type)
     }
 }
 
+#ifdef TOAST_FEATURE_SINGLEPREC
 template<>
 void TFwdSolver<float>::Allocate ()
 {
@@ -145,6 +146,7 @@ void TFwdSolver<float>::Allocate ()
 	}
     }
 }
+#endif
 
 template<>
 void TFwdSolver<double>::Allocate ()
@@ -204,6 +206,7 @@ void TFwdSolver<std::complex<double> >::Allocate ()
     }
 }
 
+#ifdef TOAST_FEATURE_SINGLEPREC
 template<>
 void TFwdSolver<std::complex<float> >::Allocate ()
 {
@@ -265,6 +268,7 @@ void TFwdSolver<float>::AssembleSystemMatrix (const Solution &sol,
     for (i = 0; i < nz; i++) *fval++ = (float)*dval++;
  
 }
+#endif
 
 template<>
 void TFwdSolver<double>::AssembleSystemMatrix (const Solution &sol,
@@ -292,6 +296,7 @@ void TFwdSolver<double>::AssembleSystemMatrix (const Solution &sol,
     AddToSysMatrixCompound(*meshptr, *F, paramset, 3);    
 }
 
+#ifdef TOAST_FEATURE_SINGLEPREC
 template<>
 void TFwdSolver<std::complex<float> >::AssembleSystemMatrix (
     const Solution &sol, double omega, bool elbasis)
@@ -327,6 +332,7 @@ void TFwdSolver<std::complex<float> >::AssembleSystemMatrix (
         sval[i] = (std::complex<float>)cval[i];
 
 }
+#endif
 
 template<>
 void TFwdSolver<std::complex<double> >::AssembleSystemMatrix (
@@ -383,6 +389,7 @@ void TFwdSolver<T>::AssembleMassMatrix (const Mesh *mesh)
     AddToSysMatrix (*mesh, *B, (RVector*)0, ASSEMBLE_FF);
 }
 
+#ifdef TOAST_FEATURE_SINGLEPREC
 template<>
 void TFwdSolver<float>::Reset (const Solution &sol, double omega, bool elbasis)
 {
@@ -399,6 +406,7 @@ void TFwdSolver<float>::Reset (const Solution &sol, double omega, bool elbasis)
 	precon->Reset (F);
     if (B) AssembleMassMatrix();
 }
+#endif
 
 template<>
 void TFwdSolver<double>::Reset (const Solution &sol, double omega, bool elbasis)
@@ -417,6 +425,7 @@ void TFwdSolver<double>::Reset (const Solution &sol, double omega, bool elbasis)
     if (B) AssembleMassMatrix();
 }
 
+#ifdef TOAST_FEATURE_SINGLEPREC
 template<>
 void TFwdSolver<std::complex<float> >::Reset (const Solution &sol,
     double omega, bool elbasis)
@@ -433,6 +442,7 @@ void TFwdSolver<std::complex<float> >::Reset (const Solution &sol,
 	precon->Reset (F);
     if (B) AssembleMassMatrix();
 }
+#endif
 
 template<>
 void TFwdSolver<std::complex<double> >::Reset (const Solution &sol,
@@ -452,6 +462,7 @@ void TFwdSolver<std::complex<double> >::Reset (const Solution &sol,
     if (B) AssembleMassMatrix();
 }
 
+#ifdef TOAST_FEATURE_SINGLEPREC
 template<>
 void TFwdSolver<float>::CalcField (const TVector<float> &qvec,
     TVector<float> &phi, IterativeSolverResult *res, int th) const
@@ -473,6 +484,7 @@ void TFwdSolver<float>::CalcField (const TVector<float> &qvec,
 	}
     }
 }
+#endif
 
 template<>
 void TFwdSolver<double>::CalcField (const TVector<double> &qvec,
@@ -496,6 +508,7 @@ void TFwdSolver<double>::CalcField (const TVector<double> &qvec,
     }
 }
 
+#ifdef TOAST_FEATURE_SINGLEPREC
 template<>
 void TFwdSolver<std::complex<float> >::CalcField (
     const TVector<std::complex<float> > &qvec,
@@ -515,6 +528,7 @@ void TFwdSolver<std::complex<float> >::CalcField (
 	}
     }
 }
+#endif
 
 template<>
 void TFwdSolver<std::complex<double> >::CalcField (
@@ -591,9 +605,11 @@ void CalcFields_engine (task_data *td)
 }
 #ifdef NEED_EXPLICIT_INSTANTIATION
 template void CalcFields_engine<double> (task_data *td);
-template void CalcFields_engine<float> (task_data *td);
 template void CalcFields_engine<std::complex<double> > (task_data *td);
+#ifdef TOAST_FEATURE_SINGLEPREC
+template void CalcFields_engine<float> (task_data *td);
 template void CalcFields_engine<std::complex<float> > (task_data *td);
+#endif
 #endif
 
 #endif // TOAST_THREAD
@@ -802,6 +818,7 @@ RVector TFwdSolver<T>::UnfoldComplex (const TVector<T> &vec)
 	return RVector();
 }
 
+#ifdef TOAST_FEATURE_SINGLEPREC
 template<>
 STOASTLIB FVector TFwdSolver<float>::UnfoldSComplex (const FVector &vec)
    const
@@ -809,6 +826,7 @@ STOASTLIB FVector TFwdSolver<float>::UnfoldSComplex (const FVector &vec)
     // nothing to do for real case
     return vec;
 }
+
 
 template<>
 STOASTLIB FVector TFwdSolver<std::complex<float> >::UnfoldSComplex (
@@ -828,7 +846,7 @@ FVector TFwdSolver<T>::UnfoldSComplex (const TVector<T> &vec)
 	xERROR("Not implemented");
 	return FVector();
 }
-
+#endif
 
 // =========================================================================
 
@@ -897,6 +915,7 @@ RVector TFwdSolver<T>::ProjectAll_real (const TCompRowMatrix<T> &mvec,
 
 // =========================================================================
 
+#ifdef TOAST_FEATURE_SINGLEPREC
 template<>
 STOASTLIB FVector TFwdSolver<float>::ProjectAll_singlereal (const FCompRowMatrix &mvec,
     const FVector *phi, DataScale scl)
@@ -918,6 +937,7 @@ FVector TFwdSolver<T>::ProjectAll_singlereal (const TCompRowMatrix<T> &mvec,
     xERROR("Not implemented");
 	return FVector();
 }
+#endif
 
 // =========================================================================
 
@@ -948,6 +968,7 @@ RVector TFwdSolver<T>::ProjectAll_real (const TCompRowMatrix<T> &qvec,
 
 // =========================================================================
 
+#ifdef TOAST_FEATURE_SINGLEPREC
 template<>
 STOASTLIB FVector TFwdSolver<float>::ProjectAll_singlereal (const FCompRowMatrix &qvec,
     const FCompRowMatrix &mvec, const Solution &sol, double omega,
@@ -972,6 +993,7 @@ FVector TFwdSolver<T>::ProjectAll_singlereal (const TCompRowMatrix<T> &qvec,
     xERROR("Not implemented");
 	return FVector();
 }
+#endif
 
 // =========================================================================
 
@@ -1045,10 +1067,12 @@ void TFwdSolver<T>::ReadParams (ParamParser &pp)
     }
 
     if (solvertp == LSOLVER_ITERATIVE) {
-        FGenericSparseMatrix::GlobalSelectIterativeSolver (method);
         RGenericSparseMatrix::GlobalSelectIterativeSolver (method);
-	SCGenericSparseMatrix::GlobalSelectIterativeSolver_complex (method);
-	CGenericSparseMatrix::GlobalSelectIterativeSolver_complex (method);
+	    CGenericSparseMatrix::GlobalSelectIterativeSolver_complex (method);
+        #ifdef TOAST_FEATURE_SINGLEPREC
+        FGenericSparseMatrix::GlobalSelectIterativeSolver (method);
+	    SCGenericSparseMatrix::GlobalSelectIterativeSolver_complex (method);
+        #endif
 
 	if (!pp.GetReal ("LINSOLVER_TOL", iterative_tol)) {
 	    do {
@@ -1210,27 +1234,34 @@ TVector<T> ProjectAll (const QMMesh *mesh, const TCompRowMatrix<T> &mvec,
 //template class STOASTLIB SuperLU_data<toast::complex>;
 //template class STOASTLIB SuperLU_data<scomplex>;
 
-template class STOASTLIB TFwdSolver<float>;
 template class STOASTLIB TFwdSolver<double>;
 template class STOASTLIB TFwdSolver<std::complex<double> >;
+#ifdef TOAST_FEATURE_SINGLEPREC
+template class STOASTLIB TFwdSolver<float>;
 template class STOASTLIB TFwdSolver<std::complex<float> >;
+#endif
 
-template STOASTLIB FVector ProjectSingle (const QMMesh *mesh, int q,
-    const FCompRowMatrix &mvec, const FVector &phi, DataScale dscale);
 template STOASTLIB RVector ProjectSingle (const QMMesh *mesh, int q,
     const RCompRowMatrix &mvec, const RVector &phi, DataScale dscale);
 template STOASTLIB CVector ProjectSingle (const QMMesh *mesh, int q,
     const CCompRowMatrix &mvec, const CVector &phi, DataScale dscale);
+#ifdef TOAST_FEATURE_SINGLEPREC
+template STOASTLIB FVector ProjectSingle (const QMMesh *mesh, int q,
+    const FCompRowMatrix &mvec, const FVector &phi, DataScale dscale);
 template STOASTLIB SCVector ProjectSingle (const QMMesh *mesh, int q,
     const SCCompRowMatrix &mvec, const SCVector &phi, DataScale dscale);
+#endif
 
-template STOASTLIB FVector ProjectAll (const QMMesh *mesh,
-    const FCompRowMatrix &mvec, const FVector *phi, DataScale dscale);
 template STOASTLIB RVector ProjectAll (const QMMesh *mesh,
     const RCompRowMatrix &mvec, const RVector *phi, DataScale dscale);
-template STOASTLIB SCVector ProjectAll (const QMMesh *mesh,
-    const SCCompRowMatrix &mvec, const SCVector *phi, DataScale dscale);
+
 template STOASTLIB CVector ProjectAll (const QMMesh *mesh,
     const CCompRowMatrix &mvec, const CVector *phi, DataScale dscale);
+#ifdef TOAST_FEATURE_SINGLEPREC
+template STOASTLIB FVector ProjectAll (const QMMesh *mesh,
+    const FCompRowMatrix &mvec, const FVector *phi, DataScale dscale);
+template STOASTLIB SCVector ProjectAll (const QMMesh *mesh,
+    const SCCompRowMatrix &mvec, const SCVector *phi, DataScale dscale);
+#endif
 
 #endif // NEED_EXPLICIT_INSTANTIATION

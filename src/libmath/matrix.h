@@ -439,11 +439,12 @@ protected:
 // typedefs for specific instances of `TMatrix'
 
 typedef TMatrix<double>   RMatrix;	// 'double real'
-typedef TMatrix<float>    FMatrix;      // 'single real'
 typedef TMatrix<std::complex<double> >  CMatrix;	// 'complex'
-typedef TMatrix<std::complex<float> > SCMatrix;     // 'single complex'
 typedef TMatrix<int>      IMatrix;      // 'integer'
-
+#ifdef TOAST_FEATURE_SINGLEPREC
+typedef TMatrix<float>    FMatrix;      // 'single real'
+typedef TMatrix<std::complex<float> > SCMatrix;     // 'single complex'
+#endif
 
 // ==========================================================================
 // ==========================================================================
@@ -527,12 +528,14 @@ TSymMatrix<MT> ATA (const TMatrix<MT> &A)
 
 // --------------------------------------------------------------------------
 
+#ifdef TOAST_FEATURE_SINGLEPREC
 template<>
 inline int TMatrix<float>::pcg (const FVector &b, FVector &x,
     double &tol, TPreconditioner<float> *precon, int maxit) const
 {
     return PCG (*this, b, x, tol, precon, maxit);
 }
+#endif
 
 template<>
 inline int TMatrix<double>::pcg (const RVector &b, RVector &x,
@@ -551,6 +554,7 @@ int TMatrix<MT>::pcg (const TVector<MT> &b, TVector<MT> &x,
 
 // --------------------------------------------------------------------------
 
+#ifdef TOAST_FEATURE_SINGLEPREC
 template<>
 inline void TMatrix<float>::pcg (const FVector *b, FVector *x, int nrhs,
     double tol, int maxit, TPreconditioner<float> *precon,
@@ -558,6 +562,7 @@ inline void TMatrix<float>::pcg (const FVector *b, FVector *x, int nrhs,
 {
     PCG (*this, b, x, nrhs, tol, maxit, precon, res);
 }
+#endif
 
 template<>
 inline void TMatrix<double>::pcg (const RVector *b, RVector *x, int nrhs,
@@ -577,12 +582,14 @@ void TMatrix<MT>::pcg (const TVector<MT> *b, TVector<MT> *x, int nrhs,
 
 // --------------------------------------------------------------------------
 
+#ifdef TOAST_FEATURE_SINGLEPREC
 template<>
 inline int TMatrix<float>::bicgstab (const FVector &b, FVector &x,
     double &tol, TPreconditioner<float> *precon, int maxit) const
 {
     return BiCGSTAB (*this, b, x, tol, precon, maxit);
 }
+#endif
 
 template<>
 inline int TMatrix<double>::bicgstab (const RVector &b, RVector &x,
@@ -601,6 +608,7 @@ int TMatrix<MT>::bicgstab (const TVector<MT> &b, TVector<MT> &x,
 
 // --------------------------------------------------------------------------
 
+#ifdef TOAST_FEATURE_SINGLEPREC
 template<>
 inline void TMatrix<float>::bicgstab (const FVector *b, FVector *x, int nrhs,
     double tol, int maxit,TPreconditioner<float> *precon,
@@ -608,6 +616,7 @@ inline void TMatrix<float>::bicgstab (const FVector *b, FVector *x, int nrhs,
 {
     BiCGSTAB (*this, b, x, nrhs, tol, maxit, precon, res);
 }
+#endif
 
 template<>
 inline void TMatrix<double>::bicgstab (const RVector *b, RVector *x, int nrhs,

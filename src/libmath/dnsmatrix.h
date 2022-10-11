@@ -445,10 +445,12 @@ private:
 // typedefs for specific instances of `TDenseMatrix'
 
 typedef TDenseMatrix<double>   RDenseMatrix;	// 'double real'
-typedef TDenseMatrix<float>    FDenseMatrix;    // 'single real'
 typedef TDenseMatrix<std::complex<double> >  CDenseMatrix;	// 'complex'
-typedef TDenseMatrix<std::complex<float> > SCDenseMatrix;   // 'single complex'
 typedef TDenseMatrix<int>      IDenseMatrix;    // 'integer'
+#ifdef TOAST_FEATURE_SINGLEPREC
+typedef TDenseMatrix<float>    FDenseMatrix;    // 'single real'
+typedef TDenseMatrix<std::complex<float> > SCDenseMatrix;   // 'single complex'
+#endif
 
 #ifndef MATHLIB_IMPLEMENTATION
 //extern template class MATHLIB TDenseMatrix<double>;

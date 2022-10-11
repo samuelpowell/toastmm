@@ -271,12 +271,14 @@ inline void TVector<double>::Copy (const TVector<double> &v)
     dcopy_(size, v.data, incr, data, incr);
 }
 template<>
+#ifdef TOAST_FEATURE_SINGLEPREC
 inline void TVector<float>::Copy (const TVector<float> &v)
 {
     const int incr = 1;
     if (size != v.size) New (v.size); // reallocate
     scopy_(size, v.data, incr, data, incr);
 }
+#endif
 #endif // USE_BLAS_LEVEL1
 
 template<class VT>
@@ -300,6 +302,7 @@ inline void TVector<double>::Copy (const TVector<double> &v,
     dcopy_(n, v.data+sofs, incr, data+tofs, incr);
 }
 template<>
+#ifdef TOAST_FEATURE_SINGLEPREC
 inline void TVector<float>::Copy (const TVector<float> &v,
     int tofs, int sofs, int n)
 {
@@ -308,6 +311,7 @@ inline void TVector<float>::Copy (const TVector<float> &v,
     if (n > size - tofs) n = size - tofs;
     scopy_(n, v.data+sofs, incr, data+tofs, incr);
 }
+#endif
 #endif // USE_BLAS_LEVEL1
 
 template<class VT>
@@ -426,6 +430,8 @@ MATHLIB TVector<double> TVector<double>::operator+ (const TVector<double> &v) co
 // vector-vector addition, single precision specialisation
 
 #ifdef USE_BLAS_LEVEL1 // interface to BLAS level 1 SAXPY functions
+
+#ifdef TOAST_FEATURE_SINGLEPREC
 template<>
 MATHLIB TVector<float> TVector<float>::operator+(const TVector<float> &v) const
 {
@@ -436,6 +442,7 @@ MATHLIB TVector<float> TVector<float>::operator+(const TVector<float> &v) const
     saxpy_((int&)size, scale, v.data, incr, tmp.data, incr);
     return tmp;
 }
+#endif
 #endif // BLAS
 
 // ==========================================================================
@@ -619,6 +626,7 @@ inline TVector<double> &TVector<double>::operator*= (const double &s)
     dscal_(size, s, data, incr);
     return *this;
 }
+#ifdef TOAST_FEATURE_SINGLEPREC
 template<>
 inline TVector<float> &TVector<float>::operator*= (const float &s)
 {
@@ -626,6 +634,8 @@ inline TVector<float> &TVector<float>::operator*= (const float &s)
     sscal_(size, s, data, incr);
     return *this;
 }
+#endif
+
 template<>
 inline TVector<std::complex<double> > &TVector<std::complex<double> >::operator*=
 (const std::complex<double> &s)
@@ -1012,6 +1022,8 @@ inline double dot (const TVector<double> &v1, const TVector<double> &v2)
     int size = v1.size;
     return ddot_(size, v1.data, incr, v2.data, incr);
 }
+
+#ifdef TOAST_FEATURE_SINGLEPREC
 template<>
 inline float dot (const TVector<float> &v1, const TVector<float> &v2)
 {
@@ -1020,6 +1032,8 @@ inline float dot (const TVector<float> &v1, const TVector<float> &v2)
     int size = v1.size;
     return sdot_(size, v1.data, incr, v2.data, incr);
 }
+#endif
+
 template<>
 inline std::complex<double> dot (const TVector<std::complex<double> > &v1, const TVector<std::complex<double> > &v2)
 {
@@ -1089,12 +1103,16 @@ inline double l2norm (const TVector<double> &v)
     const int incr = 1;
     return dnrm2_((int&)v.size, v.data, incr);
 }
+
+#ifdef TOAST_FEATURE_SINGLEPREC
 template<>
 inline double l2norm (const TVector<float> &v)
 {
     const int incr = 1;
     return (double)snrm2_((int&)v.size, v.data, incr);
 }
+#endif
+
 template<>
 inline double l2norm (const TVector<std::complex<double> > &v)
 {
@@ -1266,10 +1284,14 @@ double l1norm (const TVector<double> &v)
 {
     return cblas_dasum (v.size, v.data, 1);
 }
+
+#ifdef TOAST_FEATURE_SINGLEPREC
 double l1norm (const TVector<float> &v)
 {
     return cblas_sasum (v.size, v.data, 1);
 }
+#endif
+
 #endif // USE_CBLAS
 
 // ==========================================================================
@@ -1326,6 +1348,7 @@ inline bool visnan (const CVector &v)
     return false;
 }
 
+#ifdef TOAST_FEATURE_SINGLEPREC
 template<>
 inline bool visnan (const SCVector &v)
 {
@@ -1333,6 +1356,7 @@ inline bool visnan (const SCVector &v)
         if (std::isnan(v[i].real()) || std::isnan(v[i].imag())) return true;
     return false;
 }
+#endif
 
 template<class VT>
 bool visnan (const TVector<VT> &v)

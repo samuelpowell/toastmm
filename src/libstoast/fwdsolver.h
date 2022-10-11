@@ -367,8 +367,10 @@ public:
      */
     RVector ProjectAll_real (const TCompRowMatrix<T> &mvec,
         const TVector<T> *dphi, DataScale scl = DATA_DEFAULT);
+    #ifdef TOAST_FEATURE_SINGLEPREC
     FVector ProjectAll_singlereal (const TCompRowMatrix<T> &mvec,
         const TVector<T> *dphi, DataScale scl = DATA_DEFAULT);
+    #endif
 
     /**
      * \brief Return boundary data for all sources and all detectors, given
@@ -389,9 +391,11 @@ public:
     RVector ProjectAll_real (const TCompRowMatrix<T> &qvec,
         const TCompRowMatrix<T> &mvec, const Solution &sol, double omega,
         DataScale scl = DATA_DEFAULT);
+    #ifdef TOAST_FEATURE_SINGLEPREC
     FVector ProjectAll_singlereal (const TCompRowMatrix<T> &qvec,
         const TCompRowMatrix<T> &mvec, const Solution &sol, double omega,
         DataScale scl = DATA_DEFAULT);
+    #endif
 
     const QMMesh *meshptr;  ///< pointer to the associated FEM mesh
     LSOLVER solvertp;       ///< linear solver type
@@ -422,7 +426,9 @@ protected:
      * \note For real template types, this simply returns the input vector.
      */
     RVector UnfoldComplex (const TVector<T> &vec) const;
+    #ifdef TOAST_FEATURE_SINGLEPREC
     FVector UnfoldSComplex (const TVector<T> &vec) const;
+    #endif
 
 #ifdef UNDEF
     void UnfoldComplex (const TVector<T> &vec, RVector &res) const;
@@ -443,19 +449,23 @@ protected:
 // ==========================================================================
 // template typedefs
 
-typedef TFwdSolver<float>          FFwdSolver;
 typedef TFwdSolver<double>         RFwdSolver;
-typedef TFwdSolver<std::complex<float> > SCFwdSolver;
 typedef TFwdSolver<std::complex<double> > CFwdSolver;
+#ifdef TOAST_FEATURE_SINGLEPREC
+typedef TFwdSolver<float>          FFwdSolver;
+typedef TFwdSolver<std::complex<float> > SCFwdSolver;
+#endif
 
 // ==========================================================================
 // extern declarations of FwdSolver (only required for VS)
 
 #ifndef __FWDSOLVER_CC
-extern template class STOASTLIB TFwdSolver<float>;
 extern template class STOASTLIB TFwdSolver<double>;
-extern template class STOASTLIB TFwdSolver<std::complex<float> >;
 extern template class STOASTLIB TFwdSolver<std::complex<double> >;
+#ifdef TOAST_FEATURE_SINGLEPREC
+extern template class STOASTLIB TFwdSolver<float>;
+extern template class STOASTLIB TFwdSolver<std::complex<float> >;
+#endif
 #endif // !__FWDSOLVER_CC
 
 #endif // !__FWDSOLVER_H

@@ -159,40 +159,51 @@ private:
 // template typedefs
 
 typedef TPreconditioner<double>         RPreconditioner;
-typedef TPreconditioner<float>          FPreconditioner;
 typedef TPreconditioner<std::complex<double> > CPreconditioner;
-typedef TPreconditioner<std::complex<float> >       SCPreconditioner;
 typedef TPreconditioner<int>            IPreconditioner;
+#ifdef TOAST_FEATURE_SINGLEPREC
+typedef TPreconditioner<float>          FPreconditioner;
+typedef TPreconditioner<std::complex<float> >       SCPreconditioner;
+#endif
 
 typedef TPrecon_Null<double>            RPrecon_Null;
-typedef TPrecon_Null<float>             FPrecon_Null;
 typedef TPrecon_Null<std::complex<double> >    CPrecon_Null;
-typedef TPrecon_Null<std::complex<float> >          SCPrecon_Null;
 typedef TPrecon_Null<int>               IPrecon_Null;
+#ifdef TOAST_FEATURE_SINGLEPREC
+typedef TPrecon_Null<float>             FPrecon_Null;
+typedef TPrecon_Null<std::complex<float> >          SCPrecon_Null;
+#endif
 
 typedef TPrecon_Diag<double>            RPrecon_Diag;
-typedef TPrecon_Diag<float>             FPrecon_Diag;
 typedef TPrecon_Diag<std::complex<double> >    CPrecon_Diag;
-typedef TPrecon_Diag<std::complex<float> >          SCPrecon_Diag;
 typedef TPrecon_Diag<int>               IPrecon_Diag;
+#ifdef TOAST_FEATURE_SINGLEPREC
+typedef TPrecon_Diag<float>             FPrecon_Diag;
+typedef TPrecon_Diag<std::complex<float> >          SCPrecon_Diag;
+#endif
 
 typedef TPrecon_IC<double>              RPrecon_IC;
-typedef TPrecon_IC<float>               FPrecon_IC;
 typedef TPrecon_IC<std::complex<double> >      CPrecon_IC;
-typedef TPrecon_IC<std::complex<float> >            SCPrecon_IC;
 typedef TPrecon_IC<int>                 IPrecon_IC;
+#ifdef TOAST_FEATURE_SINGLEPREC
+typedef TPrecon_IC<float>               FPrecon_IC;
+typedef TPrecon_IC<std::complex<float> >            SCPrecon_IC;
+#endif
 
 typedef TPrecon_DILU<double>            RPrecon_DILU;
-typedef TPrecon_DILU<float>             FPrecon_DILU;
 typedef TPrecon_DILU<std::complex<double> >    CPrecon_DILU;
-typedef TPrecon_DILU<std::complex<float> >          SCPrecon_DILU;
 typedef TPrecon_DILU<int>               IPrecon_DILU;
+#ifdef TOAST_FEATURE_SINGLEPREC
+typedef TPrecon_DILU<float>             FPrecon_DILU;
+typedef TPrecon_DILU<std::complex<float> >          SCPrecon_DILU;
+#endif
 
 typedef TPrecon_CG_Multigrid<double>    RPrecon_CG_Multigrid;
-typedef TPrecon_CG_Multigrid<float>     FPrecon_CG_Multigrid;
 typedef TPrecon_CG_Multigrid<std::complex<double> > CPrecon_CG_Multigrid;
-typedef TPrecon_CG_Multigrid<std::complex<float> >  SCPrecon_CG_Multigrid;
 typedef TPrecon_CG_Multigrid<int>       IPrecon_CG_Multigrid;
-
+#ifdef TOAST_FEATURE_SINGLEPREC
+typedef TPrecon_CG_Multigrid<float>     FPrecon_CG_Multigrid;
+typedef TPrecon_CG_Multigrid<std::complex<float> >  SCPrecon_CG_Multigrid;
+#endif
 
 #endif // !__PRECON_H

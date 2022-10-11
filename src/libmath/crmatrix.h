@@ -536,10 +536,12 @@ private:
 // typedefs for specific instances of `TCompRowMatrix'
 
 typedef TCompRowMatrix<double>	 RCompRowMatrix;	// 'real'
-typedef TCompRowMatrix<float>	 FCompRowMatrix;	// 'float'
 typedef TCompRowMatrix<std::complex<double> > CCompRowMatrix;	// 'complex'
-typedef TCompRowMatrix<std::complex<float> > SCCompRowMatrix;	// 'single complex'
 typedef TCompRowMatrix<int>	 ICompRowMatrix;	// 'integer'
+#ifdef TOAST_FEATURE_SINGLEPREC
+typedef TCompRowMatrix<float>	 FCompRowMatrix;	// 'float'
+typedef TCompRowMatrix<std::complex<float> > SCCompRowMatrix;	// 'single complex'
+#endif
 
 // ==========================================================================
 // extern declarations of TCompRowMatrix (only required for VS)
@@ -547,10 +549,13 @@ typedef TCompRowMatrix<int>	 ICompRowMatrix;	// 'integer'
 #ifdef UNDEF  // NEED_EXPLICIT_INSTANTIATION
 //#ifndef __CRMATRIX_CC
 extern template class MATHLIB TCompRowMatrix<double>;
-extern template class MATHLIB TCompRowMatrix<float>;
 extern template class MATHLIB TCompRowMatrix<std::complex<double> >;
-extern template class MATHLIB TCompRowMatrix<std::complex<float> >;
 extern template class MATHLIB TCompRowMatrix<int>;
+#ifdef TOAST_FEATURE_SINGLEPREC
+extern template class MATHLIB TCompRowMatrix<float>;
+extern template class MATHLIB TCompRowMatrix<std::complex<float> >;
+#endif
+
 #endif // !__CRMATRIX_CC
 
 #endif // !__CRMATRIX_H

@@ -324,11 +324,12 @@ protected:
 // typedefs for specific instances of `TGenericSparseMatrix'
 
 typedef TGenericSparseMatrix<double>	RGenericSparseMatrix;	// 'real'
-typedef TGenericSparseMatrix<float>	FGenericSparseMatrix;	// 'float'
 typedef TGenericSparseMatrix<std::complex<double> > CGenericSparseMatrix; // 'complex'
-typedef TGenericSparseMatrix<std::complex<float> >  SCGenericSparseMatrix;	// 's. complex'
 typedef TGenericSparseMatrix<int>	IGenericSparseMatrix;	// 'integer'
-
+#ifdef TOAST_FEATURE_SINGLEPREC
+typedef TGenericSparseMatrix<float>	FGenericSparseMatrix;	// 'float'
+typedef TGenericSparseMatrix<std::complex<float> >  SCGenericSparseMatrix;	// 's. complex'
+#endif
 
 // ==========================================================================
 // ==========================================================================

@@ -1791,6 +1791,7 @@ void AddToElMatrix (const Mesh &mesh, int el, RGenericSparseMatrix &M,
     }
 }
 
+#ifdef TOAST_FEATURE_SINGLEPREC
 void AddToElMatrix (const Mesh &mesh, int el, FGenericSparseMatrix &M,
     const RVector *coeff, int mode)
 {
@@ -1875,6 +1876,7 @@ void AddToElMatrix (const Mesh &mesh, int el, SCGenericSparseMatrix &M,
 	}
     }
 }
+#endif
 
 void AddToElMatrix (const Mesh &mesh, int el, CGenericSparseMatrix &M,
     const RVector *coeff, int mode)
@@ -1976,6 +1978,7 @@ void AddToElMatrixCompound(const Mesh &mesh, int el, RGenericSparseMatrix &M,
 	}
 }
 
+#ifdef TOAST_FEATURE_SINGLEPREC
 void AddToElMatrixCompound(const Mesh &mesh, int el, FGenericSparseMatrix &M,
 						   AssemblyParamSet *param, int nparam)
 {
@@ -2087,7 +2090,7 @@ void AddToElMatrixCompound(const Mesh &mesh, int el, SCGenericSparseMatrix &M,
 		}
 	}
 }
-
+#endif
 
 
 void AddToElMatrixCompound(const Mesh &mesh, int el, CGenericSparseMatrix &M,
@@ -2220,7 +2223,7 @@ void AddToSysMatrixCompound (const Mesh &mesh, RGenericSparseMatrix &M,
 #endif
 }
 
-
+#ifdef TOAST_FEATURE_SINGLEPREC
 void AddToSysMatrixCompound (const Mesh &mesh, FGenericSparseMatrix &M,
     AssemblyParamSet *param, int nparam)
 {
@@ -2238,6 +2241,7 @@ void AddToSysMatrixCompound (const Mesh &mesh, FGenericSparseMatrix &M,
 #endif
 }
 
+#endif
 
 void AddToSysMatrixCompound (const Mesh &mesh, CGenericSparseMatrix &M,
     AssemblyParamSet *param, int nparam)
@@ -2257,7 +2261,7 @@ void AddToSysMatrixCompound (const Mesh &mesh, CGenericSparseMatrix &M,
 #endif
 }
 
-
+#ifdef TOAST_FEATURE_SINGLEPREC
 void AddToSysMatrixCompound (const Mesh &mesh, SCGenericSparseMatrix &M,
     AssemblyParamSet *param, int nparam)
 {
@@ -2275,7 +2279,7 @@ void AddToSysMatrixCompound (const Mesh &mesh, SCGenericSparseMatrix &M,
     xERROR("Compound assembly requires parallel");
 #endif
 }
-
+#endif
 
 #ifdef TOAST_THREAD_ASSEMBLE
 template<typename T>
@@ -2333,7 +2337,7 @@ void AddToSysMatrix (const Mesh &mesh, RGenericSparseMatrix &M,
 #endif
 }
 
-
+#ifdef TOAST_FEATURE_SINGLEPREC
 void AddToSysMatrix (const Mesh &mesh, FGenericSparseMatrix &M,
     const RVector *coeff, int mode)
 {
@@ -2352,6 +2356,7 @@ void AddToSysMatrix (const Mesh &mesh, FGenericSparseMatrix &M,
         AddToElMatrix (mesh, el, M, coeff, mode);
 #endif
 }
+#endif
 
 
 void AddToSysMatrix (const Mesh &mesh, CGenericSparseMatrix &M,
@@ -2374,7 +2379,7 @@ void AddToSysMatrix (const Mesh &mesh, CGenericSparseMatrix &M,
 #endif
 }
 
-
+#ifdef TOAST_FEATURE_SINGLEPREC
 void AddToSysMatrix (const Mesh &mesh, SCGenericSparseMatrix &M,
     const RVector *coeff, int mode)
 {
@@ -2394,6 +2399,7 @@ void AddToSysMatrix (const Mesh &mesh, SCGenericSparseMatrix &M,
 	AddToElMatrix (mesh, el, M, coeff, mode);
 #endif
 }
+#endif
 
 void AddToSysMatrix (const Mesh &mesh, CGenericSparseMatrix &M,
     const double coeff, int mode)
@@ -2427,6 +2433,7 @@ void AddToSysMatrix (const Mesh &mesh, CGenericSparseMatrix &M,
     }  
 }
 
+#ifdef TOAST_FEATURE_SINGLEPREC
 void AddToSysMatrix (const Mesh &mesh, SCGenericSparseMatrix &M,
     const double coeff, int mode)
 {
@@ -2458,6 +2465,7 @@ void AddToSysMatrix (const Mesh &mesh, SCGenericSparseMatrix &M,
 	}
     }  
 }
+#endif
 
 void AddToSysMatrix_elasticity (const Mesh &mesh, RGenericSparseMatrix &M,
     const RVector &modulus, const RVector &pratio)
