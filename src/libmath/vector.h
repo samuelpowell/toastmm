@@ -181,9 +181,7 @@ template<class VT>
 TVector<double> UnfoldComplex (const TVector<VT> &v);
 
 /* add specific function for CVector */
-MATHLIB TVector<float> Re(const TVector<std::complex<float> > &vec);
 MATHLIB TVector<double> Re(const TVector<std::complex<double> > &vec);
-MATHLIB TVector<float> Im(const TVector<std::complex<float> > &vec);
 MATHLIB TVector<double> Im(const TVector<std::complex<double> > &vec);
 MATHLIB TVector<double> Mod(const TVector<std::complex<double> > &vec);
 MATHLIB TVector<double> LogMod(const TVector<std::complex<double> > &vec);
@@ -193,9 +191,11 @@ MATHLIB void SelfConj(const TVector<std::complex<double> > &vec);
 MATHLIB TVector<std::complex<double> > Hadamard(const TVector<std::complex<double> > &a, const TVector<std::complex<double> > &b);
 MATHLIB void SetReal (TVector<std::complex<double> > &z, const TVector<double> &zre);
 MATHLIB void SetImag (TVector<std::complex<double> > &z, const TVector<double> &zim);
-
+#ifdef TOAST_FEATURE_SINGLEPREC
+MATHLIB TVector<float> Re(const TVector<std::complex<float> > &vec);
+MATHLIB TVector<float> Im(const TVector<std::complex<float> > &vec);
 MATHLIB TVector<std::complex<double> > MakeCVector (const TVector<std::complex<float> > &v);
-
+#endif
 // ==========================================================================
 // class TVector
 
@@ -1066,9 +1066,11 @@ private:
 // template typedefs
 
 typedef TVector<double>          RVector;
-typedef TVector<float>           FVector;
 typedef TVector<std::complex<double> >  CVector;
+#ifdef TOAST_FEATURE_SINGLEPREC
+typedef TVector<float>           FVector;
 typedef TVector<std::complex<float> >   SCVector;
+#endif
 typedef TVector<int>             IVector;
 typedef TVector<long>            LVector;
 

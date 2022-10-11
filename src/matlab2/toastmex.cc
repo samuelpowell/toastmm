@@ -91,9 +91,11 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     case TOAST_SYSMAT:
 	mtoast->Sysmat (nlhs, plhs, nrhs, prhs);
 	break;
+	#ifdef TOAST_FEATURE_RASTER2
     case TOAST_SYSMATBASIS:
 	mtoast->Sysmat_basis (nlhs, plhs, nrhs, prhs);
 	break;
+	#endif
     case TOAST_VOLMAT:
 	mtoast->Volmat (nlhs, plhs, nrhs, prhs);
 	break;
@@ -124,6 +126,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     case TOAST_BASIS_VALUE:
 	mtoast->BasisValue (nlhs, plhs, nrhs, prhs);
 	break;
+	#ifdef TOAST_FEATURE_RASTER2
     case TOAST_BASIS_BUU:
 	mtoast->GetBasisBuu (nlhs, plhs, nrhs, prhs);
 	break;
@@ -145,6 +148,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     case TOAST_BASIS_DUV:
 	mtoast->GetBasisDuv (nlhs, plhs, nrhs, prhs);
 	break;
+	#endif
     case TOAST_BASIS_SUPPORTAREA:
 	mtoast->GetBasisSupportArea (nlhs, plhs, nrhs, prhs);
 	break;

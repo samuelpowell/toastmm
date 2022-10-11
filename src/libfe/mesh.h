@@ -47,11 +47,13 @@ struct AssemblyParamSet {
 FELIB void AddToElMatrix (const Mesh &mesh, int el,
     RGenericSparseMatrix &M, const RVector *coeff, int mode);
 
+#ifdef TOAST_FEATURE_SINGLEPREC
 FELIB void AddToElMatrix (const Mesh &mesh, int el,
     FGenericSparseMatrix &M, const RVector *coeff, int mode);
 
 FELIB void AddToElMatrix (const Mesh &mesh, int el,
     SCGenericSparseMatrix &M, const RVector *coeff, int mode);
+#endif
 
 FELIB void AddToElMatrix (const Mesh &mesh, int el,
     CGenericSparseMatrix &M, const RVector *coeff, int mode);
@@ -59,11 +61,13 @@ FELIB void AddToElMatrix (const Mesh &mesh, int el,
 FELIB void AddToElMatrixCompound (const Mesh &mesh, int el,
     RGenericSparseMatrix &M,AssemblyParamSet *param, int nparam);
 
+#ifdef TOAST_FEATURE_SINGLEPREC
 FELIB void AddToElMatrixCompound (const Mesh &mesh, int el,
     FGenericSparseMatrix &M, AssemblyParamSet *param, int nparam);
 
 FELIB void AddToElMatrixCompound (const Mesh &mesh, int el,
     SCGenericSparseMatrix &M, AssemblyParamSet *param, int nparam);
+#endif
 
 FELIB void AddToElMatrixCompound (const Mesh &mesh, int el,
     CGenericSparseMatrix &M, AssemblyParamSet *param, int nparam);
@@ -71,11 +75,13 @@ FELIB void AddToElMatrixCompound (const Mesh &mesh, int el,
 FELIB void AddToSysMatrix (const Mesh &mesh,
     RGenericSparseMatrix &M, const RVector *coeff, int mode);
 
+#ifdef TOAST_FEATURE_SINGLEPREC
 FELIB void AddToSysMatrix (const Mesh &mesh,
     FGenericSparseMatrix &M, const RVector *coeff, int mode);
 
 FELIB void AddToSysMatrix (const Mesh &mesh,
     SCGenericSparseMatrix &M, const RVector *coeff, int mode);
+#endif
 
 FELIB void AddToSysMatrix (const Mesh &mesh,
     CGenericSparseMatrix &M, const RVector *coeff, int mode);
@@ -83,11 +89,13 @@ FELIB void AddToSysMatrix (const Mesh &mesh,
 FELIB void AddToSysMatrixCompound (const Mesh &mesh,
     RGenericSparseMatrix &M, AssemblyParamSet *param, int nparam);
 
+#ifdef TOAST_FEATURE_SINGLEPREC
 FELIB void AddToSysMatrixCompound (const Mesh &mesh,
     FGenericSparseMatrix &M, AssemblyParamSet *param, int nparam);
 
 FELIB void AddToSysMatrixCompound (const Mesh &mesh,
     SCGenericSparseMatrix &M, AssemblyParamSet *param, int nparam);
+#endif
 
 FELIB void AddToSysMatrixCompound (const Mesh &mesh,
     CGenericSparseMatrix &M, AssemblyParamSet *param, int nparam);
@@ -95,8 +103,10 @@ FELIB void AddToSysMatrixCompound (const Mesh &mesh,
 FELIB void AddToSysMatrix (const Mesh &mesh,
     CGenericSparseMatrix &M, const double coeff, int mode);
 
+#ifdef TOAST_FEATURE_SINGLEPREC
 FELIB void AddToSysMatrix (const Mesh &mesh,
     SCGenericSparseMatrix &M, const double coeff, int mode);
+#endif
 
 FELIB void AddToSysMatrix_elasticity (const Mesh &mesh,
     RGenericSparseMatrix &M, const RVector &modulus,
@@ -475,15 +485,16 @@ public:
     // Assembles nodal coefficient vector 'coeff' into element matrix 'M'
     // (only fills entries relevant for the element)
 
+#ifdef TOAST_FEATURE_SINGLEPREC
     friend FELIB void AddToElMatrix (const Mesh &mesh, int el,
         FGenericSparseMatrix &M, const RVector *coeff, int mode);
     // Assembles nodal coefficient vector 'coeff' into element matrix 'M'
     // (only fills entries relevant for the element)
-
     friend FELIB void AddToElMatrix (const Mesh &mesh, int el,
 	SCGenericSparseMatrix &M, const RVector *coeff, int mode);
     // Assembles nodal coefficient vector 'coeff' into element matrix 'M'
     // (only fills entries relevant for the element)
+#endif
 
     friend FELIB void AddToElMatrix (const Mesh &mesh, int el,
 	CGenericSparseMatrix &M, const RVector *coeff, int mode);
@@ -496,6 +507,7 @@ public:
     // the specified mode
     // For modes FF and DD 'coeff' is ignored
 
+#ifdef TOAST_FEATURE_SINGLEPREC
     friend FELIB void AddToSysMatrix (const Mesh &mesh,
         FGenericSparseMatrix &M, const RVector *coeff, int mode);
     // Assembles coefficient vector 'coeff' into system matrix 'M' using
@@ -504,6 +516,7 @@ public:
 
     friend FELIB void AddToSysMatrix (const Mesh &mesh,
         SCGenericSparseMatrix &M, const RVector *coeff, int mode);
+#endif
 
     friend FELIB void AddToSysMatrix (const Mesh &mesh,
         CGenericSparseMatrix &M, const RVector *coeff, int mode);
@@ -513,10 +526,12 @@ public:
     friend FELIB void AddToSysMatrix (const Mesh &mesh,
         CGenericSparseMatrix &M, const double coeff, int mode);
 
+#ifdef TOAST_FEATURE_SINGLEPREC
     friend FELIB void AddToSysMatrix (const Mesh &mesh,
         SCGenericSparseMatrix &M, const double coeff, int mode);
     // This version adds a component with constant coefficient 'coeff' to
     // the real or imaginary part of system matrix M
+#endif
 
     friend FELIB void AddToSysMatrix_elasticity (const Mesh &mesh,
         RGenericSparseMatrix &M, const RVector &modulus,

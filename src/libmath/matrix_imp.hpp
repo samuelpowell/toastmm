@@ -20,9 +20,11 @@ using namespace std;
 // These are local because TMatrix should not be used publicly anyway
 // ==========================================================================
 typedef TMatrix<double>  RMatrix;	// 'real'
-typedef TMatrix<float>   FMatrix;	// 'float'
 typedef TMatrix<std::complex<double> > CMatrix;	// 'toast::complex'
 typedef TMatrix<int>     IMatrix;	// 'integer'
+#ifdef TOAST_FEATURE_SINGLEPREC
+typedef TMatrix<float>   FMatrix;	// 'float'
+#endif
 // ==========================================================================
 
 // ==========================================================================
@@ -412,6 +414,7 @@ inline int BiCGSTAB<std::complex<double> > (const CMatrix &A, const CVector &b,
     return niter;
 }
 
+#ifdef TOAST_FEATURE_SINGLEPREC
 template<> // specialisation: single complex
 inline int BiCGSTAB<std::complex<float> > (const SCMatrix &A, const SCVector &b,
     SCVector &x, double &tol, TPreconditioner<std::complex<float> > *precon,
@@ -475,6 +478,7 @@ inline int BiCGSTAB<std::complex<float> > (const SCMatrix &A, const SCVector &b,
     tol = err/bnorm;
     return niter;
 }
+#endif
 
 template<class MT>
 int BiCGSTAB (const TMatrix<MT> &A, const TVector<MT> &b,
@@ -750,76 +754,94 @@ int GMRES (TVector<MT> (*Av_clbk)(const TVector<MT> &v, void *context),
 #ifdef UNDEF // NEED_EXPLICIT_INSTANTIATION
 
 template class MATHLIB TMatrix<double>;
-template class MATHLIB TMatrix<float>;
 template class MATHLIB TMatrix<toast::complex>;
-template class MATHLIB TMatrix<scomplex>;
 template class MATHLIB TMatrix<int>;
+#ifdef TOAST_FEATURE_SINGLEPREC
+template class MATHLIB TMatrix<float>;
+template class MATHLIB TMatrix<scomplex>;
+#endif
 
 template MATHLIB ostream &operator<< (ostream &os, const RMatrix &mat);
 template MATHLIB ostream &operator<< (ostream &os, const CMatrix &mat);
 template MATHLIB ostream &operator<< (ostream &os, const SCMatrix &mat);
 
 template RVector  Ax (const RMatrix &A, const RVector &x);
-template FVector  Ax (const FMatrix &A, const FVector &x);
 template CVector  Ax (const CMatrix &A, const CVector &x);
-template SCVector Ax (const SCMatrix &A, const SCVector &x);
 template IVector  Ax (const IMatrix &A, const IVector &x);
+#ifdef TOAST_FEATURE_SINGLEPREC
+template FVector  Ax (const FMatrix &A, const FVector &x);
+template SCVector Ax (const SCMatrix &A, const SCVector &x);
+#endif
 
 template RVector  ATx (const RMatrix &A, const RVector &x);
-template FVector  ATx (const FMatrix &A, const FVector &x);
 template CVector  ATx (const CMatrix &A, const CVector &x);
-template SCVector ATx (const SCMatrix &A, const SCVector &x);
 template IVector  ATx (const IMatrix &A, const IVector &x);
+#ifdef TOAST_FEATURE_SINGLEPREC
+template FVector  ATx (const FMatrix &A, const FVector &x);
+template SCVector ATx (const SCMatrix &A, const SCVector &x);
+#endif
 
 template MATHLIB RSymMatrix  ATA (const RMatrix &A);
-template MATHLIB FSymMatrix  ATA (const FMatrix &A);
 template MATHLIB CSymMatrix  ATA (const CMatrix &A);
+#ifdef TOAST_FEATURE_SINGLEPREC
+template MATHLIB FSymMatrix  ATA (const FMatrix &A);
 template MATHLIB SCSymMatrix ATA (const SCMatrix &A);
+#endif
 
 template MATHLIB RSymMatrix  AAT (const RMatrix &A);
-template MATHLIB FSymMatrix  AAT (const FMatrix &A);
 template MATHLIB CSymMatrix  AAT (const CMatrix &A);
+#ifdef TOAST_FEATURE_SINGLEPREC
+template MATHLIB FSymMatrix  AAT (const FMatrix &A);
 template MATHLIB SCSymMatrix AAT (const SCMatrix &A);
+#endif
 
 template MATHLIB RVector  ATA_diag (const RMatrix &A);
-template MATHLIB FVector  ATA_diag (const FMatrix &A);
 template MATHLIB CVector  ATA_diag (const CMatrix &A);
+#ifdef TOAST_FEATURE_SINGLEPREC
+template MATHLIB FVector  ATA_diag (const FMatrix &A);
 template MATHLIB SCVector ATA_diag (const SCMatrix &A);
+#endif
 
 template MATHLIB int PCG (const RMatrix &A, const RVector &b, RVector &x, double &tol,
      RPreconditioner *precon, int maxit);
-template MATHLIB int PCG (const FMatrix &A, const FVector &b, FVector &x, double &tol,
-     FPreconditioner *precon, int maxit);
 template MATHLIB int PCG (RVector (*Mv_clbk)( const RVector &v,
     void *context), void * context, const RVector &b, RVector &x,
     double &tol, RPreconditioner *precon, int maxit);
 template MATHLIB void PCG (const RMatrix &A, const RVector *b, RVector *x,
     int nrhs, double tol, int maxit, RPreconditioner *precon, IterativeSolverResult *res);
+#ifdef TOAST_FEATURE_SINGLEPREC
+template MATHLIB int PCG (const FMatrix &A, const FVector &b, FVector &x, double &tol,
+     FPreconditioner *precon, int maxit);
 template MATHLIB void PCG (const FMatrix &A, const FVector *b, FVector *x,
     int nrhs, double tol, int maxit, FPreconditioner *precon, IterativeSolverResult *res);
+#endif
 
-template MATHLIB int BiCGSTAB (const FMatrix &A, const FVector &b,
-    FVector &x, double &tol, FPreconditioner *precon, int maxit);
 template MATHLIB int BiCGSTAB (const RMatrix &A, const RVector &b,
     RVector &x, double &tol, RPreconditioner *precon, int maxit);
 template MATHLIB int BiCGSTAB (const IMatrix &A, const IVector &b,
     IVector &x, double &tol, IPreconditioner *precon, int maxit);
+#ifdef TOAST_FEATURE_SINGLEPREC
+template MATHLIB int BiCGSTAB (const FMatrix &A, const FVector &b,
+    FVector &x, double &tol, FPreconditioner *precon, int maxit);
+#endif
 
-template MATHLIB void BiCGSTAB (const FMatrix &A, const FVector *b, FVector *x,
-    int nrhs, double tol, int maxit, FPreconditioner *precon,
-    IterativeSolverResult *res);
 template MATHLIB void BiCGSTAB (const RMatrix &A, const RVector *b, RVector *x,
     int nrhs, double tol, int maxit, RPreconditioner *precon,
     IterativeSolverResult *res);
-template MATHLIB void BiCGSTAB (const SCMatrix &A, const SCVector *b,
-    SCVector *x, int nrhs, double tol, int maxit,
-    SCPreconditioner *precon, IterativeSolverResult *res);
 template MATHLIB void BiCGSTAB (const CMatrix &A, const CVector *b, CVector *x,
     int nrhs, double tol, int maxit, CPreconditioner *precon,
     IterativeSolverResult *res);
 template MATHLIB void BiCGSTAB (const IMatrix &A, const IVector *b, IVector *x,
     int nrhs, double tol, int maxit, IPreconditioner *precon,
     IterativeSolverResult *res);
+#ifdef TOAST_FEATURE_SINGLEPREC
+template MATHLIB void BiCGSTAB (const FMatrix &A, const FVector *b, FVector *x,
+    int nrhs, double tol, int maxit, FPreconditioner *precon,
+    IterativeSolverResult *res);
+template MATHLIB void BiCGSTAB (const SCMatrix &A, const SCVector *b,
+    SCVector *x, int nrhs, double tol, int maxit,
+    SCPreconditioner *precon, IterativeSolverResult *res);
+#endif
 
 template MATHLIB int BiCGSTAB (RVector(*Mv_clbk)(const RVector &v,
     void *context), void *context, const RVector &b, RVector &x,
@@ -830,18 +852,20 @@ template MATHLIB int BiCGSTAB (CVector(*Mv_clbk)(const CVector &v,
 template MATHLIB int BiCGSTAB (void (* MVM)(RVector &),  const RVector &b, 
     RVector &x, double &tol, RPreconditioner *precon, int maxit);
 
-template MATHLIB int GMRES (const FMatrix &A, const FVector &b, FVector &x,
-    double &tol, FPreconditioner *precon, int restart, int maxit,
-    void(*clbk)(void*));
 template MATHLIB int GMRES (const RMatrix &A, const RVector &b, RVector &x,
     double &tol, RPreconditioner *precon, int restart, int maxit,
     void(*clbk)(void*));
 template MATHLIB int GMRES (const CMatrix &A, const CVector &b, CVector &x,
     double &tol, CPreconditioner *precon, int restart, int maxit,
     void(*clbk)(void*));
+#ifdef TOAST_FEATURE_SINGLEPREC
+template MATHLIB int GMRES (const FMatrix &A, const FVector &b, FVector &x,
+    double &tol, FPreconditioner *precon, int restart, int maxit,
+    void(*clbk)(void*));
 template MATHLIB int GMRES (const SCMatrix &A, const SCVector &b, SCVector &x,
     double &tol, SCPreconditioner *precon, int restart, int maxit,
     void(*clbk)(void*));
+#endif
 
 template MATHLIB int GMRES (RVector (*Av_clbk)(const RVector &v, void *context),
     void *context, const RVector &b, RVector &x, double tol,

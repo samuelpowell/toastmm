@@ -296,8 +296,10 @@ template MATHLIB bool CHdecomp (CSymMatrix &a, bool recover);
 //template MATHLIB bool CHdecomp (ISymMatrix &a, bool recover);
 
 template MATHLIB RVector CHsubst (const RSymMatrix &a, const RVector &b);
-template MATHLIB FVector CHsubst (const FSymMatrix &a, const FVector &b);
 template MATHLIB CVector CHsubst (const CSymMatrix &a, const CVector &b);
+#ifdef TOAST_FEATURE_SINGLEPREC
+template MATHLIB FVector CHsubst (const FSymMatrix &a, const FVector &b);
+#endif
 //template MATHLIB IVector CHsubst (const ISymMatrix &a, const IVector &b);
 
 #endif // NEED_EXPLICIT_INSTANTIATION

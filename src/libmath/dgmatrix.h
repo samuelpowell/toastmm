@@ -260,10 +260,12 @@ public:
 // typedefs for specific instances of `TDiagMatrix'
 // ==========================================================================
 typedef TDiagMatrix<double>	RDiagMatrix;	// 'real'
-typedef TDiagMatrix<float>	FDiagMatrix;	// 'float'
 typedef TDiagMatrix<std::complex<double> >	CDiagMatrix;	// 'complex'
 typedef TDiagMatrix<int>	IDiagMatrix;	// 'integer'
 typedef TDiagMatrix<double>	DiagMatrix;	// for backward compatibility
+#ifdef TOAST_FEATURE_SINGLEPREC
+typedef TDiagMatrix<float>	FDiagMatrix;	// 'float'
+#endif
 // ==========================================================================
 
 #endif // !__DGMATRIX_H

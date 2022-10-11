@@ -434,10 +434,12 @@ int gmres (int restart, TVector<MT> (*Av_clbk)(const TVector<MT> &v,
 
 #ifdef UNDEF // NEED_EXPLICIT_INSTANTIATION
 
+#ifdef TOAST_FEATURE_SINGLEPREC
 template int gmres (int restart, const TMatrix<float> &A,
     const TVector<float> &b, TVector<float> &x,
     TPreconditioner<float> *precon, double &elim, int maxit,
     void (*clbk)(void*));
+#endif
 
 template int gmres (int restart, const TMatrix<double> &A,
     const TVector<double> &b, TVector<double> &x,

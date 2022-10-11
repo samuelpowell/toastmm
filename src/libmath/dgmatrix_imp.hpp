@@ -259,9 +259,11 @@ void TDiagMatrix<MT>::ATx (const TVector<MT> &x, TVector<MT> &b) const
 #ifdef UNDEF // NEED_EXPLICIT_INSTANTIATION
 
 template class TDiagMatrix<double>;
-template class TDiagMatrix<float>;
 template class TDiagMatrix<toast::complex>;
 template class TDiagMatrix<int>;
+#ifdef TOAST_FEATURE_SINGLEPREC
+template class TDiagMatrix<float>;
+#endif
 
 #endif // NEED_EXPLICIT_INSTANTIATION
 

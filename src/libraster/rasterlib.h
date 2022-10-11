@@ -29,6 +29,8 @@
 #include "raster_hb.h"
 #include "raster_rb.h"
 #include "raster_sb.h"
+
+#ifdef TOAST_RASTER2
 #include "raster2.h"
 #include "raster_px2.h"
 #include "raster_cpx.h"
@@ -39,5 +41,6 @@
 #include "raster_hb2.h"
 #include "raster_gb2.h"
 #include "raster_cpx_tree.h"
+#endif
 
 #endif // !__RASTERLIB_H

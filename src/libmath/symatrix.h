@@ -230,10 +230,12 @@ private:
 // typedefs for specific instances of `TSymMatrix'
 
 typedef TSymMatrix<double>   RSymMatrix;	// 'real'
-typedef TSymMatrix<float>    FSymMatrix;	// 'float'
 typedef TSymMatrix<std::complex<double> >  CSymMatrix;	// 'complex'
-typedef TSymMatrix<std::complex<float> > SCSymMatrix;	// 'single complex'
 typedef TSymMatrix<int>	     ISymMatrix;	// 'integer'
+#ifdef TOAST_FEATURE_SINGLEPREC
+typedef TSymMatrix<float>    FSymMatrix;	// 'float'
+typedef TSymMatrix<std::complex<float> > SCSymMatrix;	// 'single complex'
+#endif
 
 // ==========================================================================
 // extern declarations of TSymMatrix (only required for VS)
