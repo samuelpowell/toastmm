@@ -2514,6 +2514,13 @@ static PyObject *toast_test(PyObject *self, PyObject *args) {
 
 // ===========================================================================
 
+static PyObject *toast_version(PyObject *self, PyObject *args) {
+  return PyUnicode_FromFormat("%d.%d.%d%s", TOASTMM_VER_MAJOR, TOASTMM_VER_MINOR, TOASTMM_VER_PATCH, TOASTMM_VER_SUFFIX);
+}
+
+// ===========================================================================
+
+
 static PyMethodDef ToastMethods[] = {
     {"ReadMesh", mesh_read, METH_VARARGS, "Read a Toast mesh from file"},
     {"WriteMesh", mesh_write, METH_VARARGS, "Write a Toast mesh to file"},
@@ -2565,6 +2572,7 @@ static PyMethodDef ToastMethods[] = {
     {"elementShapeD", toast_element_shaped, METH_VARARGS, "Returns shape function derivatives for points in the element"},
 
     {"Test", toast_test, METH_VARARGS, "A dummy test function"},
+    {"Version", toast_version, METH_VARARGS, "Prints the Toast-- version number"},
     {NULL, NULL, 0, NULL}};
 
 // ===========================================================================

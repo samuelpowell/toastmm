@@ -83,11 +83,11 @@ module1 = Extension('toast.toastmod',
                          
 # Define installation
 setup(
-    name = 'PyToast',
-    version = '0.1.0',
-    description = 'Python TOAST extension',
+    name = 'toastmm',
+    version = '0.9.0',
+    description = 'Python TOAST-- extension',
     author = 'The Toast Authors',
-    url = 'http://www.toastplusplus.org',
+    url = 'https://github.com/samuelpowell/toastmm',
     setup_requires=['wheel'],
     install_requires=["numpy", "scipy"],
     python_requires='>=3',
