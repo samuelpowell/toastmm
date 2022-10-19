@@ -28,3 +28,4 @@ jobs:
           path: |
             dist/python/*.whl
             dist/python/examples
+            dist/python/meshes
