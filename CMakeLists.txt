@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.0)
-project(toastmm VERSION 0.1.0)
+project(toastmm VERSION 0.9.0)
 
 include(CTest)
 enable_testing()
@@ -92,7 +92,7 @@ if(BUILD_SHARED_LIBS)
 else()
 
     # MATLAB (mex) interface
-    add_subdirectory(src/matlab2)
+    add_subdirectory(src/matlab)
 
     # Python interface 
     #

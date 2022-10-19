@@ -1,7 +1,14 @@
 SHELL = /bin/bash
-TBIN = $(TOASTDIR)/bin
+TBIN = ../../../dist/bin
 
-all :: test1 test2 test3 test4 test5 test6 test7 test8 test9 test10 test11 test12
+testall_3D = test1 test2 test3 test4 test5 test6 test7 test8 test9 test10 test11 test12
+
+# skip longer Guass-Newton tests in CI
+ifeq ($(CI),true)
+	testall_3D = test1 test2 test3 test4 test9 test10 test11 test12
+endif
+
+all :: $(testall_3D)
 
 fmod.fem ::
 	@echo "Generating forward data ..."
