@@ -9,6 +9,14 @@
 #include "arch.h"
 #include "blasnames.h"
 
+// Versioning
+//
+#define TOASTMM_VER_MAJOR 0
+#define TOASTMM_VER_MINOR 9
+#define TOASTMM_VER_PATCH 0
+#define TOASTMM_VER_SUFFIX "-dev"
+#define TOASTMM_VER_STRING "0.9.0-dev"
+
 // All platforms appreciated explicit instantiation
 //
 #define NEED_EXPLICIT_INSTANTIATION 

@@ -1,9 +1,9 @@
 testall = test_2D test_3D
 
-# skip 3D tests in CI
-ifeq ($(TRAVIS),true)
-	testall = test_2D
-endif
+# # skip tests when running in CI
+# ifeq ($(CI),true)
+# 	testall = test_2D
+# endif
 
 all :: $(testall)
 

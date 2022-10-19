@@ -1,5 +1,5 @@
 SHELL = /bin/bash
-TBIN = $(TOASTDIR)/bin
+TBIN = ../../../dist/bin
 
 all   :: ncg gn lbfgs fmod_clean
 
