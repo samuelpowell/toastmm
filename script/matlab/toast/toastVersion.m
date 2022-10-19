@@ -1,8 +1,8 @@
-%toastVersion   - print the version number of toast--
+%toastVersion   - return string containing the version number of toast--
 %
-% Synopsis: toastVersion()
+% Synopsis: ver = toastVersion()
 %
 
-function toastVersion(level)
-  toastmex(uint32(1009));
+function [ver] = toastVersion(level)
+  ver = toastmex(uint32(1009));
 end

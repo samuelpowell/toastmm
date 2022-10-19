@@ -55,8 +55,13 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     ProvideToast();
 
 	switch (funcid) {
-		case TOAST_PRINTVERSION:
-	mexPrintf("%d.%d.%d%s", TOASTMM_VER_MAJOR, TOASTMM_VER_MINOR, TOASTMM_VER_PATCH, TOASTMM_VER_SUFFIX);
+		case TOAST_VERSION:
+	if(nlhs > 0)
+	{
+		char verstr[100];
+		snprintf(verstr, sizeof(verstr), "toastmm v%d.%d.%d%s", TOASTMM_VER_MAJOR, TOASTMM_VER_MINOR, TOASTMM_VER_PATCH, TOASTMM_VER_SUFFIX);
+		plhs[0] = mxCreateString(verstr);		
+	}
 	break;
     case TOAST_CLEARMESH:
 	mtoast->ClearMesh (nlhs, plhs, nrhs, prhs);

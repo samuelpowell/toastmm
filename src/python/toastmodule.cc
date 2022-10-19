@@ -2515,7 +2515,7 @@ static PyObject *toast_test(PyObject *self, PyObject *args) {
 // ===========================================================================
 
 static PyObject *toast_version(PyObject *self, PyObject *args) {
-  return PyUnicode_FromFormat("%d.%d.%d%s", TOASTMM_VER_MAJOR, TOASTMM_VER_MINOR, TOASTMM_VER_PATCH, TOASTMM_VER_SUFFIX);
+  return PyUnicode_FromFormat("toastmm v%d.%d.%d%s", TOASTMM_VER_MAJOR, TOASTMM_VER_MINOR, TOASTMM_VER_PATCH, TOASTMM_VER_SUFFIX);
 }
 
 // ===========================================================================
