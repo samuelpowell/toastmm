@@ -92,7 +92,7 @@ if(BUILD_SHARED_LIBS)
 else()
 
     # MATLAB (mex) interface
-    add_subdirectory(src/matlab2)
+    add_subdirectory(src/matlab)
 
     # Python interface 
     #
