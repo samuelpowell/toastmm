@@ -32,7 +32,7 @@ Pre-built binaries are provided for a number of platforms.
 
 The Matlab interface is built using MATLAB R2020a on Windows x64, Linux x64, and MacOS.
 It is expected that the interface will work on newer versions (please report if this is not
-the case), but compilation from source will be required for older installations. Versions
+the case), but compilation from source *may* be required for older installations. Versions
 prior to R2018a are not supported (owing to changes in the complex numeric API).
 
 To install, download a release for the appropriate platform and unzip the folder in a
