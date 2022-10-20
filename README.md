@@ -11,7 +11,7 @@ Toast-- is a fork of the [Toast++](https://github.com/toastpp/toastpp) project w
  3. Enhance maintainability by simplifying the codebase, and removing features not exposed by the MATLAB/Python interfaces.
  4. Reduce external dependencies and update the build system to support compilation on modern compilers.
 
-To achieve these goals, the original codebase has been extensively modified. Details can be found in the project [history](https://github.com/samuelpowell/toastmm/HISTORY.md).
+To achieve these goals, the original codebase has been extensively modified. Details can be found in the project [history](https://github.com/samuelpowell/toastmm/blob/master/HISTORY.md).
 
 ## Installation
 
