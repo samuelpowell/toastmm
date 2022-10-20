@@ -46,7 +46,8 @@ This script will configure the appropriate include paths. Save these paths to ma
 installation permanent. Check your installation by running one of the included demos:
 
 ```
->> demo toolbox toast
+>> cd demos
+>> toast_demo1
 ```
 
 ### Python
