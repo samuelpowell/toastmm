@@ -4,19 +4,16 @@
 
  - Investigate `warning C4910` on MSVC - some declspec conflict
  - Look at `fwdsolver_mw.h` instantiation requirements, determine appropriate preprocessor gaurd (e.g. Clang?)
+ - MATLAB QM are always complex, will crash on forward solve with real (NB interleaved API motivation)
  - MATLAB gmsh reader out of date
- - MATLAB complex outputs on QM
  - MATLAB flourescence example performance
- - MATLAB Fix `element_integrals.m` example dimensionality problems
  - Interleaved API permits shallow copy of various inputs in the MATLAB interface to reduce round-trip, exploit
  - Review element types in libfe, some contain unfinished defintions of operators and constants, remove
  - Move semantics for mathlib vectors and matrices
  - Improved initialisation for element entries
  - Check propensity for structural nonzeros viz. direct solvers
- - Resolve versioning 
  - Python interface build assumes Release paths on Windows
  - Default link list after make mesh appears arbitrary, resulting in enormous linklist/qmvec
- - Real qvec on forward solver crash
 
 ## Perfromance
 

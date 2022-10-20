@@ -38,11 +38,11 @@ intf_analytic = elsize * [1/3; 1/3; 1/3];
 % Now do the same with a numerical quadrature rule
 qwght = 1/6 * [1 1 1];
 qabsc = [1/2,0; 0,1/2; 1/2,1/2]';
-fun = el.ShapeFun(qabsc);
-der = el.ShapeDer(qabsc);
+fun = el.ShapeFun(qabsc);   % nn x np
+der = el.ShapeDer(qabsc');  % nn x d x np
 intf_numeric = zeros(3,1);
 for q=1:3
-    jac = der(:,:,q)*vtx;
+    jac = der(:,:,q)'*vtx;
     v = qwght(q) * det(jac);
     intf_numeric = intf_numeric + v*fun(:,q);
 end
@@ -63,7 +63,7 @@ intff_analytic = elsize/12 * [2,1,1; 1,2,1; 1,1,2];
 % And the numerical quadrature version
 intff_numeric = zeros(3,3);
 for q=1:3
-    jac = der(:,:,q)*vtx;
+    jac = der(:,:,q)'*vtx;
     v = qwght(q) * det(jac);
     intff_numeric = intff_numeric + v * (fun(:,q) * fun(:,q)');
 end
@@ -86,10 +86,10 @@ intdd_analytic = 1/(4*elsize) * [b1^2  + c1^2,  b1*b2 + c1*c2, b1*b3 + c1*c3; ..
 % And the numerical quadrature version
 intdd_numeric = zeros(3,3);
 for q=1:3
-    jac = der(:,:,q)*vtx;
+    jac = der(:,:,q)'*vtx;
     ijac = inv(jac);
     v = qwght(q) * det(jac);
-    ider = ijac*der(:,:,q);
+    ider = ijac*der(:,:,q)';
     intdd_numeric = intdd_numeric + v * (ider' * ider);
 end
 
