@@ -20,6 +20,8 @@ jobs:
       # Get MATLAB
       - name: Set up MATLAB
         uses: matlab-actions/setup-matlab@v1
+        with:
+          release: R2022a
 
       # Build the MEX
       - name: Build
