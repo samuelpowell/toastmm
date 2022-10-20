@@ -25,6 +25,7 @@ jobs:
 
       # Build the MEX
       - name: Build
+        shell: bash
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
               export CC=gcc-10
@@ -34,6 +35,7 @@ jobs:
           cd build
           cmake ../
           cmake --build . --target install --config Release
+
         
       - uses: actions/upload-artifact@v3
         with:
