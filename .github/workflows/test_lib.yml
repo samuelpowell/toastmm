@@ -1,0 +1,35 @@
+name: Toast Library Tests
+
+on:
+  pull_request:
+    types: [assigned, opened, synchronize, reopened]
+  push:
+    branches: [master]
+
+jobs:
+  buil_and_test:
+    name: Test library on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-20.04]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      # Build the MEX
+      - name: Build
+        run: |
+          mkdir build
+          cd build
+          cmake ../
+          cmake --build . --target install --config Release
+          cd ..
+        env:
+          CC:   gcc-10
+          CXX:  g++-10
+          
+      - name: Test
+        run: |
+          cd test
+          make

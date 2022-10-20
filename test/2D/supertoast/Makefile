@@ -1,7 +1,14 @@
 SHELL = /bin/bash
 TBIN = ../../../dist/bin
 
-all   :: ncg gn lbfgs fmod_clean
+testall_2D = ncg gn lbfgs fmod_clean
+
+# skip longer tests in CI
+ifeq ($(CI),true)
+	testall_2D = lbfgs
+endif
+
+all :: $(testall_2D)
 
 ncg   :: inv_ncg inv_ncg_tk1 inv_ncg_tv inv_ncg_huber
 gn    :: inv_gn inv_gn_tk1 inv_gn_tv inv_gn_huber
