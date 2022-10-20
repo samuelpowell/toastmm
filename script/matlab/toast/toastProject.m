@@ -26,10 +26,12 @@ function proj = toastProject(hMesh,mua,mus,ref,omega,qvec,mvec,solver,tol)
 % is, unused source-detector combinations are removed from the result.
 
 % Subsititute missing parameters with defaults
-if nargin < 8
-    solver = 'direct';
-elseif nargin < 9
+if nargin < 9
     tol = 1e-10;
+end
+
+if nargin < 8
+    solver = 'direct';   
 end
 
 % Calculate system matrix
