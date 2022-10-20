@@ -1,13 +1,13 @@
 # Toast-- Development Notes
 
-# TODO
+## TODO
 
  - Investigate `warning C4910` on MSVC - some declspec conflict
- - Look at fwdsolver_mw.h instantiation requirements, determine appropriate preprocessor gaurd (e.g. Clang?)
+ - Look at `fwdsolver_mw.h` instantiation requirements, determine appropriate preprocessor gaurd (e.g. Clang?)
  - MATLAB gmsh reader out of date
  - MATLAB complex outputs on QM
  - MATLAB flourescence example performance
- - MATLAB Fix element_integrals.m exmaple dimensionality problems
+ - MATLAB Fix `element_integrals.m` example dimensionality problems
  - Interleaved API permits shallow copy of various inputs in the MATLAB interface to reduce round-trip, exploit
  - Review element types in libfe, some contain unfinished defintions of operators and constants, remove
  - Move semantics for mathlib vectors and matrices
@@ -18,7 +18,7 @@
  - Default link list after make mesh appears arbitrary, resulting in enormous linklist/qmvec
  - Real qvec on forward solver crash
 
-# Perfromance
+## Perfromance
 
 - Bottlenecks
   - Mesh sparsity calculation heapsort (single-threaded), called when computing the system matrix for fields
