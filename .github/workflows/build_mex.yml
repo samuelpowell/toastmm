@@ -26,14 +26,15 @@ jobs:
       # Build the MEX
       - name: Build
         run: |
+          if [ "$RUNNER_OS" == "Linux" ]; then
+              export CC=gcc-10
+              export CXX=g++-10
+          fi
           mkdir build
           cd build
           cmake ../
           cmake --build . --target install --config Release
-        env:
-          CC:   gcc-10
-          CXX:  g++-10
-
+        
       - uses: actions/upload-artifact@v3
         with:
           name: toastmm-matlab-${{ runner.os }}
