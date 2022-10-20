@@ -16,8 +16,8 @@ To achieve these goals, the original codebase has been extensively modified. Det
 ## Compatibility
 
 The MATLAB interface is fully compatible with the Toast++ object-oriented interface, with the
-exception that OpenGL / Mesas based projection of images to a mesh is not supported. In
-certain circumstances Toast-- may employ different solvers that Toast++, and hence results
+exception that OpenGL / Mesa based projection of images to a mesh is not supported. In
+certain circumstances Toast-- may employ different solvers than Toast++, and hence results
 may not be exactly equiavelent. Any significant differences, or breakage of existing code, will
 be treated as a bug.
 
