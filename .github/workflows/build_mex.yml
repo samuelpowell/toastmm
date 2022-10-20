@@ -28,10 +28,13 @@ jobs:
           cd build
           cmake ../
           cmake --build . --target install --config Release
+        env:
+          CC:   gcc-10
+          CXX:  g++-10
 
       - uses: actions/upload-artifact@v3
         with:
-          name: toastmatlab-${{ runner.os }}
+          name: toastmm-matlab-${{ runner.os }}
           path: |
             dist/matlab
             
