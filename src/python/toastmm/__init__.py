@@ -7,5 +7,5 @@ from toastmm.mesh import gradient
 from toastmm.util import linesearch
 
 
-def Version():
+def version():
   return toastmod.Version()

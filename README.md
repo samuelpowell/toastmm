@@ -7,11 +7,22 @@ A toolbox for image reconstruction in diffuse optical tomography.
 Toast-- is a fork of the [Toast++](https://github.com/toastpp/toastpp) project which aims to: 
 
  1. Provide a drop-in replacement of the Toast++ MATLAB interface, and an updated Python interface.
- 2. Prioritise performance on larger problems on modern multi-core architectures.
- 3. Enhance maintainability by simplifying the codebase, and removing features not exposed by the MATLAB/Python interfaces.
- 4. Reduce external dependencies and update the build system to support compilation on modern compilers.
+ 2. Enhance maintainability by simplifying the codebase, and removing features not exposed by the MATLAB/Python interfaces.
+ 3. Reduce external dependencies and update the build system to support compilation on modern compilers.
+ 4. Prioritise performance on larger problems on modern multi-core architectures.
 
 To achieve these goals, the original codebase has been extensively modified. Details can be found in the project [history](https://github.com/samuelpowell/toastmm/blob/master/HISTORY.md).
+
+## Compatibility
+
+The MATLAB interface is fully compatible with the Toast++ object-oriented interface, with the
+exception that OpenGL / Mesas based projection of images to a mesh is not supported. In
+certain circumstances Toast-- may employ different solvers that Toast++, and hence results
+may not be exactly equiavelent. Any significant differences, or breakage of existing code, will
+be treated as a bug.
+
+The Python interface provides the same functionality as the PyToast interface, though the API
+differs in places. This interface is under development and should not be considered stable.
 
 ## Installation
 
