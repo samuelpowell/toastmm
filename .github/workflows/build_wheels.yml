@@ -28,7 +28,7 @@ jobs:
 
       - uses: actions/upload-artifact@v3
         with:
-          name: pytoast-${{ runner.os }}
+          name: toastmm-python-${{ runner.os }}
           path: |
             dist/python/*.whl
             dist/python/examples
