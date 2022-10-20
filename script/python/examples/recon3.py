@@ -33,7 +33,7 @@ beta = 0.01
 # Objective function
 def objective(proj,data,sd,logx):
     err_data = np.sum(np.power((data-proj)/sd, 2))
-    err_prior = regul.Value(logx)
+    err_prior = regul.value(logx)
     return err_data + err_prior
 
 
@@ -47,9 +47,9 @@ def objective_ls(logx):
     smua = scmua/cm
     skap = sckap/cm
     smus = 1/(3*skap) - smua
-    mua = basis_inv.Map('S->M', smua)
-    mus = basis_inv.Map('S->M', smus)
-    phi = mesh_inv.Fields(None, qvec, mua, mus, ref, freq)
+    mua = basis_inv.map('S->M', smua)
+    mus = basis_inv.map('S->M', smus)
+    phi = mesh_inv.fields(None, qvec, mua, mus, ref, freq)
     p = projection(phi, mvec)
     return objective(p, data, sd, logx)
 
@@ -73,7 +73,7 @@ def imerr(im1, im2):
     err = np.sum(np.power(im1-im2, 2))/np.sum(np.power(im2, 2))
     return err
 
-import toast
+import toastmm as ts
 
 # Set the file paths
 meshdir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "meshes", "2D")
@@ -99,17 +99,17 @@ mwidth = 2              # detector width
 # Generate target data
 
 # Set up mesh geometry
-mesh_fwd = toast.Mesh(meshfile1)
-mesh_fwd.ReadQM(qmfile)
-qvec = mesh_fwd.Qvec(type=qtype, shape=qprof, width=qwidth)
-mvec = mesh_fwd.Mvec(shape=mprof, width=mwidth, ref=refind)
-nlen = mesh_fwd.NodeCount()
+mesh_fwd = ts.Mesh(meshfile1)
+mesh_fwd.read_qm(qmfile)
+qvec = mesh_fwd.qvec(type=qtype, shape=qprof, width=qwidth)
+mvec = mesh_fwd.mvec(shape=mprof, width=mwidth, ref=refind)
+nlen = mesh_fwd.node_count()
 nqm = qvec.shape[1] * mvec.shape[1]
 ndat = nqm*2
 
 # Target parameters
-mua = mesh_fwd.ReadNim(muafile)
-mus = mesh_fwd.ReadNim(musfile)
+mua = mesh_fwd.read_nim(muafile)
+mus = mesh_fwd.read_nim(musfile)
 ref = np.ones(nlen) * refind
 
 # Parameter plotting ranges
@@ -119,7 +119,7 @@ mus_min = 1     # np.min(mus)
 mus_max = 4.5   # np.max(mus)
 
 # Solve forward problem
-phi = mesh_fwd.Fields(None, qvec, mua, mus, ref, freq)
+phi = mesh_fwd.fields(None, qvec, mua, mus, ref, freq)
 data = projection(phi, mvec)
 
 # Add noise
@@ -129,20 +129,20 @@ lnamp_tgt = data[0:nqm]
 phase_tgt = data[nqm:nqm*2]
 
 # Map target parameters to images for display
-basis_fwd = toast.Raster(mesh_fwd, grd)
-bmua_tgt = np.reshape(basis_fwd.Map('M->B', mua), grd)
-bmus_tgt = np.reshape(basis_fwd.Map('M->B', mus), grd)
+basis_fwd = ts.Raster(mesh_fwd, grd)
+bmua_tgt = np.reshape(basis_fwd.map('M->B', mua), grd)
+bmus_tgt = np.reshape(basis_fwd.map('M->B', mus), grd)
 
 
 # ---------------------------------------------------
 # Solve inverse problem
 
 # Set up mesh geometry
-mesh_inv = toast.Mesh(meshfile2)
-mesh_inv.ReadQM(qmfile)
-qvec = mesh_inv.Qvec(type=qtype, shape=qprof, width=qwidth)
-mvec = mesh_inv.Mvec(shape=mprof, width=mwidth, ref=refind)
-nlen = mesh_inv.NodeCount()
+mesh_inv = ts.Mesh(meshfile2)
+mesh_inv.read_qm(qmfile)
+qvec = mesh_inv.qvec(type=qtype, shape=qprof, width=qwidth)
+mvec = mesh_inv.mvec(shape=mprof, width=mwidth, ref=refind)
+nlen = mesh_inv.node_count()
 
 # Initial parameter estimates
 mua = np.ones(nlen) * 0.025
@@ -151,10 +151,10 @@ kap = 1/(3*(mua+mus))
 ref = np.ones(nlen) * refind
 
 # Solution basis
-basis_inv = toast.Raster(mesh_inv, grd)
+basis_inv = ts.Raster(mesh_inv, grd)
 
 # Initial projections
-phi = mesh_inv.Fields(None, qvec, mua, mus, ref, freq)
+phi = mesh_inv.fields(None, qvec, mua, mus, ref, freq)
 proj = projection(phi, mvec)
 lnamp = proj[0:nqm]
 phase = proj[nqm:nqm*2]
@@ -165,13 +165,13 @@ sd_phase = np.ones(phase.shape) * np.linalg.norm(phase_tgt-phase)
 sd = np.concatenate((sd_lnamp,sd_phase))
 
 # Map parameter estimates to solution basis
-bmua = basis_inv.Map('M->B', mua)
-bmus = basis_inv.Map('M->B', mus)
-bkap = basis_inv.Map('M->B', kap)
+bmua = basis_inv.map('M->B', mua)
+bmus = basis_inv.map('M->B', mus)
+bkap = basis_inv.map('M->B', kap)
 bcmua = bmua * cm
 bckap = bkap * cm
-scmua = basis_inv.Map('B->S', bcmua)
-sckap = basis_inv.Map('B->S', bckap)
+scmua = basis_inv.map('B->S', bcmua)
+sckap = basis_inv.map('B->S', bckap)
 
 # Vector of unknowns
 x = np.concatenate((scmua, sckap))
@@ -181,7 +181,7 @@ slen = int(x.shape[0]/2)
 # Create regularisation object
 #pdb.set_trace()
 #hreg = regul.Make ("TK1", hraster, logx, tau);
-regul = toast.Regul("TV", basis_inv, logx, tau, beta=beta)
+regul = ts.Regul("TV", basis_inv, logx, tau, beta=beta)
 
 # Initial error
 err0 = objective(proj, data, sd, logx)
@@ -202,39 +202,39 @@ plt.show()
 while itr <= itrmax and err > tolCG*err0 and errp-err > tolCG:
     errp = err
     
-    r = -toast.Gradient(mesh_inv.Handle(), basis_inv.Handle(),
+    r = -ts.gradient(mesh_inv, basis_inv,
                      qvec, mvec, mua, mus, ref, freq, data, sd)
     r = np.multiply(r, x)  # parameter scaling
 
-    rr = -regul.Gradient(logx)
+    rr = -regul.gradient(logx)
 
     r = r + rr
     
     plt.figure(2)
     plt.clf()
     plt.subplot(2,2,1)
-    im = plt.imshow (np.reshape (basis_inv.Map('S->B', rr[0:slen]), grd))
+    im = plt.imshow (np.reshape (basis_inv.map('S->B', rr[0:slen]), grd))
     im.axes.get_xaxis().set_visible(False)
     im.axes.get_yaxis().set_visible(False)
     plt.title("mua prior gradient")
     plt.colorbar()
 
     plt.subplot(2,2,2)
-    im = plt.imshow (np.reshape (basis_inv.Map('S->B', rr[slen:slen*2]), grd))
+    im = plt.imshow (np.reshape (basis_inv.map('S->B', rr[slen:slen*2]), grd))
     im.axes.get_xaxis().set_visible(False)
     im.axes.get_yaxis().set_visible(False)
     plt.title("kap prior gradient")
     plt.colorbar()
 
     plt.subplot(2,2,3)
-    im = plt.imshow (np.reshape (basis_inv.Map('S->B', r[0:slen]), grd))
+    im = plt.imshow (np.reshape (basis_inv.map('S->B', r[0:slen]), grd))
     im.axes.get_xaxis().set_visible(False)
     im.axes.get_yaxis().set_visible(False)
     plt.title("mua tot gradient")
     plt.colorbar()
 
     plt.subplot(2,2,4)
-    im = plt.imshow (np.reshape (basis_inv.Map('S->B', r[slen:slen*2]), grd))
+    im = plt.imshow (np.reshape (basis_inv.map('S->B', r[slen:slen*2]), grd))
     im.axes.get_xaxis().set_visible(False)
     im.axes.get_yaxis().set_visible(False)
     plt.title("kap tot gradient")
@@ -261,7 +261,7 @@ while itr <= itrmax and err > tolCG*err0 and errp-err > tolCG:
             d = s + d*beta
 
     delta_d = d.T @ d
-    step,err = toast.Linesearch(logx, d, step, err, objective_ls)
+    step,err = ts.linesearch(logx, d, step, err, objective_ls)
 
     logx = logx + d*step
     x = np.exp(logx)
@@ -270,11 +270,11 @@ while itr <= itrmax and err > tolCG*err0 and errp-err > tolCG:
     smua = scmua/cm
     skap = sckap/cm
     smus = 1/(3*skap) - smua
-    mua = basis_inv.Map('S->M', smua)
-    mus = basis_inv.Map('S->M', smus)
+    mua = basis_inv.map('S->M', smua)
+    mus = basis_inv.map('S->M', smus)
 
-    bmua = np.reshape(basis_inv.Map('S->B', smua), grd)
-    bmus = np.reshape(basis_inv.Map('S->B', smus), grd)
+    bmua = np.reshape(basis_inv.map('S->B', smua), grd)
+    bmus = np.reshape(basis_inv.map('S->B', smus), grd)
 
     erri = np.concatenate((erri, [err]))
     errmua = np.concatenate((errmua, [imerr(bmua, bmua_tgt)]))

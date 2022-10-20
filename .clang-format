@@ -1,0 +1,3 @@
+BasedOnStyle: Google
+ColumnLimit: 132
+BreakBeforeBraces: Linux
