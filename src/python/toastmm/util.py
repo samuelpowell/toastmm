@@ -1,4 +1,4 @@
-def Linesearch(x0, d, s0, p0, func):
+def linesearch(x0, d, s0, p0, func):
   sl = 0
   pl = p0
   sh = s0

@@ -65,7 +65,7 @@ class bdist_wheel_abi3(bdist_wheel):
 
 # Define the toast C extension
 #
-module1 = Extension('toast.toastmod',
+module1 = Extension('toastmm.toastmod',
                     include_dirs = inc_dirs,
                     library_dirs = lib_dirs,
                     libraries = lib_names,
@@ -95,7 +95,7 @@ setup(
         "demo": ["matplotlib"]
     },
     ext_modules = [module1],
-    packages=['toast'],
-    package_dir = {'toast': 'src/python/toast'},
+    packages=['toastmm'],
+    package_dir = {'toastmm': 'src/python/toastmm'},
     cmdclass={"bdist_wheel": bdist_wheel_abi3}
 )

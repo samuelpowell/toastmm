@@ -1,5 +1,5 @@
 import numpy as np
-from toast import toastmod
+from toastmm import toastmod
 from scipy import sparse
 
 
@@ -13,27 +13,27 @@ class Element:
     self.mesh = mesh
     self.elid = index
 
-  def Mesh(self):
+  def mesh(self):
     """Returns the mesh object the element is taken from.
     """
     return self.mesh
 
-  def Index(self):
+  def index(self):
     """Returns the element's index in the mesh (>= 0)
     """
     return self.elid
 
-  def Dof(self):
+  def dof(self):
     """Returns the the array of global degree of freedom indices for the element nodes.
     """
     return toastmod.elementDof(self.mesh.handle, self.elid)
 
-  def Size(self):
+  def size(self):
     """Returns the element size (area for 2D elements, volume for 3D elements).
     """
     return toastmod.elementSize(self.mesh.handle, self.elid)
 
-  def Region(self, val=None):
+  def region(self, val=None):
     """Returns or sets the element region index.
     """
     if val is None:
@@ -41,25 +41,25 @@ class Element:
     else:
       toastmod.elementSetRegion(self.mesh.handle, self.elid, val)
 
-  def Data(self):
+  def data(self):
     """Returns the geometry of the mesh element.
 
-    Syntax evtx,eidx,eltp = element.Data()
+    Syntax evtx,eidx,eltp = element.data()
 
     Return values:
       evtx: matrix of node coordinates
-      eidx: list of global node indices (see element.Dof)
+      eidx: list of global node indices (see element.dof)
       eltp: element type identifier
     """
     return toastmod.elementData(self.mesh.handle, self.elid)
 
-  def Mat(self, intstr, param=None, sideidx=-1):
+  def mat(self, intstr, param=None, sideidx=-1):
     """Returns an integrals of a combination of shape functions and shape function
     derivatives over the surface or interior of the element.
 
-    Syntax: mat = element.Mat(intstr)
-            mat = element.Mat(intstr, param=prm)
-            mat = element.Mat(intstr, sideidx=idx)
+    Syntax: mat = element.mat(intstr)
+            mat = element.mat(intstr, param=prm)
+            mat = element.mat(intstr, sideidx=idx)
 
     Parameters:
       intstr:  string defining the integral (see notes)
@@ -109,7 +109,7 @@ class Element:
       second parameter (sideidx) to the call to Mat, the integral can be performed over a
       single side of the element (whether boundary side or not):
       
-      elmat = el.Mat('BndFF',sideidx)
+      elmat = el.mat('BndFF',sideidx)
       
       where sideidx is the local side index (>= 1). 
       
@@ -119,11 +119,11 @@ class Element:
     """
     return toastmod.elementMat(self.mesh.handle, self.elid, intstr, param, sideidx)
 
-  def ShapeFun(self, pt, frame=0):
+  def shape_fun(self, pt, frame=0):
     """Return the shape functions for all element nodes at multiple points.
 
-    Syntax: fun = element.ShapeFun(pts)
-            fun = element.ShapeFun(pts, frame)
+    Syntax: fun = element.shape_fun(pts)
+            fun = element.shape_fun(pts, frame)
 
     Parameters:
       pts [real matrix d x np]:
@@ -153,5 +153,5 @@ class Element:
     """
     return toastmod.elementShapeF(self.mesh.handle, self.elid, pt, frame)
 
-  def ShapeDer(self, pt, frame=0):
+  def shape_der(self, pt, frame=0):
     return toastmod.elementShapeD(self.mesh.handle, self.elid, pt, frame)
