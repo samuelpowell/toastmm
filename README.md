@@ -13,7 +13,7 @@ Toast-- is a fork of the [Toast++](https://github.com/toastpp/toastpp) project w
 
 To achieve these goals, the original codebase has been extensively modified. Details can be found in the project [history](https://github.com/samuelpowell/toastmm/blob/master/HISTORY.md).
 
-## Compatibility
+## Compatibility with TOAST++
 
 The MATLAB interface is fully compatible with the Toast++ object-oriented interface, with the
 exception that OpenGL / Mesa based projection of images to a mesh is not supported. In
@@ -26,11 +26,14 @@ differs in places. This interface is under development and should not be conside
 
 ## Installation
 
-Pre-built binaries are provided for a number of platforms.
+Pre-built binaries are built for Windows x64, Linux x64, MacOS Intel and Apple Silicon (ARM).
 
 ### MATLAB
 
-The Matlab interface is built using MATLAB R2020a on Windows x64, Linux x64, and MacOS.
+The Matlab interface is built using MATLAB R2022a on Windows x64, Linux x64, and MacOS (Intel),
+and R2023b for MacOS (ARM). Note that when using an Apple Silicon device you should choose the
+pre-built binaries corresponding to the MATLAB version you are using, not the system architecture. 
+
 It is expected that the interface will work on newer versions (please report if this is not
 the case), but compilation from source *may* be required for older installations. Versions
 prior to R2018a are not supported (owing to changes in the complex numeric API).
@@ -52,7 +55,7 @@ installation permanent. Check your installation by running one of the included d
 
 ### Python
 
-The Python interface is built for Python >= v3.6.0 on Windows x64, Linux x64, and MacOS.
+The Python interface is built for Python >= v3.6.0 on Windows x64, Linux x64, and MacOS (Intel).
 
 To install, download a release for the appropriate platform an unzip the foler in a 
 convenient location. Each release includes both a Python wheel and some example scripts. It is recommended that you install the python module in a suitable
