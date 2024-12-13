@@ -64,7 +64,7 @@ int main (int argc, char *argv[])
 
     if (!ifs1 || !ifs2) {
         char cbuf[256];
-	sprintf (cbuf, "Could not open file: %s", vecname[!ifs1 ? 0 : 1]);
+	snprintf (cbuf, sizeof(cbuf), "Could not open file: %s", vecname[!ifs1 ? 0 : 1]);
 	print_error_and_exit(cbuf, 3);
     }
 
@@ -85,7 +85,7 @@ int main (int argc, char *argv[])
 	    if (!vec_diff) vec_diff = (diff != 0);
 	    if (diff > maxerr) {
 		char cbuf[256];
-		sprintf (cbuf, "Vectors differ in element %d", i+1);
+		snprintf (cbuf, sizeof(cbuf), "Vectors differ in element %d", i+1);
 		print_error_and_exit (cbuf, 1);
 	    }
 	}
@@ -106,7 +106,7 @@ int main (int argc, char *argv[])
 	    if (!vec_diff) vec_diff = (diff != 0);
 	    if (diff > maxerr) {
 		char cbuf[256];
-		sprintf (cbuf, "Vectors differ in element %d", i+1);
+		snprintf (cbuf, sizeof(cbuf), "Vectors differ in element %d", i+1);
 		print_error_and_exit (cbuf, 1);
 	    }
 	}

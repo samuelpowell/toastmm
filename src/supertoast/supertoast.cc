@@ -528,13 +528,13 @@ void OutputProgramInfo ()
     pp.Lineout ("| diffusion equation from frequency-domain data   |");
     pp.Lineout ("+-------------------------------------------------+");
     pp.Lineout (VERSION_STRING);
-    sprintf (cbuf, "Executed %s", ctime(&tme));
+    snprintf (cbuf, sizeof(cbuf), "Executed %s", ctime(&tme));
     if ((host = getenv("HOST")))
-        sprintf (cbuf+strlen(cbuf), "on host %s ", host);
-    sprintf (cbuf+strlen(cbuf), "(PID %d)", getpid());
+        snprintf (cbuf+strlen(cbuf), sizeof(cbuf)-strlen(cbuf), "on host %s ", host);
+    snprintf (cbuf+strlen(cbuf), sizeof(cbuf)-strlen(cbuf), "(PID %d)", getpid());
     pp.Lineout (cbuf);
     if (getcwd (cwd, 250)) {
-        sprintf (cbuf, "CWD: %s", cwd);
+        snprintf (cbuf, sizeof(cbuf), "CWD: %s", cwd);
 	pp.Lineout (cbuf);
     }
     pp.Lineout ("===================================================");
@@ -866,7 +866,7 @@ void SelectInitialParams (const Mesh &mesh, Solution &msol)
 		cout << "\nGlobal value:\n>> ";
 		cin >> prm;
 		param[p] = prm;
-		sprintf (cbuf, "HOMOG %f", prm);
+		snprintf (cbuf, sizeof(cbuf), "HOMOG %f", prm);
 		break;
 	    case 2:
 		nreg = ScanRegions (mesh, nregnode);
@@ -877,7 +877,7 @@ void SelectInitialParams (const Mesh &mesh, Solution &msol)
 			cout << "Value for region " << i << " (" << nregnode[i]
 			     << " nodes):\n>> ";
 			cin >> prm;
-			sprintf (cbuf+strlen(cbuf), " %f", prm);
+			snprintf (cbuf+strlen(cbuf), sizeof(cbuf)-strlen(cbuf), " %f", prm);
 			for (j = 0; j < mesh.nlen(); j++)
 			    if (mesh.nlist[j].Region() == i)
 				param[p][j] = prm;
@@ -990,14 +990,14 @@ void SelectBasis (IVector &gdim, IVector &bdim)
 
     // write back
     if (dim > 2) {
-        sprintf (cbuf, "%d %d %d", gdim[0], gdim[1], gdim[2]);
+        snprintf (cbuf, sizeof(cbuf), "%d %d %d", gdim[0], gdim[1], gdim[2]);
 	pp.PutString ("GRID", cbuf);
-	sprintf (cbuf, "%d %d %d", bdim[0], bdim[1], bdim[2]);
+	snprintf (cbuf, sizeof(cbuf), "%d %d %d", bdim[0], bdim[1], bdim[2]);
 	pp.PutString ("BASIS", cbuf);
     } else {
-        sprintf (cbuf, "%d %d", gdim[0], gdim[1]);
+        snprintf (cbuf, sizeof(cbuf), "%d %d", gdim[0], gdim[1]);
 	pp.PutString ("GRID", cbuf);
-	sprintf (cbuf, "%d %d", bdim[0], bdim[1]);
+	snprintf (cbuf, sizeof(cbuf), "%d %d", bdim[0], bdim[1]);
 	pp.PutString ("BASIS", cbuf);
     }
 }

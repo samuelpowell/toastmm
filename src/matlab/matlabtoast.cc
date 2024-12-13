@@ -12,9 +12,9 @@ void AssertArg (bool cond, const char *func, int argno, const char *errmsg)
     if (!cond) {
 	char str[1024];
 	if (argno)
-	    sprintf (str, "%s: argument %d: %s.", func, argno, errmsg);
+	    snprintf (str, sizeof(str), "%s: argument %d: %s.", func, argno, errmsg);
 	else
-	    sprintf (str, "%s: %s.", func, errmsg);
+	    snprintf (str, sizeof(str), "%s: %s.", func, errmsg);
 	mexErrMsgTxt (str);
     }
 }

@@ -76,7 +76,7 @@ int MLEMSolver::Solve(const RVector & data,
     {
 	fwdOperator(result, y);
 	char fname[100];
-	sprintf(fname, "fwdOp_on_result%d.dat", i);
+	snprintf(fname, sizeof(fname), "fwdOp_on_result%d.dat", i);
 	WriteBinaryData(y, fname);
 	for (int j=0; j<y.Dim(); ++j)
 	{
@@ -187,7 +187,7 @@ void MLEMSolver::adjOperator(RVector & b)
 	tmpImg.Copy(b, 0, i*nImagePts, nImagePts);	
 	projectors[i]->projectImageToField(tmpImg, tmpFld);
 	char fname[100];
-	sprintf(fname, "tmpFld%d.dat", i);
+	snprintf(fname, sizeof(fname), "tmpFld%d.dat", i);
 	WriteBinaryData(tmpFld, fname);
 	FEMSolver.CalcField (/*FEMMesh,*/ tmpFld, adjPhi_f);
 	raster->Map_MeshToGrid(adjPhi_f, gAdjPhi_f);

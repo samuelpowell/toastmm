@@ -756,7 +756,7 @@ void SelectInitialParams (ParamParser &pp, const Mesh &mesh, Solution &msol)
 		cout << "\nGlobal value:\n>> ";
 		cin >> prm;
 		param[p] = prm;
-		sprintf (cbuf, "HOMOG %f", prm);
+		snprintf (cbuf, sizeof(cbuf), "HOMOG %f", prm);
 		break;
 	    case 2:
 		nreg = ScanRegions (mesh, nregnode);
@@ -767,7 +767,7 @@ void SelectInitialParams (ParamParser &pp, const Mesh &mesh, Solution &msol)
 			cout << "Value for region " << i << " (" << nregnode[i]
 			     << " nodes):\n>> ";
 			cin >> prm;
-			sprintf (cbuf+strlen(cbuf), " %f", prm);
+			snprintf (cbuf+strlen(cbuf), sizeof(cbuf) - strlen(cbuf), " %f", prm);
 			for (j = 0; j < mesh.nlen(); j++)
 			    if (mesh.nlist[j].Region() == i)
 				param[p][j] = prm;

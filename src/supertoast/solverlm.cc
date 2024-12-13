@@ -1406,11 +1406,11 @@ void SolverLM::Solve (CFwdSolver &FWS, const Raster &raster,
 		RVector vg(glen);
 		raster.Map_SolToGrid (tmp1, vg);
 		if (!count) ImageScale (vg, muamin, muamax);
-		sprintf (cbuf, "images/update_mua_%03d.ppm", count);
+		snprintf (cbuf, sizeof(cbuf), "images/update_mua_%03d.ppm", count);
 		WritePPM (vg, raster.GDim(), &muamin, &muamax, cbuf);
 		raster.Map_SolToGrid (tmp2, vg);
 		if (!count) ImageScale (vg, kappamin, kappamax);
-		sprintf (cbuf, "images/update_kappa_%03d.ppm", count);
+		snprintf (cbuf, sizeof(cbuf), "images/update_kappa_%03d.ppm", count);
 		WritePPM (vg, raster.GDim(), &kappamin, &kappamax, cbuf);
 		count++;
 	    }

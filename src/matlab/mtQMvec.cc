@@ -92,7 +92,7 @@ void MatlabToast::Mvec (int nlhs, mxArray *plhs[], int nrhs,
 		int len = (int) (mxGetM(prhs[3])*mxGetN(prhs[3]));
 		if ((len != 1 && len != n) || !mxIsDouble(prhs[3])) {
 			char cbuf[256];
-			sprintf (cbuf, "Mvec: parameter 3: expected double scalar or double vector of length %d", n);
+			snprintf (cbuf, sizeof(cbuf), "Mvec: parameter 3: expected double scalar or double vector of length %d", n);
 			mexErrMsgTxt (cbuf);
 		}
 		if (len == 1) {

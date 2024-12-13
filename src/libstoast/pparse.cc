@@ -81,7 +81,7 @@ bool ParamParser::GetString (const char *cat, char *str)
 void ParamParser::PutString (const char *cat, const char *str)
 {
     char cbuf[256];
-    sprintf (cbuf, "%s = %s", cat, str);
+    snprintf (cbuf, sizeof(cbuf), "%s = %s", cat, str);
     Lineout (cbuf);
 }
 
@@ -95,7 +95,7 @@ bool ParamParser::GetReal (const char *cat, double &val)
 void ParamParser::PutReal (const char *cat, double val)
 {
     char cbuf[256];
-    sprintf (cbuf, "%s = %g", cat, val);
+    snprintf (cbuf, sizeof(cbuf), "%s = %g", cat, val);
     Lineout (cbuf);
 }
 
@@ -109,7 +109,7 @@ bool ParamParser::GetInt (const char *cat, int &val)
 void ParamParser::PutInt (const char *cat, int val)
 {
     char cbuf[256];
-    sprintf (cbuf, "%s = %d", cat, val);
+    snprintf (cbuf, sizeof(cbuf), "%s = %d", cat, val);
     Lineout (cbuf);
 }
 
@@ -125,6 +125,6 @@ bool ParamParser::GetBool(const char *cat, bool &val)
 void ParamParser::PutBool (const char *cat, bool val)
 {
     char cbuf[256];
-    sprintf (cbuf, "%s = %s", cat, val ? "TRUE":"FALSE");
+    snprintf (cbuf, sizeof(cbuf), "%s = %s", cat, val ? "TRUE":"FALSE");
     Lineout (cbuf);
 }

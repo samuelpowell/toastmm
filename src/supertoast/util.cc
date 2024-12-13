@@ -204,7 +204,7 @@ void WritePPMArray (const RVector *img, const IVector &gdim, int nimg,
 	break;
     }
     for (int i = 0; i < nimg; i++) {
-	sprintf (fname, "%s_%03d.ppm", rootname, i);
+	snprintf (fname, sizeof(fname), "%s_%03d.ppm", rootname, i);
 	WritePPM (img[i], gdim, scalemin, scalemax, fname);
     }
 }

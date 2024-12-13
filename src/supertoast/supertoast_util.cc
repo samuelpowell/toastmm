@@ -31,7 +31,7 @@ void WriteJacobian (const RMatrix *J, const Raster &raster,
     if (dim != 2) { // for now, just dump the whole thing
 	for (i = 0; i < J->nRows(); i++) {
 	    char cbuf[256];
-	    sprintf (cbuf, "pmdf_%03d.dat", i);
+	    snprintf (cbuf, sizeof(cbuf), "pmdf_%03d.dat", i);
 	    ofstream ofs (cbuf);
 	    ofs << J->Row(i) << endl;
 	}
