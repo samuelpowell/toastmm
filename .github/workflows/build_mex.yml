@@ -30,6 +30,12 @@ jobs:
         with:
           release: R2022a
 
+      - uses: apple-actions/import-codesign-certs@v3
+        if: matrix.os == 'macos-14' || matrix.os == 'macos-13'
+        with: 
+          p12-file-base64: ${{ secrets.APPLE_CERTIFICATES_P12 }}
+          p12-password: ${{ secrets.APPLE_CERTIFICATES_P12_PASSWORD }}
+
       # Build the MEX
       - name: Build
         shell: bash
@@ -43,10 +49,28 @@ jobs:
           cmake ../
           cmake --build . --target install --config Release
 
-        
+      # Code sign and archive on MacOS
+      - name: Code sign, archive and notarize
+        if: matrix.os == 'macos-14' || matrix.os == 'macos-13'
+        env:
+          APPLE_CODESIGN_IDENTITY: ${{ secrets.APPLE_CODESIGN_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+          RUNNER_OS: ${{ runner.os }}
+          RUNNER_ARCH: ${{ runner.arch }}
+        run: |
+          MEX_FILE=$(ls dist/matlab/toast/*.mex*)
+          codesign --deep --force --verify --verbose --timestamp --sign "${APPLE_CODESIGN_IDENTITY}" --options runtime ${MEX_FILE}
+          zip -r toastmm-matlab-${RUNNER_OS}-${RUNNER_ARCH}-mex.zip ${MEX_FILE}
+          xcrun notarytool submit --wait --apple-id "${APPLE_ID}" --team-id "${APPLE_TEAM_ID}" --password "${APPLE_ID_PASSWORD}" toastmm-matlab-${RUNNER_OS}-${RUNNER_ARCH}-mex.zip
+          
+      # Archive and upload
       - uses: actions/upload-artifact@v3
         with:
           name: toastmm-matlab-${{ runner.os }}-${{ runner.arch }}
           path: |
             dist/matlab
+
+
             

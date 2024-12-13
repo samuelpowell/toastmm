@@ -103,7 +103,9 @@ python -m pip wheel .
 
 The result will be a wheel file called `toastmm-<ver>-cp36-abi3-<platform>.whl` in the root directory. The additional files included with the CI build distribution are located in `script/python`.
 
+## Acknowledgements
 
+Code signing and notarisation kindly supported by [Gowerlabs](https://www.gowerlabs.co.uk).
 
 
 
