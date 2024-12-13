@@ -60,7 +60,8 @@ jobs:
           RUNNER_OS: ${{ runner.os }}
           RUNNER_ARCH: ${{ runner.arch }}
         run: |
-          codesign --deep --force --verify --verbose --timestamp --sign "${APPLE_CODESIGN_IDENTITY}" --options runtime dist/matlab/toast/*.mex*
+          security find-identity
+          codesign --deep --force --verify --verbose --timestamp --sign "Developer ID Application: Gowerlabs Ltd (PC5245M773)" --options runtime dist/matlab/toast/*.mex*
           cd dist/matlab
           zip -r toastmm-matlab-${RUNNER_OS}-${$RUNNER_ARCH}.zip *
           xcrun notarytool submit --wait --apple-id ${APPLE_ID} --team-id ${APPLE_TEAM_ID} --password ${APPLE_ID_PASSWORD} toastmm-matlab-${RUNNER_OS}-${$UNNER_ARCH}.zip
