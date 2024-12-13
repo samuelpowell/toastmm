@@ -78,7 +78,7 @@ varargout{1} = handles.output;
 %% ===========================================================
 
 function prm = load_target(prm)
-meshdir = '../../../test/3D/meshes/';
+meshdir = '../meshes/3D/';
 meshfile = 'cyl4_blobs.msh';
 qmfile = prm.meas.qmfile;
 prm.user.target.mesh = toastMesh([meshdir meshfile]);
@@ -114,7 +114,7 @@ prm.data.phase = imag(lndata);
 
 function init(handles)
 
-meshdir = '../../../test/3D/meshes/';
+meshdir = './';
 prm = toastParam;
 %prm.basis.meshfile = 'vox32_2blobs.msh';
 %prm.basis.bdim = [25 30 20];
