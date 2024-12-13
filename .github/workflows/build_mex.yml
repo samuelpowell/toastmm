@@ -60,22 +60,14 @@ jobs:
           RUNNER_OS: ${{ runner.os }}
           RUNNER_ARCH: ${{ runner.arch }}
         run: |
-          security find-identity
-          codesign --deep --force --verify --verbose --timestamp --sign "${APPLE_CODESIGN_IDENTITY}" --options runtime dist/matlab/toast/*.mex*
-          cd dist/matlab
-          zip -r toastmm-matlab-${RUNNER_OS}-${RUNNER_ARCH}.zip *
-          xcrun notarytool submit --wait --apple-id "${APPLE_ID}" --team-id "${APPLE_TEAM_ID}" --password "${APPLE_ID_PASSWORD}" toastmm-matlab-${RUNNER_OS}-${RUNNER_ARCH}.zip
-          xcrun stapler staple -v toastmm-matlab-${RUNNER_OS}-${RUNNER_ARCH}.zip
+          MEX_FILE=$(ls dist/matlab/toast/*.mex*)
+          codesign --deep --force --verify --verbose --timestamp --sign "${APPLE_CODESIGN_IDENTITY}" --options runtime ${MEX_FILE}
+          zip -r toastmm-matlab-${RUNNER_OS}-${RUNNER_ARCH}-mex.zip ${MEX_FILE}
+          xcrun notarytool submit --wait --apple-id "${APPLE_ID}" --team-id "${APPLE_TEAM_ID}" --password "${APPLE_ID_PASSWORD}" toastmm-matlab-${RUNNER_OS}-${RUNNER_ARCH}-mex.zip
+          xcrun stapler staple -v ${MEX_FILE}
 
+      # Archive and upload
       - uses: actions/upload-artifact@v3
-        if: matrix.os == 'macos-14' || matrix.os == 'macos-13'
-        with:
-          name: toastmm-matlab-${{ runner.os }}-${{ runner.arch }}
-          path: |
-            dist/matlab/toastmm-matlab-${{ runner.os }}-${{ runner.arch }}.zip
-
-      - uses: actions/upload-artifact@v3
-        if: matrix.os != 'macos-14' && matrix.os != 'macos-13'
         with:
           name: toastmm-matlab-${{ runner.os }}-${{ runner.arch }}
           path: |
