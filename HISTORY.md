@@ -1,5 +1,11 @@
 # Toast-- Development History
 
+
+## v0.9.1
+
+ - Add build for Apple Silicon
+ - Bump CI
+
 ## v0.9.0
 
 Initial release:
