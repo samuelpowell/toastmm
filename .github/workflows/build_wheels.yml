@@ -12,7 +12,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-20.04, windows-2019, macos-11]
+        os: [ubuntu-20.04, windows-2019, macos-13]
 
     steps:
       - uses: actions/checkout@v3
@@ -28,7 +28,7 @@ jobs:
 
       - uses: actions/upload-artifact@v3
         with:
-          name: toastmm-python-${{ runner.os }}
+          name: toastmm-python-${{ runner.os }}-${{ runner.arch }}
           path: |
             dist/python/*.whl
             dist/python/examples
