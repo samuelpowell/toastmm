@@ -13,7 +13,7 @@
 //
 #define TOASTMM_VER_MAJOR 0
 #define TOASTMM_VER_MINOR 9
-#define TOASTMM_VER_PATCH 0
+#define TOASTMM_VER_PATCH 1
 #define TOASTMM_VER_SUFFIX "-dev"
 #define TOASTMM_VER_STRING "0.9.1-dev"
 
