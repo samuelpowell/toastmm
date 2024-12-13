@@ -115,11 +115,11 @@ int MuaSolver::Solve(const RVector & data,
 	IVector imgDim = projectors[0]->getImageDim();
 	for (int j=0; j<nQ; ++j)
 	{
-	    sprintf(fname, "solnexcit_data_iter%d_img%d.pgm", i, j);
+	    snprintf(fname, sizeof(fname), "solnexcit_data_iter%d_img%d.pgm", i, j);
 	    im.Copy(Fx, 0, j*nImagePts, nImagePts);
 	    WritePGM(im, imgDim, fname);
 
-	    sprintf(fname, "excit_err_data_iter%d_img%d.pgm", i, j);
+	    snprintf(fname, sizeof(fname), "excit_err_data_iter%d_img%d.pgm", i, j);
 	    im.Copy(data-Fx, 0, j*nImagePts, nImagePts);
 	    WritePGM(im, imgDim, fname);
 	}
@@ -134,7 +134,7 @@ int MuaSolver::Solve(const RVector & data,
 	    im.Copy(gResult, 0, slice*gDim[0]*gDim[1], gDim[0]*gDim[1]);
 	    append(soln, im);
 	}
-	sprintf(fname, "mua_soln_iter%d_slices.dat", i);
+	snprintf(fname, sizeof(fname), "mua_soln_iter%d_slices.dat", i);
 	WriteBinaryData(soln, fname);
     }
 

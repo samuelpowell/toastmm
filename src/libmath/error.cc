@@ -45,7 +45,7 @@ void SetErrorhandler (void (*ErrorFunc)(char*))
 MATHLIB void Error (const char *name, const char *file, int line)
 {
     char cbuf[500];
-    sprintf (cbuf, "**** Error in module mathlib ****\nIn %s\nFile %s line %d\n"
+    snprintf (cbuf, sizeof(cbuf), "**** Error in module mathlib ****\nIn %s\nFile %s line %d\n"
 	, name, file, line);
     Errorhandler (cbuf);
 }
@@ -67,7 +67,7 @@ MATHLIB void Error (const char *name, const char *file, int line, const char *ms
 MATHLIB void Error_Undef (const char *name, const char *file, int line)
 {
     char cbuf[500];
-    sprintf (cbuf, "#########################\nERROR IN LIBFE3:\nFunction not implemented:\n%s\n%s, %d\n#########################\n",
+    snprintf (cbuf, sizeof(cbuf), "#########################\nERROR IN LIBFE3:\nFunction not implemented:\n%s\n%s, %d\n#########################\n",
 	     name, file, line);
     Errorhandler (cbuf);
 }
@@ -169,7 +169,7 @@ void SetVersion (const char *vstr)
 
 const char *Version (const char *type, const char *date)
 {
-    sprintf (fullversionstr, "TOAST-- distribution [%s] - Build %s\n", type, date);
+    snprintf (fullversionstr, sizeof(fullversionstr), "TOAST-- distribution [%s] - Build %s\n", type, date);
 #ifdef TOAST_THREAD
     strcat (fullversionstr, "Running parallel (pthreads) version\n");
 #endif

@@ -81,7 +81,7 @@ void MatlabFDOT::MakeProjectorList (int nlhs, mxArray *plhs[],
 	ctp = CAMTYPE_ORTHO;
     } else {
 	char cbuf[256];
-	sprintf (cbuf, "Camera type %s not supported", str);
+	snprintf (cbuf, sizeof(cbuf), "Camera type %s not supported", str);
 	mexErrMsgTxt (cbuf);
     }
 

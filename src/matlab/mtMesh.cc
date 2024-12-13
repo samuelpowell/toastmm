@@ -551,7 +551,7 @@ void MatlabToast::WriteQM (int nlhs, mxArray *plhs[], int nrhs,
 
 	if (nq != lnk.nRows() || nm != lnk.nCols()) {
 	    char cbuf[256];
-	    sprintf (cbuf, "Invalid dimension (was: %d x %d, expected %d x %d)",
+	    snprintf (cbuf, sizeof(cbuf),"Invalid dimension (was: %d x %d, expected %d x %d)",
 		     lnk.nCols(), lnk.nRows(), nm, nq);
 	    ASSERTARG(0, 4, cbuf);
 	}
