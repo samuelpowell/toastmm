@@ -55,7 +55,7 @@ jobs:
         if: matrix.os == 'macos-14' || matrix.os == 'macos-13'
         run: |
           MEX_FILE=$(ls dist/matlab/toast/*.mex*)
-          install_name_tool -add_rpath @exectuable_path/../../extern/bin/maca64 ${MEX_FILE}   
+          install_name_tool -add_rpath @executable_path/../../extern/bin/maca64 ${MEX_FILE}   
 
       # Code sign and archive on MacOS
       - name: Code sign, archive and notarize
