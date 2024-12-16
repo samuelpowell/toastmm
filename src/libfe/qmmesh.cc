@@ -184,6 +184,8 @@ void QMMesh::InitM ()
 		    InitTophatWeight (Boundary(), P[i], width[i]);
 		    weightfunc = TophatWeight;
 		    break;
+		default:
+			break;
 		}
 	        profile[i].New (nbnd());
 		RVector pprm(Boundary()->ParamDim());

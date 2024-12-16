@@ -11,7 +11,7 @@
 
 typedef enum {
     PROFILE_POINT,
-    PROFILE_GAUSSIAN,
+    // PROFILE_GAUSSIAN,        // SP: apparently unused in core lib
     PROFILE_COSINE,
     PROFILE_TOPHAT
 } MProfileType;

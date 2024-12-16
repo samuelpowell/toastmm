@@ -206,6 +206,8 @@ void Mvec_engine (task_data *td)
 	case PROF_COMPLETETRIG:
 	    m = CompleteTrigSourceVector (*mesh, i);
 	    break;
+	default:
+		xERROR("Unknown source profile");
 	}
 	if (ref) {
 	    RVector &rref = *ref;
