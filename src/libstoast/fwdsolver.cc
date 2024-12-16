@@ -1126,6 +1126,9 @@ void TFwdSolver<T>::WriteParams (ParamParser &pp)
     case DATA_LOG:
 	pp.PutString ("DATASCALE", "LOG");
 	break;
+    default:
+        xERROR("Unkown data scaling");
+        break;
     }
 
     if (solvertp == LSOLVER_DIRECT) {
@@ -1157,6 +1160,10 @@ void TFwdSolver<T>::WriteParams (ParamParser &pp)
 	    pp.PutString ("LINSOLVER_PRECON", "ICH"); break;
 	case PRECON_DILU:
 	    pp.PutString ("LINSOLVER_PRECON", "DILU"); break;
+    case PRECON_CG_MULTIGRID:
+        pp.PutString ("LINSOLVER_PRECON", "CG_MULTIGRID"); break;
+    case PRECON_ILU:
+        pp.PutString ("LINSOLVER_PRECON", "ILU"); break;
 	}
     }
 }

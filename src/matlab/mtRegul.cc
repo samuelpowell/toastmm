@@ -66,10 +66,10 @@ void MatlabToast::Regul (int nlhs, mxArray *plhs[], int nrhs,
 	        CopyVector (x0, field);
 	    field = mxGetField(regp,0,"prior");
 	    if (field) {
-		if (subfield = mxGetField (field, 0, "refimg")) {
+		if ((subfield = mxGetField (field, 0, "refimg"))) {
 		    CopyVector (kaprefimg, subfield);
 		    brefimg = true;
-		} else if (subfield = mxGetField (field,0,"refname")) {
+		} else if ((subfield = mxGetField (field,0,"refname"))) {
 		    mxGetString (subfield, cbuf, 256);
 		    if (cbuf[0]) {
 			ifstream ifs(cbuf);
@@ -153,7 +153,7 @@ void MatlabToast::Regul (int nlhs, mxArray *plhs[], int nrhs,
 	    if (field) field = mxGetField (field,0,"beta");
 	    if (field) beta = mxGetScalar(field);
 	} else { // read TV parameters from key/value list
-	    for (prm = 0; field = mxGetCell (prhs[4], prm); prm+=2) {
+	    for (prm = 0; (field = mxGetCell (prhs[4], prm)); prm+=2) {
 	        AssertArg_Char (field, __func__, 5);
 		mxGetString (field, cbuf, 256);
 		if (!strcasecmp (cbuf, "Beta")) {
@@ -197,7 +197,7 @@ void MatlabToast::Regul (int nlhs, mxArray *plhs[], int nrhs,
 	    if (field) field = mxGetField(field,0,"xs");
 	    if (field) CopyVector (xs, field);
 	} else { // read TK0 parameters from key/value list
-	    for (prm = 0; field = mxGetCell (prhs[4], prm); prm+=2) {
+	    for (prm = 0; (field = mxGetCell (prhs[4], prm)); prm+=2) {
 		AssertArg_Char (field, __func__, 5);
 		mxGetString (field, cbuf, 256);
 		if (!strcasecmp (cbuf, "Xs")) {
@@ -255,7 +255,7 @@ void MatlabToast::Regul (int nlhs, mxArray *plhs[], int nrhs,
 	    if (field) field = mxGetField(field,0,"eps");
 	    if (field) eps = mxGetScalar(field);
 	} else { // read Huber parameters from argument list
-	    for (prm = 0; field = mxGetCell (prhs[4], prm); prm+=2) {
+	    for (prm = 0; (field = mxGetCell (prhs[4], prm)); prm+=2) {
 	        AssertArg_Char (field, __func__, 5);
 		mxGetString (field, cbuf, 256);
 		if (!strcasecmp (cbuf, "Eps")) {

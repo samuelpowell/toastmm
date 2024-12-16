@@ -84,8 +84,8 @@ classdef toastSolver < handle
     methods (Access=protected)
         function prj = project (obj,logx)
             x = exp(logx);
-            scmua = x(1:size(x)/2);
-            sckap = x(size(x)/2+1:end);
+            scmua = x(1:size(x,1)/2);
+            sckap = x(size(x,1)/2+1:end);
             cmua = obj.lprm.hBasis.Map ('S->M', scmua);
             ckap = obj.lprm.hBasis.Map ('S->M', sckap);
             mua = cmua .* (obj.lprm.ref/obj.c0);
@@ -98,8 +98,8 @@ classdef toastSolver < handle
         % =====================================================================
         
         function g = gradient(obj,x)
-            mua = obj.lprm.hBasis.Map ('S->M', x(1:size(x)/2)) .* (obj.lprm.ref/obj.c0);
-            kap = obj.lprm.hBasis.Map ('S->M', x(size(x)/2+1:end)) .* (obj.lprm.ref/obj.c0);
+            mua = obj.lprm.hBasis.Map ('S->M', x(1:size(x,1)/2)) .* (obj.lprm.ref/obj.c0);
+            kap = obj.lprm.hBasis.Map ('S->M', x(size(x,1)/2+1:end)) .* (obj.lprm.ref/obj.c0);
             mus = 1./(3*kap) - mua;
                 
             g = -toastGradient (obj.lprm.hMesh, obj.lprm.hBasis, obj.lprm.qvec, obj.lprm.mvec, ...
@@ -114,8 +114,8 @@ classdef toastSolver < handle
         % =====================================================================
         
         function J = jacobian(obj,x)
-            mua = obj.lprm.hBasis.Map ('S->M', x(1:size(x)/2)) .* (obj.lprm.ref/obj.c0);
-            kap = obj.lprm.hBasis.Map ('S->M', x(size(x)/2+1:end)) .* (obj.lprm.ref/obj.c0);
+            mua = obj.lprm.hBasis.Map ('S->M', x(1:size(x,1)/2)) .* (obj.lprm.ref/obj.c0);
+            kap = obj.lprm.hBasis.Map ('S->M', x(size(x,1)/2+1:end)) .* (obj.lprm.ref/obj.c0);
             mus = 1./(3*kap) - mua;
             
             % Construct the Jacobian

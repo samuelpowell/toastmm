@@ -42,14 +42,15 @@ function toast_setup()
     assertdir (fullfile(toastdir, 'toast'));
     assertdir (fullfile(toastdir, 'utilities'));
     assertdir (fullfile(toastdir, 'demos'));
-    assertdir (fullfile(toastdir, 'html'));
+    assertdir (fullfile(toastdir, 'docs'));
     assertfile(fullfile(toastdir, 'toast', ['toastmex.' mexext]));
     
     % Add all directories under the script/matlab node   
     toastdir_core = fullfile(toastdir, 'toast');
     toastdir_util = fullfile(toastdir, 'utilities');
     toastdir_demo = fullfile(toastdir, 'demos');
-    toast_paths = {toastdir_demo, toastdir_util, toastdir_core};
+    toastdir_docs = fullfile(toastdir, 'docs');
+    toast_paths = {toastdir_demo, toastdir_util, toastdir_core, toastdir_docs};
 
     for i = 1:length(toast_paths)   
         disp(['Adding search path ' toast_paths{i}]);

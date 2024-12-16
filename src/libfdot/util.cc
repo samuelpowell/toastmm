@@ -964,7 +964,7 @@ void ReadData (char *fname, RVector &data)
     {
 	data[i] = (double)(cbuf[i]);
     }
-    delete cbuf;
+    delete[] cbuf;
     ifs.close();
 }
 

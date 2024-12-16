@@ -1841,6 +1841,9 @@ void SolverLM_CW_MW::WriteParams (ParamParser &pp)
     case LM_HSCALE_DISTANCE:
 	pp.PutString ("LM_HESS_SCALING", "LM_HSCALE_DISTANCE");
 	break;
+	case LM_HSCALE_NONE:
+	pp.PutString ("LM_HESS_SCALING", "LM_HSCALE_NONE");
+	break;
     }
 
     pp.PutBool ("LM_LINESEARCH", do_linesearch);

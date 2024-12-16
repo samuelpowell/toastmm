@@ -223,8 +223,8 @@ while (itr <= itrmax) && (err > tolGN*err0) && (errp-err > tolGN)
     x = exp(logx);
     
     % Map parameters back to mesh
-    scmua = x(1:size(x)/2);
-    sckap = x(size(x)/2+1:size(x));
+    scmua = x(1:size(x,1)/2);
+    sckap = x(size(x,1)/2+1:size(x,1));
     smua = scmua/cm;
     skap = sckap/cm;
     smus = 1./(3*skap) - smua;

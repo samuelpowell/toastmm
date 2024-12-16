@@ -179,8 +179,8 @@ while (itr <= itrmax) && (err > tolCG*err0) && (errp-err > tolCG)
     x = exp(logx);
     
     % Map parameters back to mesh
-    cmua = x(1:size(x)/2);
-    ckap = x(size(x)/2+1:size(x));
+    cmua = x(1:size(x,1)/2);
+    ckap = x(size(x,1)/2+1:size(x,1));
     mua = cmua/cm;
     kap = ckap/cm;
     mus = 1./(3*kap) - mua;

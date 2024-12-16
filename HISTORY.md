@@ -1,5 +1,8 @@
 # Toast-- Development History
 
+## v0.9.2
+
+ - Cleanup (mainline) warning on MacOS
 
 ## v0.9.1
 

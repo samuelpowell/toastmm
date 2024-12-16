@@ -984,6 +984,9 @@ void SelectData (DataScale dscale, int nqm, int nlambda, const RVector &wlength,
 	    pp.PutString (tag, cbuf);
 	    ReadDataFile (cbuf, adata);
 	    break;
+	default:
+        xERROR("Unkown data scaling");
+        break;
 	}
     }
 }
@@ -1021,6 +1024,9 @@ void SelectRefdata (DataScale dscale, int nqm, int nlambda,
 	    pp.PutString (tag, cbuf);
 	    ReadDataFile (cbuf, adata);
 	    break;
+	default:
+        xERROR("Unkown data scaling");
+        break;
 	}
     }
 

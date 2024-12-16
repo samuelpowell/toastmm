@@ -196,6 +196,9 @@ int main (int argc, char *argv[]) {
 	    }
 	    cout << "  Log field written to lphi.nim" << endl;
 	    break;
+    default:
+        xERROR("Unkown data scaling");
+        break;
 	}
     }
 
@@ -212,6 +215,9 @@ int main (int argc, char *argv[]) {
 	case DATA_LOG:
 	    WriteData (proj, "fmod.fem");
 	    break;
+    default:
+        xERROR("Unkown data scaling");
+        break;
 	}
     }
 
