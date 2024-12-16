@@ -30,3 +30,6 @@ script/matlab/demos/*.mat
 # Python build outputs
 *.egg-info
 *.whl
+
+# Mac stuff
+.DS_Store
