@@ -169,6 +169,8 @@ void SolverPCG::Solve (CFwdSolver &FWS, const Raster &raster,
 #endif // DJTJ_LIMIT
 	    LOGOUT ("Using preconditioner DIAGJTJ");
 	    break;
+    case PCG_PRECON_NONE:
+        break;
 	}
 	LOGOUT("Precon reset interval: %d", reset_count);
     } else {
@@ -290,6 +292,8 @@ void SolverPCG::Solve (CFwdSolver &FWS, const Raster &raster,
 		M.Clip (DJTJ_LIMIT, 1e50);
 		LOGOUT("Cutoff at %f", DJTJ_LIMIT);
 #endif // DJTJ_LIMIT
+        case PCG_PRECON_NONE:
+            break;
 	    }
 	}
 

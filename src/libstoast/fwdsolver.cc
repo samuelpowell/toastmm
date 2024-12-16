@@ -1160,6 +1160,10 @@ void TFwdSolver<T>::WriteParams (ParamParser &pp)
 	    pp.PutString ("LINSOLVER_PRECON", "ICH"); break;
 	case PRECON_DILU:
 	    pp.PutString ("LINSOLVER_PRECON", "DILU"); break;
+    case PRECON_CG_MULTIGRID:
+        pp.PutString ("LINSOLVER_PRECON", "CG_MULTIGRID"); break;
+    case PRECON_ILU:
+        pp.PutString ("LINSOLVER_PRECON", "ILU"); break;
 	}
     }
 }

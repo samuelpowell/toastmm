@@ -1195,7 +1195,9 @@ void SolverLM2_MW::Solve (CFwdSolverMW &FWS, const Raster &raster,
 		//GMRES (JTJx_clbk, &hdata, r, h, tol);
 		//GMRES (Hess_full (hdata, x), r, h, tol); // debug only
 	        } break;
-
+        default:
+            xERROR("Unsupported preconditioner");
+            break;
 	    }
 	    d = h;
 
@@ -1529,6 +1531,9 @@ void SolverLM2_MW::WriteParams (ParamParser &pp)
     case LM_HSCALE_DISTANCE:
 	pp.PutString ("LM_HESS_SCALING", "LM_HSCALE_DISTANCE");
 	break;
+    case LM_HSCALE_NONE:
+    pp.PutString ("LM_HESS_SCALING", "LM_HSCALE_NONE");
+    break;
     }
 
     pp.PutBool ("LM_LINESEARCH", do_linesearch);
