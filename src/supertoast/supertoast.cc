@@ -393,6 +393,9 @@ int main (int argc, char *argv[])
 	    strcpy (name_re, "log amplitude");
 	    strcpy (name_im, "phase");
 	    break;
+	default:
+        xERROR("Unkown data scaling");
+        break;
 	}
 
 	if (!pp.GetString (file_re, cbuf)) {
@@ -946,6 +949,9 @@ void SelectData (DataScale dscale, int nqm, double &freq, RVector &data)
 	ReadDataFile (cbuf, pdata);
 	pp.PutString ("DATA_ARG", cbuf);
 	break;
+	default:
+    	xERROR("Unkown data scaling");
+    	break;
     }
 
     if (!pp.GetReal ("FREQ", freq) || freq < 0.0) do {

@@ -1126,6 +1126,9 @@ void TFwdSolver<T>::WriteParams (ParamParser &pp)
     case DATA_LOG:
 	pp.PutString ("DATASCALE", "LOG");
 	break;
+    default:
+        xERROR("Unkown data scaling");
+        break;
     }
 
     if (solvertp == LSOLVER_DIRECT) {

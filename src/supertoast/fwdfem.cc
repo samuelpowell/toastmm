@@ -213,6 +213,9 @@ int main (int argc, char *argv[]) {
 	    cout << "  Log Mod field written to phi_lnmod.nim" << endl;
 	    cout << "  Arg field written to phi_arg.nim" << endl;
 	    break;
+	default:
+        xERROR("Unkown data scaling");
+        break;
 	}
     }
 
@@ -231,6 +234,9 @@ int main (int argc, char *argv[]) {
 	    WriteData (Re(proj), "fmod.fem");
 	    WriteData (Im(proj), "farg.fem");
 	    break;
+	default:
+        xERROR("Unkown data scaling");
+        break;
 	}
     }
 
