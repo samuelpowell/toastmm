@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.9.0)
+cmake_minimum_required(VERSION 3.10.0)
 project(toastmex VERSION 0.1.0)
 
 find_package(Matlab 7.16)

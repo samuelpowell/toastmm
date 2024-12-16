@@ -84,7 +84,7 @@ module1 = Extension('toastmm.toastmod',
 # Define installation
 setup(
     name = 'toastmm',
-    version = '0.9.1',
+    version = '0.9.2',
     description = 'Python TOAST-- extension',
     author = 'The Toast Authors',
     url = 'https://github.com/samuelpowell/toastmm',
