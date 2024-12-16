@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 3.0.0)
-project(toastmm VERSION 0.9.1)
+cmake_minimum_required(VERSION 3.10.0)
+project(toastmm VERSION 0.9.2)
 
 include(CTest)
 enable_testing()
