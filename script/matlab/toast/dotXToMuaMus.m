@@ -4,16 +4,16 @@ function [mua,mus] = dotXToMuaMus (hBasis, x, ref)
 
 if hBasis == 0
     c = 0.3./ref; % speed of light
-    cmua = x(1:size(x)/2);
-    ckap = x(size(x)/2+1:size(x));
+    cmua = x(1:size(x,1)/2);
+    ckap = x(size(x,1)/2+1:size(x,1));
     mua = cmua./c;
     mus = c./(3*ckap) - mua;
 else
     %c = 0.3./ref; % speed of light
     %cm = 0.3/ref(1);
     c0 = 0.3;
-    scmua = x(1:size(x)/2);
-    sckap = x(size(x)/2+1:end);
+    scmua = x(1:size(x,1)/2);
+    sckap = x(size(x,1)/2+1:end);
     cmua = hBasis.Map ('S->M', scmua);
     ckap = hBasis.Map ('S->M', sckap);
     mua = cmua .* (ref/c0);
