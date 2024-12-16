@@ -82,7 +82,7 @@ void BuildMesh(QMMesh **mesh, int nvtx, int nel, int dim, int nnd0,
 
     for (j = k = 0; j < nnd0; j++) {
 	for (i = 0; i < nel; i++) {
-	    if (el = (*mesh)->elist[i]) {
+	    if ((el = (*mesh)->elist[i])) {
 		if (j < el->nNode())
 		    el->Node[j] = idx[k];
 	    }
