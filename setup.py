@@ -90,7 +90,7 @@ setup(
     url = 'https://github.com/samuelpowell/toastmm',
     setup_requires=['wheel'],
     install_requires=["numpy", "scipy"],
-    python_requires='>=3',
+    python_requires='>=3.6',
     extras_require={  
         "demo": ["matplotlib"]
     },
