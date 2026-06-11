@@ -50,7 +50,7 @@ void BlockART_loop (const RVector &b, RVector &x, double lambda,
 	RSymMatrix JJTblock = AAT (Jblock);
 	for (i = 0; i < mb; i++)
 	    JJTblock(i,i) += tau;
-	CHdecomp (JJTblock);
+	CHdecomp (JJTblock, false);
 
 	RVector bblock(b, i0, mb);
 	RVector dyblock = bblock - Jblock * x;
@@ -260,7 +260,7 @@ void SolverART::BlockSolve (const RVector &b, const RDenseMatrix &A,
     RSymMatrix AAt = AAT(A);
     for (int i = 0; i < AAt.nRows(); i++)
 	AAt(i,i) += mu;
-    CHdecomp (AAt);
+    CHdecomp (AAt, false);
     RVector xb = CHsubst (AAt, b);
     x = transpose(A) * xb;
 }

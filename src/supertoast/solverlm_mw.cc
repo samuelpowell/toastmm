@@ -1166,7 +1166,7 @@ void SolverLM_MW::Solve (CFwdSolverMW &FWS, const Raster &raster,
 	    case LM_PRECON_CH: {    // solve with Cholesky factorisation
 		LOGOUT ("Solving Hessian: LM-CH ...");
 	        RSymMatrix hess = Hess_full (hdata, x);// need explicit Hessian
-		CHdecomp (hess);
+		CHdecomp (hess, false);
 		h = CHsubst(hess, r);
 	        } break;
 	    case LM_PRECON_ICH:     // Incomplete Cholesky factorisation
@@ -1532,7 +1532,7 @@ void SolverLM_MW::ReadParams (ParamParser &pp)
 	    for (j = 0; j <= i; j++)
 		mcov(n+i,n+j) = tmp(i,j);
 	    
-	CHdecomp (mcov);
+	CHdecomp (mcov, false);
 
 	if (!pp.GetString ("FMOD_MODEL_ERROR", merr_fmod_fname)) {
 	    cout << "Model error data for modulation: \n>> ";

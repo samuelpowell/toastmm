@@ -275,7 +275,7 @@ void SolverART::BlockSolve (const RVector &b, const RDenseMatrix &A,
     RSymMatrix AAt = AAT(A);
     for (int i = 0; i < AAt.nRows(); i++)
 	AAt(i,i) += mu;
-    CHdecomp (AAt);
+    CHdecomp (AAt, false);
     RVector xb = CHsubst (AAt, b);
     x = transpose(A) * xb;
 }

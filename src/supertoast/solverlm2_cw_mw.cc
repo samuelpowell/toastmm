@@ -1343,7 +1343,7 @@ void SolverLM2_CW_MW::Solve (RFwdSolverMW &FWS, const Raster &raster,
 		case LM_PRECON_CH: {    // solve with Cholesky factorisation
 		    LOGOUT ("Solving Hessian: LM-CH ...");
 		    RSymMatrix hess = Hess_full (hdata, x);// explicit Hessian
-		    CHdecomp (hess);
+		    CHdecomp (hess, false);
 		    h = CHsubst(hess, r);
 	            } break;
 		case LM_PRECON_ICH:     // Incomplete Cholesky factorisation
