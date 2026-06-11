@@ -7,6 +7,17 @@ if(Matlab_FOUND)
 
   message(STATUS "MATLAB located, toast MATLAB interface will be built")
 
+  # toastmex is a classic C-API MEX file (it defines mexFunction). However,
+  # CMake's FindMatlab applies the C++ MEX export map (cppMexFunction.map) and
+  # marks the C++ entry points (_mexCreateMexFunction, _mexDestroyMexFunction,
+  # _mexFunctionAdapter) as allowed-undefined for *every* mex on macOS, even
+  # C-API ones. The modern Apple linker (ld-prime / ld-1267, 2026 toolchains)
+  # no longer tolerates listing undefined symbols in -exported_symbols_list, so
+  # those C++ entry points become hard "Undefined symbols" link errors. Disable
+  # the C++ API path for this C-API mex so only c_exportsmexfileversion.map is
+  # used (which exports just the defined _mexFunction / version symbols).
+  set(Matlab_HAS_CPP_API FALSE)
+
   if(TOAST_FEATURE_RASTER2)
   matlab_add_mex(NAME toastmex    SHARED R2018a 
                                   SRC toastmex.cc 
