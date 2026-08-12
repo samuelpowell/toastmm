@@ -6,6 +6,23 @@
 #define STOASTLIB_IMPLEMENTATION
 #include "stoastlib.h"
 #include "timing.h"
+#include <limits>
+
+namespace {
+
+void CheckDenseJacobianSize (int nrows, int ncols, const char *name)
+{
+	if (nrows < 0 || ncols < 0)
+		xERROR("Invalid %s dimensions (%d x %d)", name, nrows, ncols);
+
+	const long long nelem = (long long)nrows * (long long)ncols;
+	if (nelem > (long long)std::numeric_limits<int>::max()) {
+		xERROR("%s dimensions %d x %d exceed dense storage limit (%lld elements > INT_MAX)",
+			name, nrows, ncols, nelem);
+	}
+}
+
+} // namespace
 
 // ============================================================================
 // Local prototypes
@@ -625,6 +642,8 @@ void GenerateJacobian_cw_grid (const Raster *raster, const QMMesh *mesh,
 
 #if TOAST_THREAD
     int nqm  = mesh->nQM;
+	if (Jmua) CheckDenseJacobianSize (nqm, slen, "Jmua");
+	if (Jkap) CheckDenseJacobianSize (nqm, slen, "Jkap");
     if (Jmua) Jmua->New (nqm, slen);
     if (Jkap) Jkap->New (nqm, slen);
     static GENJAC_CW_GRID_THREADDATA thdata;
@@ -653,10 +672,12 @@ void GenerateJacobian_cw_grid (const Raster *raster, const QMMesh *mesh,
     double *Jmua_ptr = 0;
     double *Jkap_ptr = 0;
     if (Jmua) {
+	CheckDenseJacobianSize (nQM, slen, "Jmua");
 	Jmua->New (nQM, slen);
 	Jmua_ptr = Jmua->ValPtr();
     }
     if (Jkap) {
+	CheckDenseJacobianSize (nQM, slen, "Jkap");
 	Jkap->New (nQM, slen);
 	Jkap_ptr = Jkap->ValPtr();
 	cdfield_grad = new RVector[dim];
@@ -831,10 +852,12 @@ void GenerateJacobian_cw_mesh (const QMMesh *mesh,
     double *Jkap_ptr = 0;
 
     if (Jmua) {
+	CheckDenseJacobianSize (nQM, nsol, "Jmua");
 	Jmua->New(nQM, nsol);
 	Jmua_ptr = Jmua->ValPtr();
     }
     if (Jkap) {
+	CheckDenseJacobianSize (nQM, nsol, "Jkap");
 	Jkap->New(nQM, nsol);
 	Jkap_ptr = Jkap->ValPtr();
     }

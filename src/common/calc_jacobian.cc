@@ -4,6 +4,30 @@
 
 #include "toastdef.h"
 #include "calc_jacobian.h"
+#include <limits>
+
+namespace {
+
+void CheckDenseJacobianSize (long long nrows, long long ncols,
+    const char *name)
+{
+    if (nrows < 0 || ncols < 0)
+        xERROR("Invalid %s dimensions (%lld x %lld)", name, nrows, ncols);
+
+    if (nrows > (long long)std::numeric_limits<int>::max() ||
+        ncols > (long long)std::numeric_limits<int>::max()) {
+        xERROR("%s dimensions %lld x %lld exceed integer matrix bounds", name,
+            nrows, ncols);
+    }
+
+    const long long nelem = nrows * ncols;
+    if (nelem > (long long)std::numeric_limits<int>::max()) {
+        xERROR("%s dimensions %lld x %lld exceed dense storage limit (%lld elements > INT_MAX)",
+            name, nrows, ncols, nelem);
+    }
+}
+
+} // namespace
 
 // ==========================================================================
 // Calculate CW Jacobian from given optical parameters.
@@ -56,6 +80,7 @@ void CalcJacobianCW (QMMesh *mesh, Raster *raster,
     // Calculate Jacobian
     int ndat = mesh->nQM;
     int nprm = slen;
+    CheckDenseJacobianSize (ndat, nprm, "J");
     J.New(ndat,nprm);
     GenerateJacobian_cw (raster, mesh, mvec, dphi, aphi, DATA_LOG, &J);
 
@@ -74,10 +99,11 @@ void CalcJacobianCW (QMMesh *mesh, Raster *raster,
 {
     int nQM  = mesh->nQM;
     int slen = (raster ? raster->SLen() : mesh->nlen());
-    int ndat = nQM;
-    int nprm = slen;
+    long long ndat = nQM;
+    long long nprm = slen;
 
-    J.New(ndat,nprm);
+    CheckDenseJacobianSize (ndat, nprm, "J");
+    J.New((int)ndat,(int)nprm);
     GenerateJacobian_cw (raster, mesh, dphi, aphi, proj, DATA_LOG, &J);
 }
 
@@ -91,13 +117,15 @@ void CalcJacobian (QMMesh *mesh, Raster *raster,
     const CVector *dphi, const CVector *aphi,
     const CVector *proj, DataScale dscale, RDenseMatrix &J)
 {
-    int nQM, slen, ndat, nprm;
+    int nQM, slen;
+    long long ndat, nprm;
     nQM  = mesh->nQM;
     slen = (raster ? raster->SLen() : mesh->nlen());
-    ndat = nQM * 2;
-    nprm = slen * 2;
+    ndat = (long long)nQM * 2;
+    nprm = (long long)slen * 2;
 
-    J.New(ndat,nprm);
+    CheckDenseJacobianSize (ndat, nprm, "J");
+    J.New((int)ndat,(int)nprm);
     GenerateJacobian (raster, mesh, dphi, aphi, proj, dscale, J);
 }
 

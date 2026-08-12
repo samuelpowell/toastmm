@@ -1,8 +1,10 @@
 # Editors / IDEs
 .vscode/*
+.cache/
 
 # CMake out of tree build
 build/
+build-xcode/
 
 # Distribution outputs
 dist/
