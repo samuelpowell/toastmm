@@ -543,12 +543,18 @@ void CopyTMatrix (RCompRowMatrix &mat, const mxArray *array)
 {
     mwIndex dim = mxGetNumberOfDimensions (array);
     if (dim > 2) mexErrMsgTxt ("CopyTMatrix: 2-D matrix expected");
+    if (!mxIsSparse (array)) mexErrMsgTxt ("CopyTMatrix: sparse matrix expected");
 
     mwIndex m   = mxGetDimensions (array)[0];
     mwIndex n   = mxGetDimensions (array)[1];
     mwIndex nz  = mxGetNzmax (array);
     #if MX_HAS_INTERLEAVED_COMPLEX
-    mxComplexDouble *pc = mxGetComplexDoubles(array);
+    mxComplexDouble *pc = 0;
+    mxDouble *pr = 0;
+    if (mxIsComplex(array))
+        pc = mxGetComplexDoubles(array);
+    else
+        pr = mxGetDoubles(array);
     #else
     double *pr  = mxGetPr (array);
     #endif
@@ -565,7 +571,10 @@ void CopyTMatrix (RCompRowMatrix &mat, const mxArray *array)
     double *val = new double[nz];
     for (mwIndex i = 0; i < nz; i++) {
          #if MX_HAS_INTERLEAVED_COMPLEX
-            val[i] = pc[i].real;
+                if (pc)
+                     val[i] = pc[i].real;
+                else
+                     val[i] = pr[i];
          #else
             val[i] = pr[i];
          #endif

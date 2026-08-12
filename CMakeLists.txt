@@ -8,6 +8,13 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/dist)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
+# When generating an Xcode project (cmake -G Xcode), create a scheme for every
+# target so they are individually runnable/debuggable from the Xcode GUI. Must
+# be set before targets are defined. No effect with other generators.
+if(CMAKE_GENERATOR STREQUAL "Xcode")
+    set(CMAKE_XCODE_GENERATE_SCHEME ON)
+endif()
+
 set(BUILD_SHARED_LIBS OFF)
 set(TOAST_THREAD ON)
 

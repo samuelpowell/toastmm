@@ -7,7 +7,7 @@
 <name>Toast++</name>
 <type>toolbox</type>
 <icon></icon>
-<help_location>html</help_location>
+<help_location>docs/html</help_location>
 
 <!-- 
 <list>
